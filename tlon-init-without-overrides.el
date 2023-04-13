@@ -23,7 +23,7 @@ init code. They will be loaded in the order set by their keyname,
 not by their position in `tlon-init-filenames'.
 ")
 
-(load (file-name-concat user-emacs-directory "tlon-init.el")) ;; helper functions package
+(load (file-name-concat user-emacs-directory "elpaca/repos/tlon-init/tlon-init.el")) ;; helper functions package
 (tlon-init-load-variables)
 (tlon-init-load-code-overrides)
 (tlon-init-set-tangle-options user-emacs-directory)

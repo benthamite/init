@@ -314,11 +314,7 @@ This adds a new profile to `~/.emacs-profiles.el' and creates a
 				      (if (string= user-full-name "Pablo Stafforini")
 					  "tlon-init-without-overrides.el"
 					"tlon-init-with-overrides.el"))))
-    (copy-file init-file (file-name-concat profile-dir "init.el") t)
-    (let ((init-package-file "tlon-init.el"))
-      (copy-file (file-name-concat init-dir init-package-file)
-		 (file-name-concat profile-dir init-package-file)
-		 t))))
+    (copy-file init-file (file-name-concat profile-dir "init.el") t)))
 
 (provide 'tlon-init)
 
