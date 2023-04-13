@@ -1,4 +1,4 @@
-(defvar ps/tlon-init-filenames
+(defvar tlon-init-filenames
   '(
     (:variables-default . (file-name-concat user-emacs-directory "variables.el"))
     (:init-1 . (file-name-concat user-emacs-directory "init-pablo.el"))

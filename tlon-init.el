@@ -48,7 +48,7 @@ file."
 
 (defun tlon-init-override-code-if-available (key code-block)
   "Return CODE-BLOCK of KEY in `tlon-init-code-overrides'.
-When KEY is not present in `ps/inir-code-overrides', return the
+When KEY is not present in `tlon-init-code-overrides', return the
 default, non-overridden code. The variable
 `tlon-init-code-overrides' is populated during the init process.
 
@@ -111,10 +111,10 @@ example, the default will be overridden by that code."
   (setq tlon-init-user-init-path (file-name-concat init-dir "init-pablo.el"))
   (setq tlon-init-early-init-path (file-name-concat init-dir "early-init.el"))
   (setq tlon-init-variables-path (file-name-concat init-dir "variables.el"))
-  (setq ps/code-overrides-path (file-name-concat init-dir "code-overrides.el"))
-  (setq ps/post-init-path (file-name-concat init-dir "post-init.el"))
-  (setq ps/tangle-flags-path (file-name-concat init-dir "tangle-flags.el"))
-  (setq ps/variables-override-path (file-name-concat init-dir "variables-override.el"))
+  (setq tlon-init-code-overrides-path (file-name-concat init-dir "code-overrides.el"))
+  (setq tlon-init-post-init-path (file-name-concat init-dir "post-init.el"))
+  (setq tlon-init-tangle-flags-path (file-name-concat init-dir "tangle-flags.el"))
+  (setq tlon-init-variables-override-path (file-name-concat init-dir "variables-override.el"))
   (message "Set init tangle targets to: %s and %s" tlon-init-user-init-path tlon-init-early-init-path)
   ;; re-read tangle flags for that process
   (let ((tangle-flags-filename (file-name-concat init-dir "tangle-flags.el")))
