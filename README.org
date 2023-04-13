@@ -1,0 +1,48 @@
+* Init system
+
+** Overview
+The init process is configured using several files with 4 different roles:
+- variable files: the :variables-default file is loaded first, then its values are overriden by the :variables-override file.
+- code overrides file: this will contain keys that are used to override code during init, by invoking the special function `ps/init-override-code-if-present' inside the init files.
+- tangle flags file: this will contain keys that are used to turn a feature on or off during the tangle process (org-babel-tangle).
+  These values should be read inside de ORG config file using the function ps/get-init-tangle-flag.
+- init files: these execute the actual init code, in order: :init-1 is evaluated first, then :init-2, and so on, up to a maximum of :init-5.
+  It is not necessary to define all :init-{n} keys, just use as required and leave the rest undefined.
+
+** Files' contents
+
+*** init-{name}.el
+This file sets the filenames that are used during the init process and bootrstaps the init process.
+It is deployed into init.el in the chemacs profile directory.
+
+**** Example
+#+begin_src emacs-lisp
+((:variables . (file-name-concat user-emacs-directory "variables-pablo.el"))
+ (:variables .  (file-name-concat user-emacs-directory "variables-fede.el"))
+ (:code-overrides . (file-name-concat user-emacs-directory "code-overrides-fede.el"))
+ (:tangle-flags . (file-name-concat user-emacs-directory "tangle-flags-fede.el"))
+ (:init .  (file-name-concat user-emacs-directory "init-pablo.el"))
+ (:init .  (file-name-concat user-emacs-directory "init-fede.el")))
+#+end_src 
+
+*** :variables files
+They contain an alist with ({symbol-name} {value}) pairs that describe variables to define (or reset) during init.
+They are loaded in sequential order, and therefore the later :variables files overwrite the values set in the previous ones
+
+*** :code-overrides file
+It contains an alist with ({package-key} {code}) pairs.
+- {package-key} is a key value following the form: `:ps/{package-name}', where {package-name} should be the name of the package where this code will be applied.
+- {code} contains the actual code that should be called
+There should be only one :code-overrides file.
+
+*** :tangle-flags
+It contains an alist with ({package-key} {flag-value}) pairs.
+- {package-key} is a key value following the form: `:ps/{package-name}', where {package-name} should be the name of the package where this code will be applied.
+- {flag-value} should be t or nil, where t means that the feature will be tangled into the resulting init file.
+  If a flag is not set it will default to t when read using ps/get-init-tangle-flag.
+
+*** :init files
+They contain the actual init configuration.
+To override all or some code in a given section, enclose it within a call to the function (ps/init-override-code-if-present ({package-key})).
+
+
