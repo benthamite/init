@@ -309,7 +309,7 @@ This adds a new profile to `~/.emacs-profiles.el' and creates a
 			  (mapcar 'car (tlon-init-available-init-dirs)))))
   (let* ((profile-dir (tlon-init-profile-dir profile-name))
 	 (init-dir (or init-dir
-		       (file-name-concat elpaca-repos-directory "new-init")))
+		       (file-name-concat elpaca-repos-directory "tlon-init")))
 	 (init-file (file-name-concat init-dir
 				      (if (string= user-full-name "Pablo Stafforini")
 					  "tlon-init-without-overrides.el"
