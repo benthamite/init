@@ -1,4 +1,4 @@
-;;; init-package.el --- Convenience functions to manage Tlön's Emacs config -*- lexical-binding: t -*-
+;;; tlon-init.el --- Convenience functions to manage Tlön's Emacs config -*- lexical-binding: t -*-
 
 ;; Author: Federico Stafforini
 ;; Version: 0.1.0
@@ -315,11 +315,11 @@ This adds a new profile to `~/.emacs-profiles.el' and creates a
 					  "init-without-overrides.el"
 					"init-with-overrides.el"))))
     (copy-file init-file (file-name-concat profile-dir "init.el") t)
-    (let ((init-package-file "init-package.el"))
+    (let ((init-package-file "tlon-init.el"))
       (copy-file (file-name-concat init-dir init-package-file)
 		 (file-name-concat profile-dir init-package-file)
 		 t))))
 
-(provide 'init-package)
+(provide 'tlon-init)
 
-;;; init-package.el ends here
+;;; tlon-init.el ends here

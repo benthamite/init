@@ -1,4 +1,4 @@
-(defvar ps/init-filenames
+(defvar ps/init-pafilenames
   '(
     (:variables-default . (file-name-concat user-emacs-directory "variables.el"))
     (:variables-override . (file-name-concat user-emacs-directory "variables-override.el"))
@@ -6,7 +6,7 @@
     (:init-1 . (file-name-concat user-emacs-directory "init-pablo.el"))
     (:init-2 . (file-name-concat user-emacs-directory "post-init.el"))
     )
-	"An alist with the configuration filenames used in the
+  "An alist with the configuration filenames used in the
 init process:
 
 `:variables-default': a file from which default variable values
@@ -34,7 +34,7 @@ not by their position in `ps/init-filenames'.
     )))
 
 
-(load (file-name-concat user-emacs-directory "init-package.el")) ;; helper functions package
+(load (file-name-concat user-emacs-directory "tlon-init.el")) ;; helper functions package
 (ps/init-load-variables)
 (ps/init-load-code-overrides)
 (ps/init-set-tangle-options user-emacs-directory)
