@@ -157,7 +157,7 @@ example, the default will be overridden by that code."
   (message "Re-deployed and tangled init files to chemacs profile %s" init-dir))
 
 (defun tlon-init-tangle-extra-config-file (init-dir)
-  "Tangle extra config file for user to INIT-DIR."
+  "Tangle extra config file to INIT-DIR."
   (let* ((user-first-name (downcase (car (split-string user-full-name))))
 	 (extra-config-file (file-name-concat default-directory
 					      (concat "config-" user-first-name ".org"))))
