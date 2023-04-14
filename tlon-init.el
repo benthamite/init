@@ -264,6 +264,10 @@ This adds a new profile to `~/.emacs-profiles.el' and creates a
   (interactive
    (list (completing-read "Chemacs profile name to delete: "
 			  (mapcar 'car (tlon-init-available-init-dirs)))))
+  (when (string= profile-name chemacs-profile-name)
+    (unless (y-or-n-p (format "You have chosen to delete profile %s, which is currently active. Proceed? ")
+		      profile-name)
+      (user-error "Aborted")))
   (let ((profile-dir (tlon-init-profile-dir profile-name)))
     ;; first delete profile dir, if it exists
     (when (and (file-exists-p profile-dir)
