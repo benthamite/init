@@ -161,7 +161,7 @@ example, the default will be overridden by that code."
   (let* ((user-first-name (downcase (car (split-string user-full-name))))
 	 (extra-config-file (file-name-concat default-directory
 					      (concat "config-" user-first-name ".org"))))
-    (if (find-buffer-visiting extra-config-file)
+    (if (file-exists-p extra-config-file)
 	(with-current-buffer (or (find-file-noselect extra-config-file)
 				 (find-buffer-visiting extra-config-file))
 	  (tlon-init-tangle init-dir))
