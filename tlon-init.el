@@ -274,7 +274,7 @@ This adds a new profile to `~/.emacs-profiles.el' and creates a
   (let ((profile-dir (tlon-init-profile-dir profile-name)))
     (when (not (file-exists-p profile-dir))
       (user-error "Profile does not exist"))
-    (tlon-init-replace-chemacs-profiles profile-name profile-dir 'set-default)
+    (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'set-default)
     (message "Set default Chemacs profile to '%s'" profile-name)))
 
 (defun tlon-init-deploy-profile (profile-name &optional init-dir)
