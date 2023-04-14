@@ -234,22 +234,23 @@ Otherwise, delete PROFILE-NAME."
       (delete-blank-lines)
       (save-buffer))))
 
-;; this function is no longer interactive because it is called by
-;; `tlon-init-deploy-profile'.
-(defun tlon-init-create-profile (&optional profile-name)
 (defun tlon-init-profile-exists-p (profile-name)
   "Return non-nil if Chemacs profile PROFILE-NAME exists."
   (file-exists-p (tlon-init-profile-dir profile-name)))
+
+(defun tlon-init-create-profile (profile-name &optional overwrite)
   "Create a new Chemacs profile named PROFILE-NAME.
 This adds a new profile to `~/.emacs-profiles.el' and creates a
  directory in the Chemacs profiles directory. The directory will
- have PROFILE-NAME as its name."
+ have PROFILE-NAME as its name. If profile already exists, throw
+ a user error message, unless OVERWRITE is non-nil."
   (let ((profile-dir (file-name-concat
 		      (file-name-directory (directory-file-name user-emacs-directory))
 		      profile-name)))
     (when (string-match file-name-invalid-regexp profile-name)
       (user-error "Invalid profile name"))
-    (when (file-exists-p profile-dir)
+    (when (and (tlon-init-profile-exists-p profile-name)
+	       (not overwrite))
       (user-error "Profile already exists"))
     (make-directory profile-dir t)
     (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'create)
