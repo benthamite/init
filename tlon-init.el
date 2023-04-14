@@ -290,27 +290,53 @@ This adds a new profile to `~/.emacs-profiles.el' and creates a
 (defun tlon-init-deploy-profile (profile-name)
   "Deploy PROFILE-NAME.
 If you are deploying a new profile in a machine with `tlon-init'
-managed by `elpaca', you only need to run this command. Otherwise,
-you must first clone https://github.com/tlon-team/tlon-init, open
-`tlon-init.el', and `M-x eval-buffer'."
+managed by `elpaca', you only need to run this command.
+Otherwise, you must first clone
+https://github.com/tlon-team/tlon-init, open `tlon-init.el', and
+`M-x eval-buffer'.
+
+If there is already a `tlon-init' subdirectory in the `elpaca'
+`repos' directory, you will be asked to confirm you want to
+overwrite it. This will also overwrite the `init.el' file in the
+profile directory, if such a file is found, but will leave the
+rest of the profile intact. To delete the entire profile, use
+`tlon-init-delete-profile'."
   (interactive "sProfile name: ")
-  (let* ((profile-name (tlon-init-create-profile profile-name))
-	 (profile-dir (tlon-init-profile-dir profile-name))
-	 (package-dir (file-name-concat profile-dir "elpaca/repos/tlon-init/"))
-	 (init-file (file-name-concat package-dir
-				      (if (user-pablo-p)
-					  "tlon-init-without-overrides.el"
-					"tlon-init-with-overrides.el")))
-	 (tlon-init-repo "https://github.com/tlon-team/tlon-init"))
-    (shell-command (format "git clone %s %s" tlon-init-repo package-dir))
-    (copy-file init-file (file-name-concat profile-dir "init.el") t)
-    (let ((message (format "Deployed profile '%s' to '%s'." profile-name profile-dir)))
-      (if (and (boundp 'ps/file-config)
-	       (y-or-n-p (concat message " Build init files?")))
-	  (with-current-buffer (or (find-file-noselect ps/file-config)
-				   (find-buffer-visiting ps/file-config))
-	    (tlon-init-build profile-dir))
-	(message message)))))
+  (let ((overwrite nil))
+    (when (tlon-init-profile-exists-p profile-name)
+      (if (y-or-n-p (format "Profile `%s' already exists. Redeploy? " profile-name))
+	  (setq overwrite t)
+	(user-error "Deploy aborted")))
+    (tlon-init-create-profile profile-name t)
+    (let* ((profile-dir (tlon-init-profile-dir profile-name))
+	   (package-dir (file-name-concat profile-dir "elpaca/repos/tlon-init/"))
+	   (init-file-source (file-name-concat package-dir
+					       (if (user-pablo-p)
+						   "tlon-init-without-overrides.el"
+						 "tlon-init-with-overrides.el")))
+	   (init-file-target (file-name-concat profile-dir "init.el"))
+	   (tlon-init-repo "https://github.com/tlon-team/tlon-init"))
+      (when (file-exists-p package-dir)
+	(if (or overwrite
+		(y-or-n-p (format "`%s' is not empty. Overwrite? " package-dir)))
+	    (progn
+	      (delete-directory package-dir t t)
+	      (setq overwrite t))
+	  (user-error "Deploy aborted")))
+      (shell-command (format "git clone %s %s" tlon-init-repo package-dir))
+      (when (file-exists-p init-file-target)
+	(if (or overwrite
+		(y-or-n-p (format "`%s' already exists. Overwrite? " init-file-target)))
+	    (delete-file init-file-target)
+	  (user-error "Deploy aborted")))
+      (copy-file init-file-source init-file-target t)
+      (let ((message (format "Deployed profile '%s' to '%s'." profile-name profile-dir)))
+	(if (and (boundp 'ps/file-config)
+		 (y-or-n-p (concat message " Build init files?")))
+	    (with-current-buffer (or (find-file-noselect ps/file-config)
+				     (find-buffer-visiting ps/file-config))
+	      (tlon-init-build profile-dir))
+	  (message message))))))
 
 (provide 'tlon-init)
 
