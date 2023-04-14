@@ -154,7 +154,7 @@ example, the default will be overridden by that code."
     (org-babel-tangle))
   (org-encrypt-entries)
   (save-buffer)
-  (message "Re-deployed and tangled init files to chemacs profile %s" init-dir))
+  (message "Tangled init files to chemacs profile %s" init-dir))
 
 (defun tlon-init-tangle-extra-config-file (init-dir)
   "Tangle extra config file to INIT-DIR."
