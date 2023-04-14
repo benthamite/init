@@ -204,14 +204,14 @@ example, the default will be overridden by that code."
   "Return the directory of the Chemacs profile PROFILE-NAME."
   (alist-get profile-name (tlon-init-available-init-dirs) nil nil 'string=))
 
-(defun tlon-init-replace-chemacs-profiles (profile-name &optional profile-dir action)
-  "Create, delete or set PROFILE-NAME as default.
-When ACTION is nil, delete PROFILE-NAME.
-When ACTION is 'create, create PROFILE-NAME.
-When ACTION is 'set-default, set PROFILE-NAME as default."
+(defun tlon-init-act-on-chemacs-profiles (profile-name &optional profile-dir action)
+  "Create, delete or set PROFILE-NAME as default in PROFILE-DIR.
+When ACTION is 'set-default, set PROFILE-NAME as default.
+  When ACTION is 'create, create PROFILE-NAME.
+  Otherwise, delete PROFILE-NAME."
   (let* ((emacs-profiles (file-truename "~/.emacs-profiles.el"))
 	 (regex-default (format "(\"default\" . ((user-emacs-directory . \"%s\")))" (tlon-init-profile-dir "default")))
-	 (regex-search (if action
+	 (regex-search (if (member action '(create set-default))
 			   "(\"default\" . ((user-emacs-directory . \".+?\")))"
 			 (format "(\"%s\" . ((user-emacs-directory . \".+?\")))" profile-name)))
 	 (regex-replace (pcase action
