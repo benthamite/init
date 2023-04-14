@@ -258,7 +258,8 @@ This adds a new profile to `~/.emacs-profiles.el' and creates a
   (let ((profile-dir (tlon-init-profile-dir profile-name)))
     ;; first delete profile dir, if it exists
     (when (and (file-exists-p profile-dir)
-	       (y-or-n-p (format "Are you sure you want to delete the profile '%s'? " profile-name)))
+	       (y-or-n-p (format "Are you sure you want to delete the directory '%s'? "
+				 (tlon-init-profile-dir profile-name))))
       (delete-directory profile-dir t t))
     ;; then delete profile from ~/.emacs-profiles.el
     (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'delete)
