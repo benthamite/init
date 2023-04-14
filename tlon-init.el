@@ -244,10 +244,11 @@ This adds a new profile to `~/.emacs-profiles.el' and creates a
     (when (file-exists-p profile-dir)
       (user-error "Profile already exists"))
     (make-directory profile-dir t)
-    (tlon-init-replace-chemacs-profiles profile-name profile-dir 'create)
+    (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'create)
     (message "Created new Chemacs profile `%s'. Default profile is `%s'"
 	     profile-name
-	     (file-name-nondirectory (tlon-init-profile-dir "default")))))
+	     (file-name-nondirectory (tlon-init-profile-dir "default")))
+    profile-name))
 
 (defun tlon-init-delete-profile (profile-name)
   "Delete a Chemacs profile with name PROFILE-NAME."
