@@ -1,4 +1,4 @@
-(defvar tlon-init-pafilenames
+(defvar tlon-init-filenames
   '(
     (:variables-default . (file-name-concat user-emacs-directory "variables.el"))
     (:variables-override . (file-name-concat user-emacs-directory "variables-override.el"))
