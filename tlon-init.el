@@ -127,49 +127,22 @@ example, the default will be overridden by that code."
       (message "tangle-flags.el not present present in init dir. This is not necessarily a problem."))))
 
 (defun tlon-init-build (init-dir)
-  "Prompt user for a Chemacs profile, configure it and build it.
-The selected Chemacs profile sets the INIT-DIR.
-
-This command performs 4 successive actions:
-
-1) Deploy or re-deploy all files related to init to the selected
-Chemacs profile, overwriting older kept-new versions.
-
-2) Set the selected Chemacs profile as the target for the tangle
-output.
-
-3) Read or re-read the tangle flags configuration for that
-profile, so that code excluded via a tangle flag is not tangled.
-
-4) Tangle `config.org' to the selected Chemacs profile.
-
-If invoked with a prefix argument, copy `straight-profile.el'
-from the dotemacs repo to the selected Chemacs profile directory."
+  "Build or rebuild a profile in INIT-DIR."
   (interactive
    (list
     (tlon-init-profile-dir
      (completing-read
       "Select Chemacs profile to build: "
       (tlon-init-available-init-dirs)))))
-  (if (not (string-equal major-mode "org-mode"))
-      (message "Error: cannot build init from a buffer that is not visiting an `org-mode' file")
-    ;; re-deploy files
-    (message "Re-deploying init files to %s" init-dir)
-    (tlon-init-deploy-profile (file-name-nondirectory init-dir))
-    ;; NOTE: this is commented out until `elpaca' implements lockfile support
-    ;; copy lockfile if missing or if user requested it
-    ;; (let ((lockfile "straight-profile.el"))
-    ;; (unless (and (file-exists-p (file-name-concat init-dir lockfile))
-    ;; (equal current-prefix-arg nil))
-    ;; (copy-file (file-name-concat ps/dir-dotemacs lockfile)
-    ;; (file-name-concat init-dir lockfile)
-    ;; t)))
-    ;; set tangle options
-    (tlon-init-set-tangle-options init-dir)
-    ;; go ahead with the tangle
-    (tlon-init-tangle init-dir)
-    (unless (string= user-full-name "Pablo Stafforini")
-      (tlon-init-tangle-extra-config-file init-dir))))
+  (unless (string-equal major-mode "org-mode")
+    (user-error "Error: cannot build init from a buffer that is not visiting an `org-mode' file"))
+  ;; set tangle options
+  (tlon-init-set-tangle-options init-dir)
+  ;; tangle `config.org'
+  (tlon-init-tangle init-dir)
+  ;; conditionally tangle extra config file
+  (unless (string= user-full-name "Pablo Stafforini")
+    (tlon-init-tangle-extra-config-file init-dir)))
 
 (defun tlon-init-tangle (init-dir)
   "Tangle `config.org' to INIT-DIR."
