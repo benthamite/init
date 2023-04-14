@@ -300,7 +300,13 @@ you must first clone https://github.com/tlon-team/tlon-init, open
 	 (tlon-init-repo "https://github.com/tlon-team/tlon-init"))
     (shell-command (format "git clone %s %s" tlon-init-repo package-dir))
     (copy-file init-file (file-name-concat profile-dir "init.el") t)
-    (message "Deployed profile '%s' to '%s'" profile-name profile-dir)))
+    (let ((message (format "Deployed profile '%s' to '%s'." profile-name profile-dir)))
+      (if (and (boundp 'ps/file-config)
+	       (y-or-n-p (concat message " Build init files?")))
+	  (with-current-buffer (or (find-file-noselect ps/file-config)
+				   (find-buffer-visiting ps/file-config))
+	    (tlon-init-build profile-dir))
+	(message message)))))
 
 (provide 'tlon-init)
 
