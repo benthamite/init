@@ -256,14 +256,15 @@ This adds a new profile to `~/.emacs-profiles.el' and creates a
    (list (completing-read "Chemacs profile name to delete: "
 			  (mapcar 'car (tlon-init-available-init-dirs)))))
   (let ((profile-dir (tlon-init-profile-dir profile-name)))
-    (when (not (file-exists-p profile-dir))
-      (user-error "Profile does not exist"))
-    (when (y-or-n-p (format "Are you sure you want to delete the profile '%s'? " profile-name))
-      (delete-directory profile-dir t t)
-      (tlon-init-replace-chemacs-profiles profile-name)
-      (message "Deleted Chemacs profile '%s'" profile-name)
-      (when (string= profile-dir (tlon-init-profile-dir "default"))
-	(call-interactively 'tlon-init-set-default-profile)))))
+    ;; first delete profile dir, if it exists
+    (when (and (file-exists-p profile-dir)
+	       (y-or-n-p (format "Are you sure you want to delete the profile '%s'? " profile-name)))
+      (delete-directory profile-dir t t))
+    ;; then delete profile from ~/.emacs-profiles.el
+    (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'delete)
+    (message "Deleted Chemacs profile '%s'" profile-name)
+    (when (string= profile-dir (tlon-init-profile-dir "default"))
+      (call-interactively 'tlon-init-set-default-profile))))
 
 (defun tlon-init-set-default-profile (profile-name)
   "Set the default Chemacs profile to PROFILE-NAME."
