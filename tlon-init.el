@@ -140,11 +140,16 @@ example, the default will be overridden by that code."
       (tlon-init-available-init-dirs)))))
   (unless (string-equal major-mode "org-mode")
     (user-error "Error: cannot build init from a buffer that is not visiting an `org-mode' file"))
+  ;; conditionally tangle extra config file
+  (unless (user-pablo-p)
+    (tlon-init-tangle-extra-config-file init-dir))
   ;; set tangle options
   (tlon-init-set-tangle-options init-dir)
   ;; tangle `config.org'
   (tlon-init-tangle init-dir)
-  ;; conditionally tangle extra config file
+  ;; conditionally tangle extra config file again
+  ;; TODO: implement more elegant solution; this is
+  ;; a hack to deal with precedence problems
   (unless (user-pablo-p)
     (tlon-init-tangle-extra-config-file init-dir))
   )
