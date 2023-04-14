@@ -230,12 +230,13 @@ Otherwise, delete PROFILE-NAME."
       (delete-blank-lines)
       (save-buffer))))
 
-(defun tlon-init-create-profile (profile-name)
+;; this function is no longer interactive because it is called by
+;; `tlon-init-deploy-profile'.
+(defun tlon-init-create-profile (&optional profile-name)
   "Create a new Chemacs profile named PROFILE-NAME.
 This adds a new profile to `~/.emacs-profiles.el' and creates a
  directory in the Chemacs profiles directory. The directory will
  have PROFILE-NAME as its name."
-  (interactive "sNew Chemacs profile name: ")
   (let ((profile-dir (file-name-concat
 		      (file-name-directory (directory-file-name user-emacs-directory))
 		      profile-name)))
