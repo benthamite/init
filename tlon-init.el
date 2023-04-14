@@ -105,27 +105,6 @@ example, the default will be overridden by that code."
 	(cdadr chemacs-profile))
        target-directories))))
 
-(defun tlon-init-set-tangle-options (init-dir)
-  "Set the tangle options for the files in INIT-DIR."
-  ;; set target chemacs profile
-  (setq tlon-init-user-init-path (file-name-concat init-dir "init-pablo.el"))
-  (setq tlon-init-early-init-path (file-name-concat init-dir "early-init.el"))
-  (setq tlon-init-variables-path (file-name-concat init-dir "variables.el"))
-  (setq tlon-init-code-overrides-path (file-name-concat init-dir "code-overrides.el"))
-  (setq tlon-init-post-init-path (file-name-concat init-dir "post-init.el"))
-  (setq tlon-init-tangle-flags-path (file-name-concat init-dir "tangle-flags.el"))
-  (setq tlon-init-variables-override-path (file-name-concat init-dir "variables-override.el"))
-  (message "Set init tangle targets to: %s and %s" tlon-init-user-init-path tlon-init-early-init-path)
-  ;; re-read tangle flags for that process
-  (let ((tangle-flags-filename (file-name-concat init-dir "tangle-flags.el")))
-    (condition-case err
-	(setq tlon-init-tangle-flags (tlon-init-read-file tangle-flags-filename))
-      (error err
-	     (setq tlon-init-tangle-flags nil)))
-    (if tlon-init-tangle-flags
-	(message (concat "Re-read init tangle flags from filename: " tangle-flags-filename))
-      (message "tangle-flags.el not present present in init dir. This is not necessarily a problem."))))
-
 (defun user-pablo-p ()
   "Check if the current user is Pablo."
   (string= user-full-name "Pablo Stafforini"))
@@ -140,19 +119,34 @@ example, the default will be overridden by that code."
       (tlon-init-available-init-dirs)))))
   (unless (string-equal major-mode "org-mode")
     (user-error "Error: cannot build init from a buffer that is not visiting an `org-mode' file"))
-  ;; set tangle options
-  (tlon-init-set-tangle-options init-dir)
+  ;; set paths for code blocks
+  (setq tlon-init-user-init-path (file-name-concat init-dir "init-pablo.el")
+	tlon-init-early-init-path (file-name-concat init-dir "early-init.el")
+	tlon-init-variables-path (file-name-concat init-dir "variables.el")
+	tlon-init-code-overrides-path (file-name-concat init-dir "code-overrides.el")
+	tlon-init-post-init-path (file-name-concat init-dir "post-init.el")
+	tlon-init-tangle-flags-path (file-name-concat init-dir "tangle-flags.el")
+	tlon-init-variables-override-path (file-name-concat init-dir "variables-override.el"))
   ;; conditionally tangle extra config file
   (unless (user-pablo-p)
-    (tlon-init-tangle-extra-config-file init-dir))
+    (tlon-init-tangle-extra-config-file))
+  ;; set tangle options
+  (let ((tangle-flags-filename (file-name-concat init-dir "tangle-flags.el")))
+    (condition-case err
+	(setq tlon-init-tangle-flags (tlon-init-read-file tangle-flags-filename))
+      (error err
+	     (setq tlon-init-tangle-flags nil)))
+    (if tlon-init-tangle-flags
+	(message (concat "Re-read init tangle flags from filename: " tangle-flags-filename))
+      (unless (user-pablo-p)
+	(user-error "`tangle-flags.el' not present present in init dir."))))
   ;; tangle `config.org'
   (tlon-init-tangle)
   ;; conditionally tangle extra config file again
   ;; TODO: implement more elegant solution; this is
   ;; a hack to deal with precedence problems
   (unless (user-pablo-p)
-    (tlon-init-tangle-extra-config-file init-dir))
-  )
+    (tlon-init-tangle-extra-config-file)))
 
 (defun tlon-init-tangle ()
   "Tangle `config.org'."
