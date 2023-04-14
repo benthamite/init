@@ -237,6 +237,9 @@ Otherwise, delete PROFILE-NAME."
 ;; this function is no longer interactive because it is called by
 ;; `tlon-init-deploy-profile'.
 (defun tlon-init-create-profile (&optional profile-name)
+(defun tlon-init-profile-exists-p (profile-name)
+  "Return non-nil if Chemacs profile PROFILE-NAME exists."
+  (file-exists-p (tlon-init-profile-dir profile-name)))
   "Create a new Chemacs profile named PROFILE-NAME.
 This adds a new profile to `~/.emacs-profiles.el' and creates a
  directory in the Chemacs profiles directory. The directory will
