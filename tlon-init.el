@@ -158,10 +158,10 @@ example, the default will be overridden by that code."
     (org-babel-tangle))
   (org-encrypt-entries)
   (save-buffer)
-  (message "Tangled init files to chemacs profile %s" tlon-init-user-init-path))
+  (message "Tangled init files to Chemacs profile `%s'" tlon-init-user-init-path))
 
-(defun tlon-init-tangle-extra-config-file (init-dir)
-  "Tangle extra config file to INIT-DIR."
+(defun tlon-init-tangle-extra-config-file ()
+  "Tangle extra config file."
   (let* ((user-first-name (downcase (car (split-string user-full-name))))
 	 (extra-config-file (file-name-concat default-directory
 					      (concat "config-" user-first-name ".org"))))
