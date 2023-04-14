@@ -126,6 +126,10 @@ example, the default will be overridden by that code."
 	(message (concat "Re-read init tangle flags from filename: " tangle-flags-filename))
       (message "tangle-flags.el not present present in init dir. This is not necessarily a problem."))))
 
+(defun user-pablo-p ()
+  "Check if the current user is Pablo."
+  (string= user-full-name "Pablo Stafforini"))
+
 (defun tlon-init-build (init-dir)
   "Build or rebuild a profile in INIT-DIR."
   (interactive
@@ -141,8 +145,9 @@ example, the default will be overridden by that code."
   ;; tangle `config.org'
   (tlon-init-tangle init-dir)
   ;; conditionally tangle extra config file
-  (unless (string= user-full-name "Pablo Stafforini")
-    (tlon-init-tangle-extra-config-file init-dir)))
+  (unless (user-pablo-p)
+    (tlon-init-tangle-extra-config-file init-dir))
+  )
 
 (defun tlon-init-tangle (init-dir)
   "Tangle `config.org' to INIT-DIR."
@@ -290,7 +295,7 @@ you must first clone https://github.com/tlon-team/tlon-init, open
 	 (profile-dir (tlon-init-profile-dir profile-name))
 	 (package-dir (file-name-concat profile-dir "elpaca/repos/tlon-init/"))
 	 (init-file (file-name-concat package-dir
-				      (if (string= user-full-name "Pablo Stafforini")
+				      (if (user-pablo-p)
 					  "tlon-init-without-overrides.el"
 					"tlon-init-with-overrides.el")))
 	 (tlon-init-repo "https://github.com/tlon-team/tlon-init"))
