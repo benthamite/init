@@ -279,25 +279,23 @@ This adds a new profile to `~/.emacs-profiles.el' and creates a
     (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'set-default)
     (message "Set default Chemacs profile to '%s'" profile-name)))
 
-(defun tlon-init-deploy-profile ()
+(defun tlon-init-deploy-profile (profile-name)
   "Deploy PROFILE-NAME.
 If you are deploying a new profile in a machine with `tlon-init'
 managed by `elpaca', you only need to run this command. Otherwise,
 you must first clone https://github.com/tlon-team/tlon-init, open
 `tlon-init.el', and `M-x eval-buffer'."
-  (interactive)
-  (let* ((profile-name (call-interactively #'tlon-init-create-profile))
+  (interactive "sProfile name: ")
+  (let* ((profile-name (tlon-init-create-profile profile-name))
 	 (profile-dir (tlon-init-profile-dir profile-name))
-	 (tlon-init-repo (file-name-directory (symbol-file 'tlon-init-create-profile)))
-	 (init-file (file-name-concat tlon-init-repo
+	 (package-dir (file-name-concat profile-dir "elpaca/repos/tlon-init/"))
+	 (init-file (file-name-concat package-dir
 				      (if (string= user-full-name "Pablo Stafforini")
 					  "tlon-init-without-overrides.el"
 					"tlon-init-with-overrides.el")))
-	 (tlon-init-file (file-name-concat tlon-init-repo "tlon-init.el"))
-	 (target-directory (file-name-concat profile-dir "elpaca/repos/tlon-init/")))
+	 (tlon-init-repo "https://github.com/tlon-team/tlon-init"))
+    (shell-command (format "git clone %s %s" tlon-init-repo package-dir))
     (copy-file init-file (file-name-concat profile-dir "init.el") t)
-    (make-directory target-directory t)
-    (copy-file tlon-init-file (file-name-concat target-directory "tlon-init.el") t)
     (message "Deployed profile '%s' to '%s'" profile-name profile-dir)))
 
 (provide 'tlon-init)
