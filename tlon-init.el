@@ -206,9 +206,9 @@ example, the default will be overridden by that code."
 
 (defun tlon-init-act-on-chemacs-profiles (profile-name &optional profile-dir action)
   "Create, delete or set PROFILE-NAME as default in PROFILE-DIR.
-When ACTION is 'set-default, set PROFILE-NAME as default.
-  When ACTION is 'create, create PROFILE-NAME.
-  Otherwise, delete PROFILE-NAME."
+When ACTION is `'set-default', set PROFILE-NAME as default.
+When ACTION is `'create', create PROFILE-NAME.
+Otherwise, delete PROFILE-NAME."
   (let* ((emacs-profiles (file-truename "~/.emacs-profiles.el"))
 	 (regex-default (format "(\"default\" . ((user-emacs-directory . \"%s\")))" (tlon-init-profile-dir "default")))
 	 (regex-search (if (member action '(create set-default))
@@ -231,7 +231,7 @@ When ACTION is 'set-default, set PROFILE-NAME as default.
       (save-buffer))))
 
 (defun tlon-init-create-profile (profile-name)
-  "Create a new Chemacs profile with name PROFILE-NAME.
+  "Create a new Chemacs profile named PROFILE-NAME.
 This adds a new profile to `~/.emacs-profiles.el' and creates a
  directory in the Chemacs profiles directory. The directory will
  have PROFILE-NAME as its name."
@@ -280,7 +280,7 @@ This adds a new profile to `~/.emacs-profiles.el' and creates a
 (defun tlon-init-deploy-profile ()
   "Deploy PROFILE-NAME.
 If you are deploying a new profile in a machine with `tlon-init'
-managed by elpaca, you only need to run this function. Otherwise,
+managed by `elpaca', you only need to run this command. Otherwise,
 you must first clone https://github.com/tlon-team/tlon-init, open
 `tlon-init.el', and `M-x eval-buffer'."
   (interactive)
