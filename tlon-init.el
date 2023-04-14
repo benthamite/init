@@ -154,8 +154,8 @@ example, the default will be overridden by that code."
     (tlon-init-tangle-extra-config-file init-dir))
   )
 
-(defun tlon-init-tangle (init-dir)
-  "Tangle `config.org' to INIT-DIR."
+(defun tlon-init-tangle ()
+  "Tangle `config.org'."
   (widen)
   (save-buffer)
   ;; decrypt, then re-encrypt "variables" heading
@@ -164,7 +164,7 @@ example, the default will be overridden by that code."
     (org-babel-tangle))
   (org-encrypt-entries)
   (save-buffer)
-  (message "Tangled init files to chemacs profile %s" init-dir))
+  (message "Tangled init files to chemacs profile %s" tlon-init-user-init-path))
 
 (defun tlon-init-tangle-extra-config-file (init-dir)
   "Tangle extra config file to INIT-DIR."
@@ -174,7 +174,7 @@ example, the default will be overridden by that code."
     (if (file-exists-p extra-config-file)
 	(with-current-buffer (or (find-file-noselect extra-config-file)
 				 (find-buffer-visiting extra-config-file))
-	  (tlon-init-tangle init-dir))
+	  (tlon-init-tangle))
       (user-error "Extra config file for user %s not found" user-first-name))))
 
 (defun tlon-init-eval-value-if-possible (value)
