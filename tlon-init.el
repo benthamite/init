@@ -109,9 +109,8 @@ example, the default will be overridden by that code."
   "Check if the current user is Pablo."
   (string= user-full-name "Pablo Stafforini"))
 
- ;; set paths for code blocks
 (defun tlon-init-set-tangle-flags (init-dir)
-""
+  "Set tangle flags for INIT-DIR."
   (let ((tangle-flags-filename (file-name-concat init-dir "tangle-flags.el")))
     (condition-case err
 	(setq tlon-init-tangle-flags (tlon-init-read-file tangle-flags-filename))
@@ -143,16 +142,7 @@ example, the default will be overridden by that code."
   ;; conditionally tangle extra config file
   (unless (user-pablo-p)
     (tlon-init-tangle-extra-config-file))
-  ;; set tangle options
-  (let ((tangle-flags-filename (file-name-concat init-dir "tangle-flags.el")))
-    (condition-case err
-	(setq tlon-init-tangle-flags (tlon-init-read-file tangle-flags-filename))
-      (error err
-	     (setq tlon-init-tangle-flags nil)))
-    (if tlon-init-tangle-flags
-	(message (concat "Re-read init tangle flags from filename: " tangle-flags-filename))
-      (unless (user-pablo-p)
-	(user-error "`tangle-flags.el' not present present in init dir."))))
+  (tlon-init-set-tangle-flags init-dir)
   ;; tangle `config.org'
   (tlon-init-tangle)
   ;; conditionally tangle extra config file again
