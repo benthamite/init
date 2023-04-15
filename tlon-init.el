@@ -249,7 +249,8 @@ Otherwise, delete PROFILE-NAME."
 
 (defun tlon-init-profile-exists-p (profile-name)
   "Return non-nil if Chemacs profile PROFILE-NAME exists."
-  (file-exists-p (tlon-init-profile-dir profile-name)))
+  (when-let ((profile-dir (tlon-init-profile-dir profile-name)))
+    (file-directory-p profile-dir)))
 
 (defun tlon-init-create-profile (profile-name &optional overwrite)
   "Create a new Chemacs profile named PROFILE-NAME.
