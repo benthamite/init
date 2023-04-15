@@ -310,14 +310,14 @@ profile directory, if such a file is found, but will leave the
 rest of the profile intact. To delete the entire profile, use
 `tlon-init-delete-profile'."
   (interactive "sProfile name: ")
-  (let ((overwrite nil))
-    (when (tlon-init-profile-exists-p profile-name)
+  (let ((profile-dir (tlon-init-profile-dir profile-name))
+	(overwrite nil))
+    (if (not (tlon-init-profile-exists-p profile-name))
+	(tlon-init-create-profile profile-name t)
       (if (y-or-n-p (format "Profile `%s' already exists. Redeploy? " profile-name))
 	  (setq overwrite t)
 	(user-error "Deploy aborted")))
-    (tlon-init-create-profile profile-name t)
-    (let* ((profile-dir (tlon-init-profile-dir profile-name))
-	   (package-dir (file-name-concat profile-dir "elpaca/repos/tlon-init/"))
+    (let* ((package-dir (file-name-concat profile-dir "elpaca/repos/tlon-init/"))
 	   (init-file-source (file-name-concat package-dir
 					       (if (user-pablo-p)
 						   "tlon-init-without-overrides.el"
