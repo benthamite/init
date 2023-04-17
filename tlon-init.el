@@ -310,7 +310,7 @@ profile directory, if such a file is found, but will leave the
 rest of the profile intact. To delete the entire profile, use
 `tlon-init-delete-profile'."
   (interactive "sProfile name: ")
-  (let (overwrite nil)
+  (let ((overwrite nil))
     (if (not (tlon-init-profile-exists-p profile-name))
 	(tlon-init-create-profile profile-name t)
       (if (y-or-n-p (format "Profile `%s' already exists. Redeploy? " profile-name))
