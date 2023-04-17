@@ -139,15 +139,15 @@ example, the default will be overridden by that code."
 	tlon-init-post-init-path (file-name-concat init-dir "post-init.el")
 	tlon-init-tangle-flags-path (file-name-concat init-dir "tangle-flags.el")
 	tlon-init-variables-override-path (file-name-concat init-dir "variables-override.el"))
-  ;; conditionally tangle extra config file
+  ;; conditionally tangle extra config file, pass 1: get tangle flags only
+  (setq tlon-init-extra-config-tangle-pass 1)
   (unless (user-pablo-p)
     (tlon-init-tangle-extra-config-file))
   (tlon-init-set-tangle-flags init-dir)
   ;; tangle `config.org'
   (tlon-init-tangle)
-  ;; conditionally tangle extra config file again
-  ;; TODO: implement more elegant solution; this is
-  ;; a hack to deal with precedence problems
+  ;; conditionally tangle extra config file, pass 2: get the rest of extra config
+  (setq tlon-init-extra-config-tangle-pass 2)
   (unless (user-pablo-p)
     (tlon-init-tangle-extra-config-file)))
 
