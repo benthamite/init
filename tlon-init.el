@@ -300,8 +300,8 @@ This adds a new profile to `~/.emacs-profiles.el' and creates a
 If you are deploying a new profile in a machine with `tlon-init'
 managed by `elpaca', you only need to run this command.
 Otherwise, you must first clone
-https://github.com/tlon-team/tlon-init, open `tlon-init.el', and
-`M-x eval-buffer'.
+https://github.com/tlon-team/tlon-init, open `tlon-init.el' in
+the cloned repo, and `M-x eval-buffer'.
 
 If there is already a `tlon-init' subdirectory in the `elpaca'
 `repos' directory, you will be asked to confirm you want to
