@@ -318,12 +318,12 @@ rest of the profile intact. To delete the entire profile, use
 	(user-error "Deploy aborted")))
     (let* ((profile-dir (tlon-init-profile-dir profile-name))
 	   (package-dir (file-name-concat profile-dir "elpaca/repos/tlon-init/"))
-	   (init-file-source (file-name-concat package-dir
-					       (if (user-pablo-p)
-						   "tlon-init-without-overrides.el"
-						 "tlon-init-with-overrides.el")))
+	   (init-file-source (concat package-dir
+				     (if (user-pablo-p)
+					 "tlon-init-without-overrides.el"
+				       "tlon-init-with-overrides.el")))
 	   (init-file-target (file-name-concat profile-dir "init.el"))
-	   (tlon-init-repo "https://github.com/tlon-team/tlon-init"))
+	   (tlon-init-repo "git@github.com:tlon-team/tlon-init"))
       (when (file-exists-p package-dir)
 	(if (or overwrite
 		(y-or-n-p (format "`%s' is not empty. Overwrite? " package-dir)))
