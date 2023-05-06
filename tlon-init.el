@@ -184,7 +184,7 @@ If email is nil, use tlon.shared@gmail.com."
     encrypted-vars-file))
 
 (defun tlon-init-get-decrypted-variables (org-id)
-  "Get decrypted contents of `shared variables' org heading."
+  "Get decrypted contents of `shared variables' in heading with ORG-ID."
   (org-id-goto org-id)
   (org-decrypt-entry)
   (save-restriction
@@ -193,7 +193,7 @@ If email is nil, use tlon.shared@gmail.com."
     (buffer-substring-no-properties (point) (point-max))))
 
 (defun tlon-init-encrypt-variables (&optional org-id)
-  "Encrypt contents of `shared variables' org heading."
+  "Encrypt contents of `shared variables' in heading with ORG-ID."
   (interactive)
   ;; first, create temp file with encrypted variables and store its path
   (let* ((org-id (or org-id
