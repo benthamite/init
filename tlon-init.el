@@ -207,9 +207,8 @@ If email is nil, use tlon.shared@gmail.com."
     (save-restriction
       (org-narrow-to-subtree)
       (org-end-of-meta-data)
-      (let ((begin (point)))
-	(delete-region begin (point-max))
-	(insert encrypted-vars)))))
+      (delete-region (point) (point-max))
+      (insert encrypted-vars))))
 
 (defun tlon-init-tangle-extra-config-file ()
   "Tangle extra config file."
