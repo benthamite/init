@@ -189,7 +189,7 @@ If email is nil, use tlon.shared@gmail.com."
   (org-decrypt-entry)
   (save-restriction
     (org-narrow-to-subtree)
-    (org-end-of-meta-data)
+    (org-end-of-meta-data t)
     (buffer-substring-no-properties poi (point-max))))
 
 (defun tlon-init-encrypt-variables ()
@@ -206,7 +206,7 @@ If email is nil, use tlon.shared@gmail.com."
     (org-id-goto "3A5E2CF3-5CC3-4804-8AEC-89BFD943E0BF")
     (save-restriction
       (org-narrow-to-subtree)
-      (org-end-of-meta-data)
+      (org-end-of-meta-data t)
       (delete-region (point) (point-max))
       (insert encrypted-vars))))
 
