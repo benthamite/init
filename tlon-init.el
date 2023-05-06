@@ -163,6 +163,54 @@ example, the default will be overridden by that code."
   (save-buffer)
   (message "Tangled init files to Chemacs profile `%s'" tlon-init-user-init-path))
 
+;; auxiliary functions to be used when org-crypt/epg fails
+(defun tlon-init-encrypt (&optional text email)
+  "Encrypt TEXT using gpg key associated with EMAIL.
+If text is nil, use the current region.
+If email is nil, use tlon.shared@gmail.com."
+  (interactive)
+  (let* ((text (or text
+		   (unless (region-active-p)
+		     (user-error "No region selected"))
+		   (buffer-substring-no-properties (region-beginning) (region-end))))
+	 (decrypted-vars-file (make-temp-file "decrypted-vars" nil nil text))
+	 (encrypted-vars-file (file-name-with-extension
+			       (make-temp-file "encrypted-vars" nil nil)
+			       "gpg"))
+	 (email (or email
+		    "tlon.shared@gmail.com")))
+    (shell-command (format "gpg --output %s --encrypt --recipient %s %s"
+			   encrypted-vars-file email decrypted-vars-file))
+    encrypted-vars-file))
+
+(defun tlon-init-get-decrypted-variables ()
+  "Get decrypted contents of `shared variables' org heading."
+  (org-id-goto "3A5E2CF3-5CC3-4804-8AEC-89BFD943E0BF")
+  (org-decrypt-entry)
+  (save-restriction
+    (org-narrow-to-subtree)
+    (org-end-of-meta-data)
+    (buffer-substring-no-properties poi (point-max))))
+
+(defun tlon-init-encrypt-variables ()
+  "Encrypt contents of `shared variables' org heading."
+  (interactive)
+  ;; first, create temp file with encrypted variables and store its path
+  (let ((encrypted-vars-file (tlon-init-encrypt (tlon-init-get-decrypted-variables)))
+	encrypted-vars)
+    ;; then, read encrypted variables from temp file
+    (with-temp-buffer
+      (insert-file-contents-literally encrypted-vars-file)
+      (setq encrypted-vars (buffer-substring-no-properties (point-min) (point-max))))
+    ;; finally, insert the encrypted variables in the org heading
+    (org-id-goto "3A5E2CF3-5CC3-4804-8AEC-89BFD943E0BF")
+    (save-restriction
+      (org-narrow-to-subtree)
+      (org-end-of-meta-data)
+      (let ((begin (point)))
+	(delete-region begin (point-max))
+	(insert encrypted-vars)))))
+
 (defun tlon-init-tangle-extra-config-file ()
   "Tangle extra config file."
   (let* ((user-first-name (downcase (car (split-string user-full-name))))
