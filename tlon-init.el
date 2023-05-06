@@ -201,7 +201,7 @@ If DECRYPT is non-nil, decrypt instead of encrypting."
 		     (pcase (file-name-nondirectory (buffer-file-name))
 		       ("config.org" "3A5E2CF3-5CC3-4804-8AEC-89BFD943E0BF")
 		       ("config-leonardo.org" "") ; TODO: add org-id
-		       ("config-federico.org" "") ; TODO: add org-id
+		       ("config-federico.org" "3B040374-6F20-4AD5-92AA-B01FE20C924B")
 		       (_ (user-error "Variables not encrypted. You don't seem to be visiting a config file")))))
 	 (crypted-vars (tlon-init-crypt decrypt (tlon-init-get-variables org-id))))
     (org-id-goto org-id)
