@@ -178,9 +178,9 @@ If email is nil, use tlon.shared@gmail.com."
 	 (email (or email
 		    "tlon.shared@gmail.com")))
     (shell-command-to-string (if decrypt
-				 (format "gpg --decrypt %s"
+				 (format "gpg --decrypt -q %s"
 					 input-file)
-			       (format "gpg --output - --encrypt --armor --recipient %s %s"
+			       (format "gpg --output - --encrypt -q --armor --recipient %s %s"
 				       email input-file)))))
 
 (defun tlon-init-get-variables (org-id)
