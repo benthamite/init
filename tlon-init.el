@@ -174,49 +174,41 @@ If email is nil, use tlon.shared@gmail.com."
 		   (unless (region-active-p)
 		     (user-error "No region selected"))
 		   (buffer-substring-no-properties (region-beginning) (region-end))))
-	 (decrypted-vars-file (make-temp-file "decrypted-vars" nil nil text))
-	 (encrypted-vars-file (file-name-with-extension
-			       (make-temp-file "encrypted-vars" nil nil)
-			       "gpg"))
+	 (input-file (make-temp-file "input" nil nil text))
 	 (email (or email
 		    "tlon.shared@gmail.com")))
-    (shell-command (format "gpg --output %s --encrypt --recipient %s %s"
-			   encrypted-vars-file email decrypted-vars-file))
-    encrypted-vars-file))
+    (shell-command-to-string (if decrypt
+				 (format "gpg --decrypt %s"
+					 input-file)
+			       (format "gpg --output - --encrypt --armor --recipient %s %s"
+				       email input-file)))))
 
-(defun tlon-init-get-decrypted-variables (org-id)
-  "Get decrypted contents of `shared variables' in heading with ORG-ID."
+(defun tlon-init-get-variables (org-id)
+  "Get contents of `shared variables' in heading with ORG-ID."
   (org-id-goto org-id)
-  (org-decrypt-entry)
   (save-restriction
     (org-narrow-to-subtree)
     (org-end-of-meta-data t)
     (buffer-substring-no-properties (point) (point-max))))
 
-(defun tlon-init-encrypt-variables (&optional org-id)
-  "Encrypt contents of `shared variables' in heading with ORG-ID."
+(defun tlon-init-crypt-variables (&optional decrypt org-id)
+  "Encrypt contents of `shared variables' in heading with ORG-ID.
+If DECRYPT is non-nil, decrypt instead of encrypting."
   (interactive)
-  ;; first, create temp file with encrypted variables and store its path
+  ;; first, create temp file with encrypted/decrypted variables and store its path
   (let* ((org-id (or org-id
 		     (pcase (file-name-nondirectory (buffer-file-name))
 		       ("config.org" "3A5E2CF3-5CC3-4804-8AEC-89BFD943E0BF")
 		       ("config-leonardo.org" "") ; TODO: add org-id
 		       ("config-federico.org" "") ; TODO: add org-id
 		       (_ (user-error "Variables not encrypted. You don't seem to be visiting a config file")))))
-	 (encrypted-vars-file (tlon-init-encrypt (tlon-init-get-decrypted-variables org-id)))
-	 encrypted-vars)
-    ;; then, read encrypted variables from temp file
-    (with-temp-buffer
-      (insert-file-contents-literally encrypted-vars-file)
-      (base64-encode-region (point-min) (point-max))
-      (setq encrypted-vars (buffer-substring-no-properties (point-min) (point-max))))
-    ;; finally, insert the encrypted variables in the org heading with ORG-ID
+	 (crypted-vars (tlon-init-crypt decrypt (tlon-init-get-variables org-id))))
     (org-id-goto org-id)
     (save-restriction
       (org-narrow-to-subtree)
       (org-end-of-meta-data t)
       (delete-region (point) (point-max))
-      (insert encrypted-vars))))
+      (insert crypted-vars))))
 
 (defun tlon-init-tangle-extra-config-file ()
   "Tangle extra config file."
