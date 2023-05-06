@@ -201,15 +201,15 @@ If email is nil, use tlon.shared@gmail.com."
 		       ("config.org" "3A5E2CF3-5CC3-4804-8AEC-89BFD943E0BF")
 		       ("config-leonardo.org" "") ; TODO: add org-id
 		       ("config-federico.org" "") ; TODO: add org-id
-		       (_ (user-error "Variables not encrypted. You don't seem to be visiting a config file.")))))
+		       (_ (user-error "Variables not encrypted. You don't seem to be visiting a config file")))))
 	 (encrypted-vars-file (tlon-init-encrypt (tlon-init-get-decrypted-variables org-id)))
 	 encrypted-vars)
     ;; then, read encrypted variables from temp file
     (with-temp-buffer
-      ;; acá está el problema
       (insert-file-contents-literally encrypted-vars-file)
+      (base64-encode-region (point-min) (point-max))
       (setq encrypted-vars (buffer-substring-no-properties (point-min) (point-max))))
-    ;; finally, insert the encrypted variables in the org heading
+    ;; finally, insert the encrypted variables in the org heading with ORG-ID
     (org-id-goto org-id)
     (save-restriction
       (org-narrow-to-subtree)
