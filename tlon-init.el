@@ -195,7 +195,6 @@ If email is nil, use tlon.shared@gmail.com."
   "Encrypt contents of `shared variables' in heading with ORG-ID.
 If DECRYPT is non-nil, decrypt instead of encrypting."
   (interactive)
-  ;; first, create temp file with encrypted/decrypted variables and store its path
   (let* ((org-id (or org-id
 		     (pcase (file-name-nondirectory (buffer-file-name))
 		       ("config.org" "3A5E2CF3-5CC3-4804-8AEC-89BFD943E0BF")
