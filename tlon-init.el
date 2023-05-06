@@ -164,8 +164,9 @@ example, the default will be overridden by that code."
   (message "Tangled init files to Chemacs profile `%s'" tlon-init-user-init-path))
 
 ;; auxiliary functions to be used when org-crypt/epg fails
-(defun tlon-init-encrypt (&optional text email)
+(defun tlon-init-crypt (&optional decrypt text email)
   "Encrypt TEXT using gpg key associated with EMAIL.
+If DECRYPT is non-nil, decrypt instead of encrypting.
 If text is nil, use the current region.
 If email is nil, use tlon.shared@gmail.com."
   (interactive)
