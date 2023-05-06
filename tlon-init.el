@@ -156,10 +156,12 @@ example, the default will be overridden by that code."
   (widen)
   (save-buffer)
   ;; decrypt, then re-encrypt "variables" heading
-  (org-decrypt-entries)
+  ;; (org-decrypt-entries)
+  (tlon-init-crypt-variables 'decrypt)
   (let ((org-babel-pre-tangle-hook (remove 'save-buffer org-babel-pre-tangle-hook)))
     (org-babel-tangle))
-  (org-encrypt-entries)
+  ;; (org-encrypt-entries)
+  (tlon-init-crypt-variables)
   (save-buffer)
   (message "Tangled init files to Chemacs profile `%s'" tlon-init-user-init-path))
 
