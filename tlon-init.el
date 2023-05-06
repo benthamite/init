@@ -190,7 +190,7 @@ If email is nil, use tlon.shared@gmail.com."
   (save-restriction
     (org-narrow-to-subtree)
     (org-end-of-meta-data t)
-    (buffer-substring-no-properties poi (point-max))))
+    (buffer-substring-no-properties (point) (point-max))))
 
 (defun tlon-init-encrypt-variables ()
   "Encrypt contents of `shared variables' org heading."
