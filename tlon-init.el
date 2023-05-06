@@ -183,27 +183,34 @@ If email is nil, use tlon.shared@gmail.com."
 			   encrypted-vars-file email decrypted-vars-file))
     encrypted-vars-file))
 
-(defun tlon-init-get-decrypted-variables ()
+(defun tlon-init-get-decrypted-variables (org-id)
   "Get decrypted contents of `shared variables' org heading."
-  (org-id-goto "3A5E2CF3-5CC3-4804-8AEC-89BFD943E0BF")
+  (org-id-goto org-id)
   (org-decrypt-entry)
   (save-restriction
     (org-narrow-to-subtree)
     (org-end-of-meta-data t)
     (buffer-substring-no-properties (point) (point-max))))
 
-(defun tlon-init-encrypt-variables ()
+(defun tlon-init-encrypt-variables (&optional org-id)
   "Encrypt contents of `shared variables' org heading."
   (interactive)
   ;; first, create temp file with encrypted variables and store its path
-  (let ((encrypted-vars-file (tlon-init-encrypt (tlon-init-get-decrypted-variables)))
-	encrypted-vars)
+  (let* ((org-id (or org-id
+		     (pcase (file-name-nondirectory (buffer-file-name))
+		       ("config.org" "3A5E2CF3-5CC3-4804-8AEC-89BFD943E0BF")
+		       ("config-leonardo.org" "") ; TODO: add org-id
+		       ("config-federico.org" "") ; TODO: add org-id
+		       (_ (user-error "Variables not encrypted. You don't seem to be visiting a config file.")))))
+	 (encrypted-vars-file (tlon-init-encrypt (tlon-init-get-decrypted-variables org-id)))
+	 encrypted-vars)
     ;; then, read encrypted variables from temp file
     (with-temp-buffer
+      ;; acá está el problema
       (insert-file-contents-literally encrypted-vars-file)
       (setq encrypted-vars (buffer-substring-no-properties (point-min) (point-max))))
     ;; finally, insert the encrypted variables in the org heading
-    (org-id-goto "3A5E2CF3-5CC3-4804-8AEC-89BFD943E0BF")
+    (org-id-goto org-id)
     (save-restriction
       (org-narrow-to-subtree)
       (org-end-of-meta-data t)
