@@ -155,35 +155,10 @@ example, the default will be overridden by that code."
   "Tangle `config.org'."
   (widen)
   (save-buffer)
-  ;; decrypt, then re-encrypt "variables" heading
-  ;; (org-decrypt-entries)
-  (tlon-init-crypt-variables 'decrypt)
   (let ((org-babel-pre-tangle-hook (remove 'save-buffer org-babel-pre-tangle-hook)))
     (org-babel-tangle))
-  ;; (org-encrypt-entries)
-  (tlon-init-crypt-variables)
   (save-buffer)
   (message "Tangled init files to Chemacs profile `%s'" tlon-init-user-init-path))
-
-;; auxiliary functions to be used when org-crypt/epg fails
-(defun tlon-init-crypt (&optional decrypt text email)
-  "Encrypt TEXT using gpg key associated with EMAIL.
-If DECRYPT is non-nil, decrypt instead of encrypting.
-If text is nil, use the current region.
-If email is nil, use tlon.shared@gmail.com."
-  (interactive)
-  (let* ((text (or text
-		   (unless (region-active-p)
-		     (user-error "No region selected"))
-		   (buffer-substring-no-properties (region-beginning) (region-end))))
-	 (input-file (make-temp-file "input" nil nil text))
-	 (email (or email
-		    "tlon.shared@gmail.com")))
-    (shell-command-to-string (if decrypt
-				 (format "gpg --decrypt -q %s"
-					 input-file)
-			       (format "gpg --output - --encrypt -q --armor --recipient %s %s"
-				       email input-file)))))
 
 (defun tlon-init-get-variables (org-id)
   "Get contents of `shared variables' in heading with ORG-ID."
@@ -192,24 +167,6 @@ If email is nil, use tlon.shared@gmail.com."
     (org-narrow-to-subtree)
     (org-end-of-meta-data t)
     (buffer-substring-no-properties (point) (point-max))))
-
-(defun tlon-init-crypt-variables (&optional decrypt org-id)
-  "Encrypt contents of `shared variables' in heading with ORG-ID.
-If DECRYPT is non-nil, decrypt instead of encrypting."
-  (interactive)
-  (let* ((org-id (or org-id
-		     (pcase (file-name-nondirectory (buffer-file-name))
-		       ("config.org" "3A5E2CF3-5CC3-4804-8AEC-89BFD943E0BF")
-		       ("config-leonardo.org" "") ; TODO: add org-id
-		       ("config-federico.org" "3B040374-6F20-4AD5-92AA-B01FE20C924B")
-		       (_ (user-error "Variables not encrypted. You don't seem to be visiting a config file")))))
-	 (crypted-vars (tlon-init-crypt decrypt (tlon-init-get-variables org-id))))
-    (org-id-goto org-id)
-    (save-restriction
-      (org-narrow-to-subtree)
-      (org-end-of-meta-data t)
-      (delete-region (point) (point-max))
-      (insert crypted-vars))))
 
 (defun tlon-init-tangle-extra-config-file ()
   "Tangle extra config file."
