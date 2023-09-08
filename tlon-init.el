@@ -456,8 +456,8 @@ example, the default will be overridden by that code."
 	(cdadr chemacs-profile))
        target-directories))))
 
-(defun user-pablo-p ()
-  "Check if the current user is Pablo."
+(defun tlon-init-user-pablo-p ()
+  "Return t if Pablo is the current user, and nil otherwise."
   (string= user-full-name "Pablo Stafforini"))
 
 (defun tlon-init-set-tangle-flags (init-dir)
@@ -469,8 +469,8 @@ example, the default will be overridden by that code."
 	     (setq tlon-init-tangle-flags nil)))
     (if tlon-init-tangle-flags
 	(message (concat "Re-read init tangle flags from filename: " tangle-flags-filename))
-      (unless (user-pablo-p)
-	(user-error "`tangle-flags.el' not present present in init dir.")))))
+      (unless (tlon-init-user-pablo-p)
+	(user-error "`tangle-flags.el' not present present in init dir")))))
 
 (defun tlon-init-build (init-dir)
   "Build or rebuild a profile in INIT-DIR."
@@ -492,14 +492,14 @@ example, the default will be overridden by that code."
 	tlon-init-variables-override-path (file-name-concat init-dir "variables-override.el"))
   ;; conditionally tangle extra config file, pass 1: get tangle flags only
   (setq tlon-init-extra-config-tangle-pass 1)
-  (unless (user-pablo-p)
+  (unless (tlon-init-user-pablo-p)
     (tlon-init-tangle-extra-config-file))
   (tlon-init-set-tangle-flags init-dir)
   ;; tangle `config.org'
   (tlon-init-tangle)
   ;; conditionally tangle extra config file, pass 2: get the rest of extra config
   (setq tlon-init-extra-config-tangle-pass 2)
-  (unless (user-pablo-p)
+  (unless (tlon-init-user-pablo-p)
     (tlon-init-tangle-extra-config-file)))
 
 (defun tlon-init-tangle ()
@@ -675,7 +675,7 @@ rest of the profile intact. To delete the entire profile, use
     (let* ((profile-dir (tlon-init-profile-dir profile-name))
 	   (package-dir (file-name-concat profile-dir "elpaca/repos/tlon-init/"))
 	   (init-file-source (concat package-dir
-				     (if (user-pablo-p)
+				     (if (tlon-init-user-pablo-p)
 					 "tlon-init-without-overrides.el"
 				       "tlon-init-with-overrides.el")))
 	   (init-file-target (file-name-concat profile-dir "init.el"))
