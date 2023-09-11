@@ -67,313 +67,160 @@
 ;; We declare all the variables here and then Pablo sets their values
 ;; in his config file. Other users may in turn override these values.
 
-(defvar ps/personal-name nil)
-
-(defvar ps/personal-gmail nil)
-
-(defvar ps/personal-email nil)
-
-(defvar ps/tlon-email nil)
-
-(defvar ps/dir-root nil)
-
-(defvar ps/dir-system-apps nil)
-
-(defvar ps/dir-user nil)
-
-(defvar ps/dir-dropbox nil)
-
-(defvar ps/dir-downloads nil)
-
-(defvar ps/dir-emacs nil)
-
-(defvar ps/dir-google-drive nil)
-
-(defvar ps/dir-music nil)
-
-(defvar ps/dir-movies nil)
-
-(defvar ps/dir-finance nil)
-
-(defvar ps/dir-audiobooks nil)
-
-(defvar ps/dir-music-tango nil)
-
-(defvar ps/dir-music-popular nil)
-
-(defvar ps/dir-music-classical nil)
-
-(defvar ps/dir-music-to-sort nil)
-
-(defvar ps/dir-anki nil)
-
-(defvar ps/dir-archive nil)
-
-(defvar ps/dir-inactive nil)
-
-(defvar ps/dir-personal-bibliography nil)
-
-(defvar ps/dir-personal-csl-styles nil)
-
-(defvar ps/dir-personal-csl-locales nil)
-
-(defvar ps/dir-blog nil)
-
-(defvar ps/dir-journal nil)
-
-(defvar ps/dir-wiki nil)
-
-(defvar ps/dir-wiki-entries nil)
-
-(defvar ps/dir-wiki-references nil)
-
-(defvar ps/dir-dotfiles nil)
-
-(defvar ps/dir-dotemacs nil)
-
-(defvar ps/dir-karabiner nil)
-
-(defvar ps/dir-bibliographic-notes nil)
-
-(defvar ps/dir-yasnippets nil)
-
-(defvar ps/dir-yasnippets-private nil)
-
-(defvar ps/dir-abbrev nil)
-
-(defvar ps/dir-private nil)
-
-(defvar ps/dir-ledger nil)
-
-(defvar ps/dir-notes nil)
-
-(defvar ps/dir-people nil)
-
-(defvar ps/dir-android nil)
-
-(defvar ps/dir-bbdb nil)
-
-(defvar ps/dir-ade nil)
-
-(defvar ps/dir-library-pdf nil)
-
-(defvar ps/dir-library-html nil)
-
-(defvar ps/dir-library-media nil)
-
-(defvar ps/dir-emacs-var nil)
-
-(defvar ps/dir-source nil)
-
-(defvar ps/dir-translation-server nil)
-
-(defvar ps/dir-PW nil)
-
-(defvar ps/dir-org-clock-reports nil)
-
-(defvar ps/dir-google-drive-tlon nil)
-
-(defvar ps/dir-google-drive-tlon-leo nil)
-
-(defvar ps/dir-google-drive-tlon-BAE nil)
-
-(defvar ps/dir-google-drive-tlon-EAN nil)
-
-(defvar ps/dir-google-drive-tlon-FM nil)
-
-(defvar ps/dir-google-drive-tlon-GPE nil)
-
-(defvar ps/dir-google-drive-tlon-HEAR nil)
-
-(defvar ps/dir-google-drive-tlon-LBDLH nil)
-
-(defvar ps/dir-google-drive-tlon-LP nil)
-
-(defvar ps/dir-google-drive-tlon-RAE nil)
-
-(defvar ps/dir-google-drive-tlon-RCG nil)
-
-(defvar ps/dir-dropbox-tlon nil)
-
-(defvar ps/dir-google-drive-tlon-core nil)
-
-(defvar ps/dir-google-drive-tlon-fede nil)
-
-(defvar ps/dir-dropbox-tlon-core nil)
-
-(defvar ps/dir-dropbox-tlon-leo nil)
-
-(defvar ps/dir-dropbox-tlon-fede nil)
-
-(defvar ps/dir-dropbox-tlon-pablo nil)
-
-(defvar ps/dir-dropbox-tlon-ledger nil)
-
-(defvar ps/dir-dropbox-tlon-pass nil)
-
-(defvar ps/dir-dropbox-tlon-BAE nil)
-
-(defvar ps/dir-dropbox-tlon-EAN nil)
-
-(defvar ps/dir-dropbox-tlon-FM nil)
-
-(defvar ps/dir-dropbox-tlon-GPE nil)
-
-(defvar ps/dir-dropbox-tlon-HEAR nil)
-
-(defvar ps/dir-dropbox-tlon-LBDLH nil)
-
-(defvar ps/dir-dropbox-tlon-LP nil)
-
-(defvar ps/dir-dropbox-tlon-RAE nil)
-
-(defvar ps/dir-dropbox-tlon-RCG nil)
-
-(defvar ps/dir-repos nil)
-
-(defvar ps/dir-tlon-babel nil)
-
-(defvar ps/dir-tlon-docs nil)
-
-(defvar ps/dir-emacs-local nil)
-
-(defvar ps/dir-chemacs-profiles nil)
-
-(defvar ps/dir-org nil)
-
-(defvar ps/dir-org-roam nil)
-
-(defvar ps/dir-org-images nil)
-
-(defvar ps/dir-websites nil)
-
-(defvar ps/dir-calibre nil)
-
+(defvar ps/personal-name)
+(defvar ps/personal-gmail)
+(defvar ps/personal-email)
+(defvar ps/tlon-email)
+(defvar ps/dir-roo)
+(defvar ps/dir-system-apps)
+(defvar ps/dir-use)
+(defvar ps/dir-dropbox)
+(defvar ps/dir-downloads)
+(defvar ps/dir-emacs)
+(defvar ps/dir-google-drive)
+(defvar ps/dir-music)
+(defvar ps/dir-movies)
+(defvar ps/dir-finance)
+(defvar ps/dir-audiobooks)
+(defvar ps/dir-music-tango)
+(defvar ps/dir-music-popula)
+(defvar ps/dir-music-classical)
+(defvar ps/dir-music-to-so)
+(defvar ps/dir-anki)
+(defvar ps/dir-archive)
+(defvar ps/dir-inactive)
+(defvar ps/dir-personal-bibliography)
+(defvar ps/dir-personal-csl-styles)
+(defvar ps/dir-personal-csl-locales)
+(defvar ps/dir-blog)
+(defvar ps/dir-journal)
+(defvar ps/dir-wiki)
+(defvar ps/dir-wiki-entries)
+(defvar ps/dir-wiki-references)
+(defvar ps/dir-dotfiles)
+(defvar ps/dir-dotemacs)
+(defvar ps/dir-karabine)
+(defvar ps/dir-bibliographic-notes)
+(defvar ps/dir-yasnippets)
+(defvar ps/dir-yasnippets-private)
+(defvar ps/dir-abbrev)
+(defvar ps/dir-private)
+(defvar ps/dir-ledge)
+(defvar ps/dir-notes)
+(defvar ps/dir-people)
+(defvar ps/dir-android)
+(defvar ps/dir-bbdb)
+(defvar ps/dir-ade)
+(defvar ps/dir-library-pdf)
+(defvar ps/dir-library-html)
+(defvar ps/dir-library-media)
+(defvar ps/dir-emacs-va)
+(defvar ps/dir-source)
+(defvar ps/dir-translation-serve)
+(defvar ps/dir-PW)
+(defvar ps/dir-org-clock-reports)
+(defvar ps/dir-google-drive-tlo)
+(defvar ps/dir-google-drive-tlon-leo)
+(defvar ps/dir-google-drive-tlon-BAE)
+(defvar ps/dir-google-drive-tlon-EA)
+(defvar ps/dir-google-drive-tlon-FM)
+(defvar ps/dir-google-drive-tlon-GPE)
+(defvar ps/dir-google-drive-tlon-HEA)
+(defvar ps/dir-google-drive-tlon-LBDLH)
+(defvar ps/dir-google-drive-tlon-LP)
+(defvar ps/dir-google-drive-tlon-RAE)
+(defvar ps/dir-google-drive-tlon-RCG)
+(defvar ps/dir-dropbox-tlo)
+(defvar ps/dir-google-drive-tlon-core)
+(defvar ps/dir-google-drive-tlon-fede)
+(defvar ps/dir-dropbox-tlon-core)
+(defvar ps/dir-dropbox-tlon-leo)
+(defvar ps/dir-dropbox-tlon-fede)
+(defvar ps/dir-dropbox-tlon-pablo)
+(defvar ps/dir-dropbox-tlon-ledge)
+(defvar ps/dir-dropbox-tlon-pass)
+(defvar ps/dir-dropbox-tlon-BAE)
+(defvar ps/dir-dropbox-tlon-EA)
+(defvar ps/dir-dropbox-tlon-FM)
+(defvar ps/dir-dropbox-tlon-GPE)
+(defvar ps/dir-dropbox-tlon-HEA)
+(defvar ps/dir-dropbox-tlon-LBDLH)
+(defvar ps/dir-dropbox-tlon-LP)
+(defvar ps/dir-dropbox-tlon-RAE)
+(defvar ps/dir-dropbox-tlon-RCG)
+(defvar ps/dir-repos)
+(defvar ps/dir-tlon-babel)
+(defvar ps/dir-tlon-docs)
+(defvar ps/dir-emacs-local)
+(defvar ps/dir-chemacs-profiles)
+(defvar ps/dir-org)
+(defvar ps/dir-org-roam)
+(defvar ps/dir-org-images)
+(defvar ps/dir-websites)
+(defvar ps/dir-calibre)
 (defvar ps/dir-all-repos '())
-
-(defvar ps/file-notes nil)
-
-(defvar ps/file-inbox-desktop nil)
-
-(defvar ps/file-inbox-mobile nil)
-
-(defvar ps/file-calendar nil)
-
-(defvar ps/file-feeds-pablo nil)
-
-(defvar ps/file-tlon-feeds nil)
-
-(defvar ps/file-anki nil)
-
-(defvar ps/file-init nil)
-
-(defvar ps/file-config nil)
-
-(defvar ps/file-karabiner nil)
-
-(defvar ps/file-karabiner-edn nil)
-
-(defvar ps/file-personal-bibliography-old nil)
-
-(defvar ps/file-personal-bibliography-new nil)
-
-(defvar ps/file-wiki-notes nil)
-
-(defvar ps/file-wiki-published nil)
-
-(defvar ps/file-wiki-help nil)
-
-(defvar ps/file-library nil)
-
-(defvar ps/file-quotes nil)
-
-(defvar ps/file-films nil)
-
-(defvar ps/file-tlon-tareas-leo nil)
-
-(defvar ps/file-tlon-tareas-fede nil)
-
-(defvar ps/file-org2blog nil)
-
-(defvar ps/file-straight-profile nil)
-
-(defvar ps/file-orb-noter-template nil)
-
-(defvar ps/file-orb-capture-template nil)
-
-(defvar ps/file-bookmarks nil)
-
-(defvar ps/file-ledger nil)
-
-(defvar ps/file-ledger-db nil)
-
-(defvar ps/file-metaculus nil)
-
-(defvar ps/file-gpe nil)
-
-(defvar ps/file-fm nil)
-
-(defvar ps/file-ffrp nil)
-
-(defvar ps/file-rcg nil)
-
-(defvar ps/file-ean nil)
-
-(defvar ps/file-cookies nil)
-
-(defvar ps/file-work nil)
-
-(defvar ps/file-tlon-ledger-schedule-file nil)
-
-(defvar ps/file-tlon-babel nil)
-
-(defvar ps/file-tlon-ledger nil)
-
-(defvar ps/file-urls-open-externally-default nil)
-
-(defvar ps/file-urls-open-externally-firefox nil)
-
-(defvar ps/personal-bibliography-files '())
-
-(defvar ps/tlon-bibliography-files '())
-
-(defvar ps/all-bibliography-files '())
-
-(defvar ps/face-fixed-pitch nil)
-
-(defvar ps/face-fixed-pitch-size nil)
-
-(defvar ps/face-variable-pitch nil)
-
-(defvar ps/monitor-type nil)
-
-(defvar ps/ledger-active-currencies nil)
-
-(defvar ps/frame-width-threshold nil)
-
-(defvar ps/new-empty-buffer-major-mode nil)
-
-(defvar ps/forge-owned-accounts nil)
-
-(defvar ps/personal-signature nil)
-
-(defvar ps/location-name nil)
-
-(defvar ps/display-wttr-locations nil)
-
-(defvar ps/location-latitude nil)
-
-(defvar ps/location-longitude nil)
-
-(defvar ps/split-width-threshold nil)
-
-(defvar ps/telega-server-libs-prefix nil)
-
-(defvar ps/init-location nil)
-
-(defvar ps/early-init-location nil)
-
-(defvar ps/init-target-locations nil)
+(defvar ps/file-notes)
+(defvar ps/file-inbox-desktop)
+(defvar ps/file-inbox-mobile)
+(defvar ps/file-calenda)
+(defvar ps/file-feeds-pablo)
+(defvar ps/file-tlon-feeds)
+(defvar ps/file-anki)
+(defvar ps/file-ini)
+(defvar ps/file-config)
+(defvar ps/file-karabine)
+(defvar ps/file-karabiner-ed)
+(defvar ps/file-personal-bibliography-old)
+(defvar ps/file-personal-bibliography-new)
+(defvar ps/file-wiki-notes)
+(defvar ps/file-wiki-published)
+(defvar ps/file-wiki-help)
+(defvar ps/file-library)
+(defvar ps/file-quotes)
+(defvar ps/file-films)
+(defvar ps/file-tlon-tareas-leo)
+(defvar ps/file-tlon-tareas-fede)
+(defvar ps/file-org2blog)
+(defvar ps/file-straight-profile)
+(defvar ps/file-orb-noter-template)
+(defvar ps/file-orb-capture-template)
+(defvar ps/file-bookmarks)
+(defvar ps/file-ledge)
+(defvar ps/file-ledger-db)
+(defvar ps/file-metaculus)
+(defvar ps/file-gpe)
+(defvar ps/file-fm)
+(defvar ps/file-ffrp)
+(defvar ps/file-rcg)
+(defvar ps/file-ea)
+(defvar ps/file-cookies)
+(defvar ps/file-work)
+(defvar ps/file-tlon-ledger-schedule-file)
+(defvar ps/file-tlon-babel)
+(defvar ps/file-tlon-ledge)
+(defvar ps/file-urls-open-externally-defaul)
+(defvar ps/file-urls-open-externally-firefox)
+(defvar ps/personal-bibliography-files)
+(defvar ps/tlon-bibliography-files)
+(defvar ps/all-bibliography-files)
+(defvar ps/face-fixed-pitch)
+(defvar ps/face-fixed-pitch-size)
+(defvar ps/face-variable-pitch)
+(defvar ps/monitor-type)
+(defvar ps/ledger-active-currencies)
+(defvar ps/frame-width-threshold)
+(defvar ps/new-empty-buffer-major-mode)
+(defvar ps/forge-owned-accounts)
+(defvar ps/personal-signature)
+(defvar ps/location-name)
+(defvar ps/display-wttr-locations)
+(defvar ps/location-latitude)
+(defvar ps/location-longitude)
+(defvar ps/split-width-threshold)
+(defvar ps/telega-server-libs-prefix)
+(defvar ps/init-locatio)
+(defvar ps/early-init-locatio)
+(defvar ps/init-target-locations)
 
 ;;;; Functions
 
