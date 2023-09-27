@@ -549,6 +549,11 @@ rest of the profile intact. To delete the entire profile, use
 	      (tlon-init-build profile-dir))
 	  (message message))))))
 
+(defun tlon-init-disable-funs (seconds funs)
+  "Disable functions in list FUNS after SECONDS."
+  (dolist (fun funs)
+    (run-with-timer seconds nil (lambda () (advice-add fun :override #'ignore)))))
+
 (provide 'tlon-init)
 
 ;;; tlon-init.el ends here
