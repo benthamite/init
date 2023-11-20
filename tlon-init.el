@@ -389,10 +389,10 @@ rest of the profile intact. To delete the entire profile, use
 	  (user-error aborted)))
       (copy-file init-file-source init-file-target t)
       (let ((message (format "Deployed profile '%s' to '%s'." profile-name profile-dir)))
-	(if (and (boundp 'ps/file-config)
+	(if (and (boundp 'paths-file-config)
 		 (y-or-n-p (concat message " Build init files?")))
-	    (with-current-buffer (or (find-file-noselect ps/file-config)
-				     (find-buffer-visiting ps/file-config))
+	    (with-current-buffer (or (find-file-noselect paths-file-config)
+				     (find-buffer-visiting paths-file-config))
 	      (tlon-init-build profile-dir))
 	  (message message))))))
 
