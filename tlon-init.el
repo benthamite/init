@@ -95,8 +95,8 @@ With optional TANGLE-TO-EARLY-INIT, tangle to the `early-init.el'
 file."
   (if (alist-get key tlon-init-tangle-flags t)
       (if tangle-to-early-init
-	  tlon-init-early-init-path
-	tlon-init-user-init-path)
+	  tlon-init-file-early-init
+	tlon-init-file-user-init)
     "no"))
 
 (defun tlon-init-override-code-if-available (key code-block)
@@ -185,13 +185,12 @@ example, the default will be overridden by that code."
   (unless (string-equal major-mode "org-mode")
     (user-error "Error: cannot build init from a buffer that is not visiting an `org-mode' file"))
   ;; set paths for code blocks
-  (setq tlon-init-user-init-path (file-name-concat init-dir "init-pablo.el")
-	tlon-init-early-init-path (file-name-concat init-dir "early-init.el")
-	tlon-init-variables-path (file-name-concat init-dir "variables.el")
-	tlon-init-code-overrides-path (file-name-concat init-dir "code-overrides.el")
-	tlon-init-post-init-path (file-name-concat init-dir "post-init.el")
-	tlon-init-tangle-flags-path (file-name-concat init-dir "tangle-flags.el")
-	tlon-init-variables-override-path (file-name-concat init-dir "variables-override.el"))
+  (setq tlon-init-file-paths-override (file-name-concat init-dir "paths-override.el"))
+  (setq tlon-init-file-code-override (file-name-concat init-dir "code-override.el"))
+  (setq tlon-init-file-tangle-flags (file-name-concat init-dir "tangle-flags.el"))
+  (setq tlon-init-file-early-init (file-name-concat init-dir "early-init.el"))
+  (setq tlon-init-file-user-init (file-name-concat init-dir "init-pablo.el"))
+  (setq tlon-init-file-late-init (file-name-concat init-dir "late-init.el"))
   ;; conditionally tangle extra config file, pass 1: get tangle flags only
   (setq tlon-init-extra-config-tangle-pass 1)
   (unless (tlon-init-user-pablo-p)
