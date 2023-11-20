@@ -210,15 +210,7 @@ example, the default will be overridden by that code."
   (let ((org-babel-pre-tangle-hook (remove 'save-buffer org-babel-pre-tangle-hook)))
     (org-babel-tangle))
   (save-buffer)
-  (message "Tangled init files to Chemacs profile `%s'" tlon-init-user-init-path))
-
-(defun tlon-init-get-variables (org-id)
-  "Get contents of `shared variables' in heading with ORG-ID."
-  (org-id-goto org-id)
-  (save-restriction
-    (org-narrow-to-subtree)
-    (org-end-of-meta-data t)
-    (buffer-substring-no-properties (point) (point-max))))
+  (message "Tangled init files to Chemacs profile `%s'" tlon-init-file-user-init))
 
 (defun tlon-init-tangle-extra-config-file ()
   "Tangle extra config file."
