@@ -1,6 +1,6 @@
 ;;; tlon-init.el --- Convenience functions to manage Tlön's Emacs config -*- lexical-binding: t -*-
 
-;; Author: Federico Stafforini
+;; Author: Federico Stafforini & Pablo Stafforini
 ;; Version: 0.1.0
 ;; Homepage: https://tlon.team
 ;; Keywords: convenience tools
@@ -27,6 +27,10 @@
 ;;; Code:
 
 ;;;; Requirements
+
+(require 'ob-tangle)
+(require 'cus-edit)
+;; (require 'chemacs)
 
 ;;;; Variables
 
