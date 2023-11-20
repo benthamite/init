@@ -213,7 +213,8 @@ example, the default will be overridden by that code."
   (message "Tangled init files to Chemacs profile `%s'" tlon-init-user-init-path))
 
 (defun tlon-init-tangle-extra-config-file ()
-  "Tangle extra config file."
+  "Tangle extra config file.
+The extra config file is the file with the name `config-{user-first-name}.org'"
   (let* ((user-first-name (downcase (car (split-string user-full-name))))
 	 (extra-config-file (file-name-concat default-directory
 					      (concat "config-" user-first-name ".org"))))
