@@ -1,26 +1,10 @@
-(defvar tlon-init-filenames
-  '(
-    (:variables-default . (file-name-concat user-emacs-directory "variables.el"))
-    (:init-1 . (file-name-concat user-emacs-directory "init-pablo.el"))
-    )
-  "An alist with the configuration filenames used in the
-init process:
+(defvar tlon-init-file-paths
+  (file-name-concat user-emacs-directory "paths.el")
+  "Path to `paths.el'.")
 
-`:variables-default': a file from which default variable values
-will read and set.
-
-`:variables-override': (optional) file from which to override
-default variable values.
-
-`:code-overrides': (optional) file from which to override code
-sections in the init file, using the function
-`tlon-init-override-code-if-present', which is created by this init
-process. The convention for key names is :{package-name} but
-it is not required by this code.
-
-`:init-N': (N between 1 and 5) the files containing the actual
-init code. They will be loaded in the order set by their keyname,
-not by their position in `tlon-init-filenames'.")
+(defvar tlon-init-file-user-init
+  (file-name-concat user-emacs-directory "init-pablo.el")
+  "Path to `init-pablo.el'.")
 
 (load (file-name-concat user-emacs-directory "elpaca/repos/tlon-init/tlon-init.el")) ;; helper functions package
 (tlon-init-set-paths)

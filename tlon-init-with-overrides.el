@@ -1,30 +1,29 @@
-(defvar tlon-init-filenames
-  '(
-    (:variables-default . (file-name-concat user-emacs-directory "variables.el"))
-    (:variables-override . (file-name-concat user-emacs-directory "variables-override.el"))
-    (:code-overrides . (file-name-concat user-emacs-directory "code-overrides.el"))
-    (:init-1 . (file-name-concat user-emacs-directory "init-pablo.el"))
-    (:init-2 . (file-name-concat user-emacs-directory "post-init.el"))
-    )
-  "An alist with the configuration filenames used in the
-init process:
+(defvar tlon-init-file-paths
+  (file-name-concat user-emacs-directory "paths.el")
+  "Path to `paths.el'.")
 
-`:variables-default': a file from which default variable values
-will read and set.
+(defvar tlon-init-file-paths-override
+  (file-name-concat user-emacs-directory "paths-override.el")
+  "Path to `paths-override.el'.")
 
-`:variables-override': (optional) file from which to override
-default variable values.
+(defvar tlon-init-file-code-override
+  (file-name-concat user-emacs-directory "code-override.el")
+  "Path to `code-override.el'.")
 
-`:code-overrides': (optional) file from which to override code
-sections in the init file, using the function
-`tlon-init-override-code-if-present', which is created by this init
-process. The convention for key names is :ps/{package-name} but
-it is not required by this code.
+(defvar tlon-init-file-tangle-flags
+  (file-name-concat user-emacs-directory "tangle-flags.el")
+  "Path to `tangle-flags.el'.")
 
-`:init-N': (N between 1 and 5) the files containing the actual
-init code. They will be loaded in the order set by their keyname,
-not by their position in `tlon-init-filenames'.
-")
+(defvar tlon-init-file-early-init nil
+  "Path to `early-init.el'.")
+
+(defvar tlon-init-file-user-init
+  (file-name-concat user-emacs-directory "init-pablo.el")
+  "Path to `init-pablo.el'.")
+
+(defvar tlon-init-file-late-init
+  (file-name-concat user-emacs-directory "late-init.el")
+  "Path to `late-init-el'.")
 
 (defun tlon-init-post-init ()
   ;; Continue the init process, loading the files defined above, in tlon-init-filenames
@@ -36,5 +35,5 @@ not by their position in `tlon-init-filenames'.
 (tlon-init-set-paths)
 (tlon-init-load-code-overrides)
 (tlon-init-set-tangle-flags user-emacs-directory)
-(load (eval (alist-get :init-1 tlon-init-filenames)))
+(load (eval tlon-init-file-user-init))
 (add-hook 'elpaca-after-init-hook #'tlon-init-post-init)
