@@ -204,7 +204,7 @@ example, the default will be overridden by that code."
     (tlon-init-tangle-extra-config-file)))
 
 (defun tlon-init-tangle ()
-  "Tangle `config.org'."
+  "Tangle the current buffer."
   (widen)
   (save-buffer)
   (let ((org-babel-pre-tangle-hook (remove 'save-buffer org-babel-pre-tangle-hook)))
