@@ -223,32 +223,31 @@ example, the default will be overridden by that code."
       (eval value)
     (error value)))
 
-(defun tlon-init-load-variables ()
-  "Load or re-load variables and from the currently booted init profile."
-  (interactive)
-  (let ((default-vars
-	 (tlon-init-read-file
-	  (eval (alist-get :variables-default tlon-init-filenames))))
-	(override-vars
-	 (tlon-init-read-file
-	  (eval (alist-get :variables-override tlon-init-filenames)))))
-    ;; set all variables in :variables-default, overriding with values from :variables-override when present
-    (dolist (row default-vars)
-      (set
-       (car row)
-       (tlon-init-eval-value-if-possible
-	(alist-get (car row) override-vars (cdr row)))))
-    ;; set variables from :variables-override that are not present in :variables-default
-    (dolist (row override-vars)
-      (unless (symbolp (car row))
-	(set
-	 (car row)
-	 (tlon-init-eval-value-if-possible (cdr row)))))))
-
 (defun tlon-init-load-code-overrides ()
   "Load or re-load code overrides and from the currently booted init profile."
   (setq tlon-init-code-overrides
-	(tlon-init-read-file (eval (alist-get :code-overrides tlon-init-filenames)))))
+	(tlon-init-read-file tlon-init-file-code-override)))
+
+(defun tlon-init-set-paths ()
+  "Set paths from the currently booted init profile."
+  (interactive)
+  (load tlon-init-file-paths)
+  (tlon-init-set-default-paths)
+  (tlon-init-set-override-paths))
+
+(defun tlon-init-set-default-paths ()
+  "Set paths in `paths.el', overriding them with `paths-override.el’ if present."
+  (dolist (row (custom-group-members 'paths nil))
+    (set (car row)
+	 (tlon-init-eval-value-if-possible
+	  (alist-get (car row) (tlon-init-read-file tlon-init-file-paths-override) (cdr row))))))
+
+(defun tlon-init-set-override-paths ()
+  "Set paths in `paths-override.el' not present in `paths.el'."
+  (dolist (row (tlon-init-read-file tlon-init-file-paths-override))
+    (unless (symbolp (car row))
+      (set (car row)
+	   (tlon-init-eval-value-if-possible (cdr row))))))
 
 (defun tlon-init-profile-dir (profile-name)
   "Return the directory of the Chemacs profile PROFILE-NAME."

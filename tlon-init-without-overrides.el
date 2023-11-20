@@ -24,7 +24,7 @@ not by their position in `tlon-init-filenames'.
 ")
 
 (load (file-name-concat user-emacs-directory "elpaca/repos/tlon-init/tlon-init.el")) ;; helper functions package
-(tlon-init-load-variables)
+(tlon-init-set-paths)
 (tlon-init-load-code-overrides)
 (tlon-init-set-tangle-flags user-emacs-directory)
 ;; Continue the init process, loading the files defined above, in tlon-init-filenames
