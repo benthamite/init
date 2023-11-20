@@ -359,12 +359,13 @@ profile directory, if such a file is found, but will leave the
 rest of the profile intact. To delete the entire profile, use
 `tlon-init-delete-profile'."
   (interactive "sProfile name: ")
-  (let ((overwrite nil))
+  (let ((overwrite nil)
+	(aborted "Deploy aborted"))
     (if (not (tlon-init-profile-exists-p profile-name))
 	(tlon-init-create-profile profile-name t)
       (if (y-or-n-p (format "Profile `%s' already exists. Redeploy? " profile-name))
 	  (setq overwrite t)
-	(user-error "Deploy aborted")))
+	(user-error aborted)))
     (let* ((profile-dir (tlon-init-profile-dir profile-name))
 	   (package-dir (file-name-concat profile-dir "elpaca/repos/tlon-init/"))
 	   (init-file-source (concat package-dir
@@ -379,13 +380,13 @@ rest of the profile intact. To delete the entire profile, use
 	    (progn
 	      (delete-directory package-dir t t)
 	      (setq overwrite t))
-	  (user-error "Deploy aborted")))
+	  (user-error aborted)))
       (shell-command (format "git clone %s %s" tlon-init-repo package-dir))
       (when (file-exists-p init-file-target)
 	(if (or overwrite
 		(y-or-n-p (format "`%s' already exists. Overwrite? " init-file-target)))
 	    (delete-file init-file-target)
-	  (user-error "Deploy aborted")))
+	  (user-error aborted)))
       (copy-file init-file-source init-file-target t)
       (let ((message (format "Deployed profile '%s' to '%s'." profile-name profile-dir)))
 	(if (and (boundp 'ps/file-config)
