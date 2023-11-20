@@ -32,26 +32,37 @@
 
 ;;;;; Package variables
 
-(defvar tlon-init-early-init-path nil
-  "Path to `early-init.el'.")
+;;;;;; Files
 
-(defvar tlon-init-user-init-path nil
-  "Path to user init file.")
+(defvar tlon-init-file-paths
+  (file-name-concat user-emacs-directory "paths.el")
+  "Path to `paths.el'.")
 
-(defvar tlon-init-variables-path nil
-  "Path to `variables.el'.")
+(defvar tlon-init-file-paths-override
+  (file-name-concat user-emacs-directory "paths-override.el")
+  "Path to `paths-override.el'.")
 
-(defvar tlon-init-code-overrides-path nil
-  "Path to `code-overrides.el'.")
+(defvar tlon-init-file-code-override
+  (file-name-concat user-emacs-directory "code-override.el")
+  "Path to `code-override.el'.")
 
-(defvar tlon-init-post-init-path nil
-  "Path to `post-init.el'.")
-
-(defvar tlon-init-tangle-flags-path nil
+(defvar tlon-init-file-tangle-flags
+  (file-name-concat user-emacs-directory "tangle-flags.el")
   "Path to `tangle-flags.el'.")
 
-(defvar tlon-init-variables-override-path nil
-  "Path to `variables-override.el'.")
+(defvar tlon-init-file-early-init
+  (file-name-concat user-emacs-directory "early-init.el")
+  "Path to `early-init.el'.")
+
+(defvar tlon-init-file-user-init
+  (file-name-concat user-emacs-directory "init-pablo.el")
+  "Path to `init-pablo.el'.")
+
+(defvar tlon-init-file-late-init
+  (file-name-concat user-emacs-directory "late-init.el")
+  "Path to `late-init.el'.")
+
+;;;;;; Other
 
 (defvar tlon-init-tangle-flags '()
   "Alist of tangle flags for each package.")

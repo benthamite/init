@@ -1,11 +1,3 @@
-(defvar tlon-init-file-paths
-  (file-name-concat user-emacs-directory "paths.el")
-  "Path to `paths.el'.")
-
-(defvar tlon-init-file-user-init
-  (file-name-concat user-emacs-directory "init-pablo.el")
-  "Path to `init-pablo.el'.")
-
 (load (file-name-concat user-emacs-directory "elpaca/repos/tlon-init/tlon-init.el")) ;; helper functions package
 (tlon-init-set-paths)
 (tlon-init-load-code-overrides)
