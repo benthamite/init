@@ -15,7 +15,7 @@ default variable values.
 `:code-overrides': (optional) file from which to override code
 sections in the init file, using the function
 `tlon-init-override-code-if-present', which is created by this init
-process. The convention for key names is :ps/{package-name} but
+process. The convention for key names is :{package-name} but
 it is not required by this code.
 
 `:init-N': (N between 1 and 5) the files containing the actual

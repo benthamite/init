@@ -72,9 +72,9 @@ in the active config when present.
 If no key is present returns `yes', so that the default behavior
 is to tangle blocks that are not present in `tlon-init-flags'.
 
-The syntax for the KEY parameter is `:ps/{package-name}' where
+The syntax for the KEY parameter is `:{package-name}' where
 `{package-name}' is the name of the package. Examples:
-`:ps/general', `:ps/embark', `:ps/hydra'.
+`:general', `:embark', `:hydra'.
 
 With optional TANGLE-TO-EARLY-INIT, tangle to the `early-init.el'
 file."
@@ -90,21 +90,21 @@ When KEY is not present in `tlon-init-code-overrides', return the
 default, non-overridden code. The variable
 `tlon-init-code-overrides' is populated during the init process.
 
-The syntax for the KEY parameter is `:ps/{package-name}' where
+The syntax for the KEY parameter is `:{package-name}' where
 `{package-name}' is the name of the package. Examples:
-`:ps/general', `:ps/embark', `:ps/hydra'.
+`:general', `:embark', `:hydra'.
 
 Example usage:
 
 \(tlon-init-override-code-if-available
- :ps/embark
+ :embark
  \='(
   (use-package embark
    ;; Default, non-overridden code goes here,
    ;; in this case, the full use-package call
    )))
 
-If `:ps/embark' is found within `tlon-init-code-overrides' in this
+If `:embark' is found within `tlon-init-code-overrides' in this
 example, the default will be overridden by that code."
   (with-temp-buffer
     (dolist (row (alist-get key tlon-init-code-overrides code-block))
