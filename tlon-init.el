@@ -263,10 +263,19 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 
 (defun tlon-init-load-default-paths ()
   "Set paths in `paths.el', overriding them with `paths-override.el’ if present."
-  (dolist (row (custom-group-members 'paths nil))
+  (dolist (row (tlon-init-get-variables-and-values 'paths))
     (set (car row)
 	 (tlon-init-eval-value-if-possible
 	  (alist-get (car row) (tlon-init-read-file tlon-init-file-paths-override) (cdr row))))))
+
+(defun tlon-init-get-variables-and-values (group)
+  "Return a list of lists of all variables and corresopnding values in GROUP."
+  (let (result)
+    (dolist (member (custom-group-members group nil))
+      (when (eq (cadr member) 'custom-variable)
+        (let ((option (car member)))
+          (push (list option (symbol-value option)) result))))
+    (nreverse result)))
 
 (defun tlon-init-load-override-paths ()
   "Set paths in `paths-override.el' not present in `paths.el'."
