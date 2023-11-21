@@ -274,7 +274,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
     (dolist (member (custom-group-members group nil))
       (when (eq (cadr member) 'custom-variable)
         (let ((option (car member)))
-          (push (list option (symbol-value option)) result))))
+          (push `(,option . ,(symbol-value option)) result))))
     (nreverse result)))
 
 (defun tlon-init-load-override-paths ()
