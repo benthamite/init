@@ -183,7 +183,8 @@ example, the default will be overridden by that code."
     (if tlon-init-tangle-flags
 	(message (concat "Re-read init tangle flags from filename: " tangle-flags-filename))
       (unless (tlon-init-user-pablo-p)
-	(user-error "`tangle-flags.el' not present present in init dir")))))
+	(user-error "`tangle-flags.el' not present present in init dir"))))
+  (message "Set tangle flags for Chemacs profile `%s'" chemacs-profile-name))
 
 (defun tlon-init-build (init-dir)
   "Build or rebuild a profile in INIT-DIR."
@@ -245,13 +246,15 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
   "Load or re-load code overrides and from the currently booted init profile."
   (unless (tlon-init-user-pablo-p)
     (setq tlon-init-code-overrides
-	  (tlon-init-read-file tlon-init-file-code-override))))
+	  (tlon-init-read-file tlon-init-file-code-override)))
+  (message "Loaded code overrides from Chemacs profile `%s'" chemacs-profile-name))
 
 (defun tlon-init-load-init-files ()
   "Load user init file and, if appropriate, late init file."
   (load tlon-init-file-user-init)
   (unless (tlon-init-user-pablo-p)
-    (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init)))
+    (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init))
+  (message "Loaded init files from Chemacs profile `%s'" chemacs-profile-name))
 
 (defun tlon-init-load-late-init ()
   "Load `late-init.el'."
@@ -263,7 +266,8 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
   (load tlon-init-file-paths)
   (unless (tlon-init-user-pablo-p)
     (tlon-init-load-default-paths)
-    (tlon-init-load-override-paths)))
+    (tlon-init-load-override-paths))
+  (message "Loaded paths from Chemacs profile `%s'" chemacs-profile-name))
 
 (defun tlon-init-load-default-paths ()
   "Set paths in `paths.el', overriding them with `paths-override.el’ if present."
