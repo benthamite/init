@@ -36,10 +36,20 @@
 
 ;;;;; Package variables
 
+;;;;;; Dirs
+
+(defvar tlon-init-dir-dotemacs
+  (pcase user-full-name
+    ("Pablo Stafforini" "/Users/pablostafforini/Library/CloudStorage/Dropbox/dotfiles/emacs/")
+    ("Federico Stafforini" "/Users/fstafforini/source/dotfiles/emacs/") ; check
+    ("Leonardo Picón" "/Users/cartago/source/dotfiles/emacs") ; check
+    (_ (user-error "No dotemacs directory found for user %s" user-full-name)))
+  "Path to `tlon-init/' directory.")
+
 ;;;;;; Files
 
 (defvar tlon-init-file-paths
-  (file-name-concat user-emacs-directory "paths.el")
+  (file-name-concat tlon-init-dir-dotemacs "extras/paths.el")
   "Path to `paths.el'.")
 
 (defvar tlon-init-file-paths-override
@@ -67,6 +77,7 @@
   "Path to `late-init.el'.")
 
 ;;;;;; Other
+
 
 (defvar tlon-init-tangle-flags '()
   "Alist of tangle flags for each package.")
