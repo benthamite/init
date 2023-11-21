@@ -251,7 +251,11 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
   "Load user init file and, if appropriate, late init file."
   (load tlon-init-file-user-init)
   (unless (tlon-init-user-pablo-p)
-    (add-hook 'elpaca-after-init-hook #'tlon-init-file-late-init)))
+    (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init)))
+
+(defun tlon-init-load-late-init ()
+  "Load `late-init.el'."
+  (load tlon-init-file-late-init))
 
 (defun tlon-init-load-paths ()
   "Set paths from the currently booted init profile."
