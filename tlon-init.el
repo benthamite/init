@@ -28,7 +28,7 @@
 
 ;;;; Requirements
 
-(require 'ob-tangle)
+;; (require 'ob-tangle)
 (require 'cus-edit)
 ;; (require 'chemacs)
 
