@@ -235,21 +235,27 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
   (setq tlon-init-code-overrides
 	(tlon-init-read-file tlon-init-file-code-override)))
 
-(defun tlon-init-set-paths ()
+(defun tlon-init-load-init-files ()
+  "Load user init file and, if appropriate, late init file."
+  (load tlon-init-file-user-init)
+  (unless (tlon-init-user-pablo-p)
+    (add-hook 'elpaca-after-init-hook #'tlon-init-file-late-init)))
+
+(defun tlon-init-load-paths ()
   "Set paths from the currently booted init profile."
   (interactive)
   (load tlon-init-file-paths)
-  (tlon-init-set-default-paths)
-  (tlon-init-set-override-paths))
+  (tlon-init-load-default-paths)
+  (tlon-init-load-override-paths))
 
-(defun tlon-init-set-default-paths ()
+(defun tlon-init-load-default-paths ()
   "Set paths in `paths.el', overriding them with `paths-override.el’ if present."
   (dolist (row (custom-group-members 'paths nil))
     (set (car row)
 	 (tlon-init-eval-value-if-possible
 	  (alist-get (car row) (tlon-init-read-file tlon-init-file-paths-override) (cdr row))))))
 
-(defun tlon-init-set-override-paths ()
+(defun tlon-init-load-override-paths ()
   "Set paths in `paths-override.el' not present in `paths.el'."
   (dolist (row (tlon-init-read-file tlon-init-file-paths-override))
     (unless (symbolp (car row))
@@ -368,10 +374,7 @@ rest of the profile intact. To delete the entire profile, use
 	(user-error aborted)))
     (let* ((profile-dir (tlon-init-profile-dir profile-name))
 	   (package-dir (file-name-concat profile-dir "elpaca/repos/tlon-init/"))
-	   (init-file-source (concat package-dir
-				     (if (tlon-init-user-pablo-p)
-					 "tlon-init-without-overrides.el"
-				       "tlon-init-with-overrides.el")))
+	   (init-file-source (concat package-dir "tlon-init-boot-file.el"))
 	   (init-file-target (file-name-concat profile-dir "init.el"))
 	   (tlon-init-repo "git@github.com:tlon-team/tlon-init"))
       (when (file-exists-p package-dir)
@@ -395,6 +398,14 @@ rest of the profile intact. To delete the entire profile, use
 				     (find-buffer-visiting paths-file-config))
 	      (tlon-init-build profile-dir))
 	  (message message))))))
+
+(defun tlon-init-startup ()
+  "Start up Emacs with `tlon-init' config.
+This is the function that is called by `init.el'."
+  (tlon-init-load-paths)
+  (tlon-init-load-code-overrides)
+  (tlon-init-set-tangle-flags user-emacs-directory)
+  (tlon-init-load-init-files))
 
 (provide 'tlon-init)
 
