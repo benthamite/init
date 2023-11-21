@@ -243,8 +243,9 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 
 (defun tlon-init-load-code-overrides ()
   "Load or re-load code overrides and from the currently booted init profile."
-  (setq tlon-init-code-overrides
-	(tlon-init-read-file tlon-init-file-code-override)))
+  (unless (tlon-init-user-pablo-p)
+    (setq tlon-init-code-overrides
+	  (tlon-init-read-file tlon-init-file-code-override))))
 
 (defun tlon-init-load-init-files ()
   "Load user init file and, if appropriate, late init file."
@@ -256,8 +257,9 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
   "Set paths from the currently booted init profile."
   (interactive)
   (load tlon-init-file-paths)
-  (tlon-init-load-default-paths)
-  (tlon-init-load-override-paths))
+  (unless (tlon-init-user-pablo-p)
+    (tlon-init-load-default-paths)
+    (tlon-init-load-override-paths)))
 
 (defun tlon-init-load-default-paths ()
   "Set paths in `paths.el', overriding them with `paths-override.el’ if present."
