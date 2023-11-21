@@ -221,7 +221,7 @@ example, the default will be overridden by that code."
   (let ((org-babel-pre-tangle-hook (remove 'save-buffer org-babel-pre-tangle-hook)))
     (org-babel-tangle))
   (save-buffer)
-  (message "Tangled init files to Chemacs profile `%s'" tlon-init-user-init-path))
+  (message "Tangled init files to Chemacs profile `%s'" tlon-init-file-user-init))
 
 (defun tlon-init-tangle-extra-config-file ()
   "Tangle extra config file.
