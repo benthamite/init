@@ -432,6 +432,7 @@ rest of the profile intact. To delete the entire profile, use
 (defun tlon-init-startup ()
   "Start up Emacs with `tlon-init' config.
 This is the function that is called by `init.el'."
+  (message "Running startup...")
   (tlon-init-load-paths)
   (tlon-init-load-code-overrides)
   (tlon-init-set-tangle-flags user-emacs-directory)
