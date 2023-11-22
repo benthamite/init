@@ -274,7 +274,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 	  (alist-get (car row) (tlon-init-read-file tlon-init-file-paths-override) (cdr row))))))
 
 (defun tlon-init-get-variables-and-values (group)
-  "Return a list of lists of all variables and corresopnding values in GROUP."
+  "Return a list of lists of all variables and corresponding values in GROUP."
   (let (result)
     (dolist (member (custom-group-members group nil))
       (when (eq (cadr member) 'custom-variable)
