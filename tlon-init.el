@@ -402,7 +402,7 @@ rest of the profile intact. To delete the entire profile, use
 	(user-error aborted)))
     (let* ((profile-dir (tlon-init-profile-dir profile-name))
 	   (package-dir (file-name-concat profile-dir "elpaca/repos/tlon-init/"))
-	   (init-file-source (concat package-dir "tlon-init-boot-file.el"))
+	   (init-file-source (file-name-concat package-dir "init.el"))
 	   (init-file-target (file-name-concat profile-dir "init.el"))
 	   (tlon-init-repo "git@github.com:tlon-team/tlon-init"))
       (when (file-exists-p package-dir)
