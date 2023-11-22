@@ -29,7 +29,7 @@
 ;;;; Requirements
 
 ;; (require 'ob-tangle)
-;; (require 'cus-edit)
+(require 'cus-edit)
 ;; (require 'chemacs)
 
 ;;;; Variables
