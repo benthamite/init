@@ -40,7 +40,7 @@
   (pcase user-full-name
     ("Pablo Stafforini" "/Users/pablostafforini/Library/CloudStorage/Dropbox/dotfiles/emacs/")
     ("Federico Stafforini" "/Users/fstafforini/source/dotfiles/emacs/") ; check
-    ("Leonardo Picón" "/Users/cartago/source/dotfiles/emacs/") ; check
+    ("cartago" "/Users/cartago/source/dotfiles/emacs/")
     (_ (user-error "No dotemacs directory found for user %s" user-full-name)))
   "Path to `tlon-init/' directory.")
 
