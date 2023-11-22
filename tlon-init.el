@@ -225,7 +225,7 @@ example, the default will be overridden by that code."
   "Tangle extra config file.
 The extra config file is the file with the name `config-{user-first-name}.org'"
   (let* ((user-first-name (downcase (car (split-string user-full-name))))
-	 (extra-config-file (file-name-concat default-directory
+	 (extra-config-file (file-name-concat paths-dir-dotemacs
 					      (concat "config-" user-first-name ".org"))))
     (if (file-exists-p extra-config-file)
 	(with-current-buffer (or (find-file-noselect extra-config-file)
