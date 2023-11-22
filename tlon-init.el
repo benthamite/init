@@ -170,6 +170,10 @@ example, the default will be overridden by that code."
   "Return t if Pablo is the current user, and nil otherwise."
   (string= user-full-name "Pablo Stafforini"))
 
+(defun tlon-init-machine-pablo-p ()
+  "Return t if Pablo's machine is the current machine, and nil otherwise."
+  (string= system-name "Pablos-MacBook-Pro.local"))
+
 (defun tlon-init-set-tangle-flags (init-dir)
   "Set tangle flags for INIT-DIR."
   (let ((tangle-flags-filename (file-name-concat init-dir "tangle-flags.el")))
@@ -249,7 +253,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 (defun tlon-init-load-init-files ()
   "Load user init file and, if appropriate, late init file."
   (load tlon-init-file-user-init)
-  (unless (tlon-init-user-pablo-p)
+  (unless (tlon-init-machine-pablo-p)
     (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init))
   (message "Loaded init files for Chemacs profile `%s'" chemacs-profile-name))
 
