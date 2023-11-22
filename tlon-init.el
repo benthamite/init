@@ -392,6 +392,7 @@ profile directory, if such a file is found, but will leave the
 rest of the profile intact. To delete the entire profile, use
 `tlon-init-delete-profile'."
   (interactive "sProfile name: ")
+  (tlon-init-check-paths-loaded)
   (let ((overwrite nil)
 	(aborted "Deploy aborted"))
     (if (not (tlon-init-profile-exists-p profile-name))
@@ -425,6 +426,11 @@ rest of the profile intact. To delete the entire profile, use
 				     (find-buffer-visiting paths-file-config))
 	      (tlon-init-build profile-dir))
 	  (message message))))))
+
+(defun tlon-init-check-paths-loaded ()
+  "Check that `paths.el' has been loaded, else signal an error."
+  (unless (boundp 'paths-file-config)
+    (user-error "Error: `paths.el' not loaded")))
 
 (defun tlon-init-startup ()
   "Start up Emacs with `tlon-init' config.
