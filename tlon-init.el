@@ -244,14 +244,14 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
   (unless (tlon-init-user-pablo-p)
     (setq tlon-init-code-overrides
 	  (tlon-init-read-file tlon-init-file-code-override)))
-  (message "Loaded code overrides from Chemacs profile `%s'" chemacs-profile-name))
+  (message "Loaded code overrides for Chemacs profile `%s'" chemacs-profile-name))
 
 (defun tlon-init-load-init-files ()
   "Load user init file and, if appropriate, late init file."
   (load tlon-init-file-user-init)
   (unless (tlon-init-user-pablo-p)
     (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init))
-  (message "Loaded init files from Chemacs profile `%s'" chemacs-profile-name))
+  (message "Loaded init files for Chemacs profile `%s'" chemacs-profile-name))
 
 (defun tlon-init-load-late-init ()
   "Load `late-init.el'."
@@ -264,7 +264,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
   (unless (tlon-init-user-pablo-p)
     (tlon-init-load-default-paths)
     (tlon-init-load-override-paths))
-  (message "Loaded paths from Chemacs profile `%s'" chemacs-profile-name))
+  (message "Loaded paths for Chemacs profile `%s'" chemacs-profile-name))
 
 (defun tlon-init-load-default-paths ()
   "Set paths in `paths.el', overriding them with `paths-override.el’ if present."
@@ -340,7 +340,7 @@ This adds a new profile to `~/.emacs-profiles.el' and creates a
       (user-error "Profile already exists"))
     (make-directory profile-dir t)
     (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'create)
-    (message "Created new Chemacs profile `%s'. Default profile is `%s'"
+    (message "Created new Chemacs profile `%s'. Default profile is `%s'."
 	     profile-name
 	     (file-name-nondirectory (tlon-init-profile-dir "default")))
     profile-name))
