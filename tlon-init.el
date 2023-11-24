@@ -39,7 +39,7 @@
 (defvar tlon-init-dir-dotemacs
   (pcase user-full-name
     ("Pablo Stafforini" "/Users/pablostafforini/Library/CloudStorage/Dropbox/dotfiles/emacs/")
-    ("Federico Stafforini" "/Users/fstafforini/source/dotfiles/emacs/") ; check
+    ("Federico Stafforini" "/Users/fstafforini/source/dotfiles/emacs/")
     ("cartago" "/Users/cartago/source/dotfiles/emacs/")
     (_ (user-error "No dotemacs directory found for user %s" user-full-name)))
   "Path to `tlon-init/' directory.")
