@@ -85,6 +85,11 @@
 (defvar tlon-init-extra-config-tangle-pass nil
   "Pass number for extra config tangle.")
 
+(defvar tlon-init-boot-as-if-not-pablo nil
+  "If non-nil, boot as if the user is not Pablo and the computer is not Pablo’s.
+This variable allows Pablo to test other people’s configs from his own computer.
+It should be set in `init.el'.")
+
 ;;;; Functions
 
 (defun tlon-init-get-tangle-flag (key &optional tangle-to-early-init)
@@ -206,14 +211,14 @@ example, the default will be overridden by that code."
   (setq tlon-init-file-late-init (file-name-concat init-dir "late-init.el"))
   ;; conditionally tangle extra config file, pass 1: get tangle flags only
   (setq tlon-init-extra-config-tangle-pass 1)
-  (unless (tlon-init-user-pablo-p)
+  (unless (and (tlon-init-user-pablo-p) (not tlon-init-boot-as-if-not-pablo))
     (tlon-init-tangle-extra-config-file))
   (tlon-init-set-tangle-flags init-dir)
   ;; tangle `config.org'
   (tlon-init-tangle)
   ;; conditionally tangle extra config file, pass 2: get the rest of extra config
   (setq tlon-init-extra-config-tangle-pass 2)
-  (unless (tlon-init-user-pablo-p)
+  (unless (and (tlon-init-user-pablo-p) (not tlon-init-boot-as-if-not-pablo))
     (tlon-init-tangle-extra-config-file)))
 
 (defun tlon-init-tangle ()
@@ -245,7 +250,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 
 (defun tlon-init-load-code-overrides ()
   "Load or re-load code overrides and from the currently booted init profile."
-  (unless (tlon-init-user-pablo-p)
+  (unless (and (tlon-init-user-pablo-p) (not tlon-init-boot-as-if-not-pablo))
     (setq tlon-init-code-overrides
 	  (tlon-init-read-file tlon-init-file-code-override)))
   (message "Loaded code overrides for Chemacs profile `%s'" chemacs-profile-name))
@@ -253,7 +258,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 (defun tlon-init-load-init-files ()
   "Load user init file and, if appropriate, late init file."
   (load tlon-init-file-user-init)
-  (unless (tlon-init-machine-pablo-p)
+  (unless (and (tlon-init-machine-pablo-p) (not tlon-init-boot-as-if-not-pablo))
     (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init))
   (message "Loaded init files for Chemacs profile `%s'" chemacs-profile-name))
 
@@ -265,7 +270,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
   "Set paths from the currently booted init profile."
   (interactive)
   (load tlon-init-file-paths)
-  (unless (tlon-init-user-pablo-p)
+  (unless (and (tlon-init-user-pablo-p) (not tlon-init-boot-as-if-not-pablo))
     (tlon-init-load-default-paths)
     (tlon-init-load-override-paths))
   (message "Loaded paths for Chemacs profile `%s'" chemacs-profile-name))
