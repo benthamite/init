@@ -186,7 +186,7 @@ example, the default will be overridden by that code."
 	(message (concat "Re-read init tangle flags from filename: " tangle-flags-filename))
       (unless (and (tlon-init-machine-pablo-p) (not tlon-init-boot-as-if-not-pablo))
 	(user-error "`tangle-flags.el' not present present in init dir"))))
-  (message "Set tangle flags for Chemacs profile `%s'" chemacs-profile-name))
+  (message "Set tangle flags for `%s'" init-dir))
 
 (defun tlon-init-build (init-dir)
   "Build or rebuild a profile in INIT-DIR."
