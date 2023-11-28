@@ -95,18 +95,16 @@ It should be set in `init.el'.")
 
 (defun tlon-init-get-tangle-flag (key &optional tangle-to-early-init)
   "Get a `yes' / `no' tangle flag for a given KEY.
-Use the default config as a base, which is overridden by values
-in the active config when present.
+Use the default config as a base, which is overridden by values in the active
+config when present.
 
-If no key is present returns `yes', so that the default behavior
-is to tangle blocks that are not present in `tlon-init-flags'.
+If no key is present returns `yes', so that the default behavior is to tangle
+blocks that are not present in `tlon-init-flags'.
 
-The syntax for the KEY parameter is `:{package-name}' where
-`{package-name}' is the name of the package. Examples:
-`:general', `:embark', `:hydra'.
+The syntax for the KEY parameter is `:{package-name}' where `{package-name}' is
+the name of the package. Examples: `:general', `:embark', `:hydra'.
 
-With optional TANGLE-TO-EARLY-INIT, tangle to the `early-init.el'
-file."
+With optional TANGLE-TO-EARLY-INIT, tangle to the `early-init.el' file."
   (if (alist-get key tlon-init-tangle-flags t)
       (if tangle-to-early-init
 	  tlon-init-file-early-init
@@ -115,13 +113,12 @@ file."
 
 (defun tlon-init-override-code-if-available (key code-block)
   "Return CODE-BLOCK of KEY in `tlon-init-code-overrides'.
-When KEY is not present in `tlon-init-code-overrides', return the
-default, non-overridden code. The variable
-`tlon-init-code-overrides' is populated during the init process.
+When KEY is not present in `tlon-init-code-overrides', return the default,
+non-overridden code. The variable `tlon-init-code-overrides' is populated during
+the init process.
 
-The syntax for the KEY parameter is `:{package-name}' where
-`{package-name}' is the name of the package. Examples:
-`:general', `:embark', `:hydra'.
+The syntax for the KEY parameter is `:{package-name}' where `{package-name}' is
+the name of the package. Examples: `:general', `:embark', `:hydra'.
 
 Example usage:
 
@@ -133,8 +130,8 @@ Example usage:
    ;; in this case, the full use-package call
    )))
 
-If `:embark' is found within `tlon-init-code-overrides' in this
-example, the default will be overridden by that code."
+If `:embark' is found within `tlon-init-code-overrides' in this example, the
+default will be overridden by that code."
   (with-temp-buffer
     (dolist (row (alist-get key tlon-init-code-overrides code-block))
       (insert (prin1-to-string row)))
@@ -304,9 +301,8 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 
 (defun tlon-init-act-on-chemacs-profiles (profile-name &optional profile-dir action)
   "Create, delete or set PROFILE-NAME as default in PROFILE-DIR.
-When ACTION is `'set-default', set PROFILE-NAME as default.
-When ACTION is `'create', create PROFILE-NAME.
-Otherwise, delete PROFILE-NAME."
+When ACTION is `'set-default', set PROFILE-NAME as default. When ACTION is
+`'create', create PROFILE-NAME. Otherwise, delete PROFILE-NAME."
   (let* ((emacs-profiles (file-truename "~/.emacs-profiles.el"))
 	 (regex-default (format "(\"default\" . ((user-emacs-directory . \"%s\")))" (tlon-init-profile-dir "default")))
 	 (regex-search (if (member action '(create set-default))
@@ -335,10 +331,9 @@ Otherwise, delete PROFILE-NAME."
 
 (defun tlon-init-create-profile (profile-name &optional overwrite)
   "Create a new Chemacs profile named PROFILE-NAME.
-This adds a new profile to `~/.emacs-profiles.el' and creates a
- directory in the Chemacs profiles directory. The directory will
- have PROFILE-NAME as its name. If profile already exists, throw
- a user error message, unless OVERWRITE is non-nil."
+This adds a new profile to `~/.emacs-profiles.el' and creates a directory in the
+Chemacs profiles directory. The directory will have PROFILE-NAME as its name. If
+profile already exists, throw a user error message, unless OVERWRITE is non-nil."
   (let ((profile-dir (file-name-concat
 		      (file-name-directory (directory-file-name user-emacs-directory))
 		      profile-name)))
@@ -388,17 +383,15 @@ This adds a new profile to `~/.emacs-profiles.el' and creates a
 
 (defun tlon-init-deploy-profile (profile-name)
   "Deploy PROFILE-NAME.
-If you are deploying a new profile in a machine with `tlon-init'
-managed by `elpaca', you only need to run this command.
-Otherwise, you must first clone
-https://github.com/tlon-team/tlon-init, open `tlon-init.el' in
-the cloned repo, and `M-x eval-buffer'.
+If you are deploying a new profile in a machine with `tlon-init' managed by
+`elpaca', you only need to run this command. Otherwise, you must first clone
+https://github.com/tlon-team/tlon-init, open `tlon-init.el' in the cloned repo,
+and `M-x eval-buffer'.
 
-If there is already a `tlon-init' subdirectory in the `elpaca'
-`repos' directory, you will be asked to confirm you want to
-overwrite it. This will also overwrite the `init.el' file in the
-profile directory, if such a file is found, but will leave the
-rest of the profile intact. To delete the entire profile, use
+If there is already a `tlon-init' subdirectory in the `elpaca' `repos'
+directory, you will be asked to confirm you want to overwrite it. This will also
+overwrite the `init.el' file in the profile directory, if such a file is found,
+but will leave the rest of the profile intact. To delete the entire profile, use
 `tlon-init-delete-profile'."
   (interactive "sProfile name: ")
   (tlon-init-check-paths-loaded)
