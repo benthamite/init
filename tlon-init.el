@@ -173,8 +173,11 @@ example, the default will be overridden by that code."
        target-directories))))
 
 (defun tlon-init-machine-pablo-p ()
-  "Return t if Pablo's machine is the current machine, and nil otherwise."
-  (string= system-name "Pablos-MacBook-Pro.local"))
+  "Return t if Pablo's machine is the current machine, and nil otherwise.
+Set `tlon-init-boot-as-if-not-pablo' to t in `init.el' to test from Pablo's
+machine"
+  (and (string= system-name "Pablos-MacBook-Pro.local")
+       (not tlon-init-boot-as-if-not-pablo)))
 
 (defun tlon-init-set-tangle-flags (init-dir)
   "Set tangle flags for INIT-DIR."
@@ -185,7 +188,7 @@ example, the default will be overridden by that code."
 	     (setq tlon-init-tangle-flags nil)))
     (if tlon-init-tangle-flags
 	(message (concat "Re-read init tangle flags from filename: " tangle-flags-filename))
-      (unless (and (tlon-init-machine-pablo-p) (not tlon-init-boot-as-if-not-pablo))
+      (unless (tlon-init-machine-pablo-p)
 	(user-error "`tangle-flags.el' not present present in init dir"))))
   (message "Set tangle flags for `%s'" init-dir))
 
@@ -208,14 +211,14 @@ example, the default will be overridden by that code."
   (setq tlon-init-file-late-init (file-name-concat init-dir "late-init.el"))
   ;; conditionally tangle extra config file, pass 1: get tangle flags only
   (setq tlon-init-extra-config-tangle-pass 1)
-  (unless (and (tlon-init-machine-pablo-p) (not tlon-init-boot-as-if-not-pablo))
+  (unless (tlon-init-machine-pablo-p)
     (tlon-init-tangle-extra-config-file))
   (tlon-init-set-tangle-flags init-dir)
   ;; tangle `config.org'
   (tlon-init-tangle)
   ;; conditionally tangle extra config file, pass 2: get the rest of extra config
   (setq tlon-init-extra-config-tangle-pass 2)
-  (unless (and (tlon-init-machine-pablo-p) (not tlon-init-boot-as-if-not-pablo))
+  (unless (tlon-init-machine-pablo-p)
     (tlon-init-tangle-extra-config-file)))
 
 (defun tlon-init-tangle ()
@@ -247,7 +250,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 
 (defun tlon-init-load-code-overrides ()
   "Load or re-load code overrides and from the currently booted init profile."
-  (unless (and (tlon-init-machine-pablo-p) (not tlon-init-boot-as-if-not-pablo))
+  (unless (tlon-init-machine-pablo-p)
     (setq tlon-init-code-overrides
 	  (tlon-init-read-file tlon-init-file-code-override)))
   (message "Loaded code overrides for Chemacs profile `%s'" chemacs-profile-name))
@@ -255,7 +258,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 (defun tlon-init-load-init-files ()
   "Load user init file and, if appropriate, late init file."
   (load tlon-init-file-user-init)
-  (unless (and (tlon-init-machine-pablo-p) (not tlon-init-boot-as-if-not-pablo))
+  (unless (tlon-init-machine-pablo-p)
     (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init))
   (message "Loaded init files for Chemacs profile `%s'" chemacs-profile-name))
 
@@ -267,7 +270,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
   "Set paths from the currently booted init profile."
   (interactive)
   (load tlon-init-file-paths)
-  (unless (and (tlon-init-machine-pablo-p) (not tlon-init-boot-as-if-not-pablo))
+  (unless (tlon-init-machine-pablo-p)
     (tlon-init-load-default-paths)
     (tlon-init-load-override-paths))
   (message "Loaded paths for Chemacs profile `%s'" chemacs-profile-name))
