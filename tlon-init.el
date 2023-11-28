@@ -277,7 +277,8 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
   (dolist (row (tlon-init-get-variables-and-values 'paths))
     (set (car row)
 	 (tlon-init-eval-value-if-possible
-	  (alist-get (car row) (tlon-init-read-file tlon-init-file-paths-override) (cdr row))))))
+	  (alist-get (car row) (tlon-init-read-file tlon-init-file-paths-override) (cdr row))))
+    (message "Set `%s' to `%s'" (car row) (symbol-value (car row)))))
 
 (defun tlon-init-get-variables-and-values (group)
   "Return a list of lists of all variables and corresponding values in GROUP."
