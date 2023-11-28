@@ -294,7 +294,8 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
   (dolist (row (tlon-init-read-file tlon-init-file-paths-override))
     (unless (boundp (car row))
       (set (car row)
-	   (tlon-init-eval-value-if-possible (cdr row))))))
+	   (tlon-init-eval-value-if-possible (cdr row)))
+      (message "Set `%s' to `%s'" (car row) (symbol-value (car row))))))
 
 (defun tlon-init-profile-dir (profile-name)
   "Return the directory of the Chemacs profile PROFILE-NAME."
