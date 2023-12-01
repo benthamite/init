@@ -39,7 +39,7 @@
 	       ("/Users/pablostafforini" "Library/CloudStorage/Dropbox/dotfiles/emacs/")
 	       ("/Users/fede" "source/dotfiles/emacs/")
 	       ("/Users/cartago" "source/dotfiles/emacs/")
-	       (_ (user-error "Home directory does not match that of known user")))))
+	       (_ (user-error "Home directory does not match that of a known user")))))
     (file-name-concat (getenv "HOME") dir))
   "Path to `tlon-init/' directory.")
 
