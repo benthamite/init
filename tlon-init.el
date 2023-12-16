@@ -89,6 +89,9 @@
 This variable allows Pablo to test other people’s configs from his own computer.
 It should be set in `init.el'.")
 
+(defvar tlon-init-after-init-hook nil
+  "Hook run after a user’s config has been loaded.")
+
 ;;;; Functions
 
 (defun tlon-init-get-tangle-flag (key &optional tangle-to-early-init)
