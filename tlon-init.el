@@ -90,9 +90,13 @@ This variable allows Pablo to test other people’s configs from his own compute
 It should be set in `init.el'.")
 
 (defvar tlon-init-post-init-hook nil
-  "Hook run at the end of each user’s config file has been loaded.
-If the user is Pablo, it is run after Pablo’s config file has been loaded.
-Otherwise, it is run after the user’s personal config file has been loaded.")
+  "Hook run at the end of the user’s config file.
+If the user is Pablo, it is run at the end of `config.org'. Otherwise, it is run
+at the end the user’s personal config file, e.g. `config-leonardo.org' if the
+user is Leo.
+
+The advantage of this hook over `elpaca-after-init-hook' is that the latter will
+always load at the end of `config.org', even when the user is not Pablo.")
 
 ;;;; Functions
 
@@ -260,17 +264,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
   (load tlon-init-file-user-init)
   (unless (tlon-init-machine-pablo-p)
     (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init))
-  (tlon-init-set-post-init-hook)
   (message "Loaded init files for Chemacs profile `%s'" chemacs-profile-name))
-
-(defun tlon-init-set-post-init-hook ()
-  "Run `tlon-init-post-init-hook'.
-Note that there is an explicit call to run this hook at the end of the Leo/Fede
-config files, so this function is only needed for Pablo's config file."
-  (when (tlon-init-machine-pablo-p)
-    (add-hook 'elpaca-after-init-hook
-	      (lambda ()
-		(run-hooks 'tlon-init-post-init-hook)))))
 
 (defun tlon-init-load-late-init ()
   "Load `late-init.el'."
