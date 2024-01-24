@@ -273,7 +273,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 (defun tlon-init-load-paths ()
   "Set paths from the currently booted init profile."
   (interactive)
-  (load tlon-init-file-paths)
+  ;; (load tlon-init-file-paths)
   (unless (tlon-init-machine-pablo-p)
     (tlon-init-load-default-paths)
     (tlon-init-load-override-paths))
