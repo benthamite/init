@@ -155,6 +155,8 @@ default will be overridden by that code."
 	(error
 	 (error "Failed to parse %s: %s" fname (error-message-string err)))))))
 
+(defvar chemacs-profiles)
+(defvar chemacs-profiles-path)
 (defun tlon-init-available-init-dirs ()
   "Return Alist of Chemacs profiles and associated init locations."
   ;; update `chemacs-profiles' in case a new profile was added
@@ -225,6 +227,8 @@ machine"
   (unless (tlon-init-machine-pablo-p)
     (tlon-init-tangle-extra-config-file)))
 
+(defvar org-babel-pre-tangle-hook)
+(declare-function org-babel-tangle "file-name")
 (defun tlon-init-tangle ()
   "Tangle the current buffer."
   (widen)
@@ -248,10 +252,11 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 
 (defun tlon-init-eval-value-if-possible (value)
   "Evaluate variable VALUE if possible, else return unevaluated VALUE."
-  (condition-case err
+  (condition-case _
       (eval value)
     (error value)))
 
+(defvar chemacs-profile-name)
 (defun tlon-init-load-code-overrides ()
   "Load or re-load code overrides and from the currently booted init profile."
   (unless (tlon-init-machine-pablo-p)
