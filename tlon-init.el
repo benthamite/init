@@ -261,7 +261,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 
 (defun tlon-init-load-init-files ()
   "Load user init file and, if appropriate, late init file."
-  (load tlon-init-file-user-init)
+  ;; (load tlon-init-file-user-init)
   (unless (tlon-init-machine-pablo-p)
     (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init))
   (message "Loaded init files for Chemacs profile `%s'" chemacs-profile-name))
