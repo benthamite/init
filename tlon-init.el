@@ -287,6 +287,14 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 	  (alist-get (car row) (tlon-init-read-file tlon-init-file-paths-override) (cdr row))))
     (message "Set `%s' to `%s'" (car row) (symbol-value (car row)))))
 
+(defun tlon-init-load-override-paths ()
+  "Set paths in `paths-override.el' not present in `paths.el'."
+  (dolist (row (tlon-init-read-file tlon-init-file-paths-override))
+    (unless (boundp (car row))
+      (set (car row)
+	   (tlon-init-eval-value-if-possible (cdr row)))
+      (message "Set `%s' to `%s'" (car row) (symbol-value (car row))))))
+
 (defun tlon-init-get-variables-and-values (group)
   "Return a list of lists of all variables and corresponding values in GROUP."
   (let (result)
@@ -295,14 +303,6 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 	(let ((option (car member)))
 	  (push `(,option . ,(symbol-value option)) result))))
     (nreverse result)))
-
-(defun tlon-init-load-override-paths ()
-  "Set paths in `paths-override.el' not present in `paths.el'."
-  (dolist (row (tlon-init-read-file tlon-init-file-paths-override))
-    (unless (boundp (car row))
-      (set (car row)
-	   (tlon-init-eval-value-if-possible (cdr row)))
-      (message "Set `%s' to `%s'" (car row) (symbol-value (car row))))))
 
 (defun tlon-init-profile-dir (profile-name)
   "Return the directory of the Chemacs profile PROFILE-NAME."
