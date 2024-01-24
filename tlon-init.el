@@ -462,6 +462,8 @@ This is the function that is called by `init.el'."
   (when (tlon-init-machine-pablo-p)
     (run-hooks 'tlon-init-post-init-hook)))
 
+(add-hook 'elpaca-after-init-hook #'tlon-init-run-post-init-hook)
+
 (provide 'tlon-init)
 
 ;;; tlon-init.el ends here
