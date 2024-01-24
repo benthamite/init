@@ -182,7 +182,7 @@ default will be overridden by that code."
   "Return t if Pablo's machine is the current machine, and nil otherwise.
 Set `tlon-init-boot-as-if-not-pablo' to t in `init.el' to test from Pablo's
 machine"
-  (and (string= system-name "Pablos-MacBook-Pro.local")
+  (and (string= (system-name) "Pablos-MacBook-Pro.local")
        (not tlon-init-boot-as-if-not-pablo)))
 
 (defun tlon-init-set-tangle-flags (init-dir)
