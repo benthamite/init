@@ -452,6 +452,11 @@ This is the function that is called by `init.el'."
   (tlon-init-set-tangle-flags user-emacs-directory)
   (tlon-init-load-init-files))
 
+(defun tlon-init-run-post-init-hook ()
+  "Run `tlon-init-post-init-hook'."
+  (when (tlon-init-machine-pablo-p)
+    (run-hooks 'tlon-init-post-init-hook)))
+
 (provide 'tlon-init)
 
 ;;; tlon-init.el ends here
