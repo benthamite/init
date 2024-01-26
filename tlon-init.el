@@ -460,9 +460,10 @@ This is the function that is called by `init.el'."
 (defun tlon-init-run-post-init-hook ()
   "Run `tlon-init-post-init-hook'."
   (when (tlon-init-machine-pablo-p)
+    (dolist (hook tlon-init-post-init-hook)
+      (message "Running `%s'" (symbol-name hook)))
+    (message "Running of hooks in `tlon-init-post-init-hook' complete")
     (run-hooks 'tlon-init-post-init-hook)))
-
-(add-hook 'elpaca-after-init-hook #'tlon-init-run-post-init-hook)
 
 (provide 'tlon-init)
 
