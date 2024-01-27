@@ -455,13 +455,13 @@ When ACTION is `'set-default', set PROFILE-NAME as default. When ACTION is
 ;;;;; 
 
 (defun tlon-init-startup ()
-  "Start up Emacs with `tlon-init' config.
-This is the function that is called by `init.el'."
+  "Start up Emacs with `tlon-init' config."
   (message "Running startup...")
   (tlon-init-load-paths)
   (tlon-init-load-code-overrides)
   (tlon-init-set-tangle-flags user-emacs-directory)
-  (tlon-init-load-init-files))
+  (tlon-init-load-init-files)
+  (add-hook 'elpaca-after-init-hook #'tlon-init-run-post-init-hook))
 
 (defun tlon-init-run-post-init-hook ()
   "Run `tlon-init-post-init-hook'."
