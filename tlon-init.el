@@ -66,7 +66,7 @@
   "Path to `early-init.el'.")
 
 (defvar tlon-init-file-user-init
-  (file-name-concat user-emacs-directory "init-pablo.el")
+  (file-name-concat user-emacs-directory "init.el")
   "Path to `init-pablo.el'.")
 
 (defvar tlon-init-file-late-init
@@ -230,7 +230,7 @@ machine"
 	tlon-init-file-code-override (file-name-concat init-dir "code-override.el")
 	tlon-init-file-tangle-flags (file-name-concat init-dir "tangle-flags.el")
 	tlon-init-file-early-init (file-name-concat init-dir "early-init.el")
-	tlon-init-file-user-init (file-name-concat init-dir "init-pablo.el")
+	tlon-init-file-user-init (file-name-concat init-dir "init.el")
 	tlon-init-file-late-init (file-name-concat init-dir "late-init.el")))
 
 (defvar org-babel-pre-tangle-hook)
