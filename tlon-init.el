@@ -351,6 +351,8 @@ When ACTION is `'set-default', set PROFILE-NAME as default. When ACTION is
   (when-let ((profile-dir (tlon-init-profile-dir profile-name)))
     (file-directory-p profile-dir)))
 
+;;;;; Profile management
+
 (defun tlon-init-create-profile (profile-name &optional overwrite)
   "Create a new Chemacs profile named PROFILE-NAME.
 This adds a new profile to `~/.emacs-profiles.el' and creates a directory in the
