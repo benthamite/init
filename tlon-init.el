@@ -240,9 +240,7 @@ machine"
   "Tangle the current buffer."
   (widen)
   (save-buffer)
-  (let ((org-babel-pre-tangle-hook (remove 'save-buffer org-babel-pre-tangle-hook)))
-    (org-babel-tangle))
-  (save-buffer)
+  (org-babel-tangle)
   (message "Tangled init files to Chemacs profile `%s'" tlon-init-file-user-init))
 
 (defun tlon-init-tangle-extra-config-file ()
