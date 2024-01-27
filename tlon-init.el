@@ -45,9 +45,6 @@
 
 ;;;;; Files
 
-(defvar tlon-init-file-paths
-  (file-name-concat tlon-init-dir-dotemacs "extras/paths.el")
-  "Path to `paths.el'.")
 
 (defvar tlon-init-file-paths-override
   (file-name-concat user-emacs-directory "paths-override.el")
