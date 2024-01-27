@@ -374,57 +374,24 @@ profile already exists, throw a user error message, unless OVERWRITE is non-nil.
     (message "Set default Chemacs profile to '%s'" profile-name)))
 
 (defun tlon-init-deploy-profile (profile-name)
-  "Deploy PROFILE-NAME.
-If you are deploying a new profile in a machine with `tlon-init' managed by
-`elpaca', you only need to run this command. Otherwise, you must first clone
-https://github.com/tlon-team/tlon-init, open `tlon-init.el' in the cloned repo,
-and `M-x eval-buffer'.
-
-If there is already a `tlon-init' subdirectory in the `elpaca' `repos'
-directory, you will be asked to confirm you want to overwrite it. This will also
-overwrite the `init.el' file in the profile directory, if such a file is found,
-but will leave the rest of the profile intact. To delete the entire profile, use
-`tlon-init-delete-profile'."
+  "Deploy PROFILE-NAME."
   (interactive "sProfile name: ")
-  (tlon-init-check-paths-loaded)
-  (let ((overwrite nil)
-	(aborted "Deploy aborted"))
-    (if (not (tlon-init-profile-exists-p profile-name))
-	(tlon-init-create-profile profile-name t)
-      (if (y-or-n-p (format "Profile `%s' already exists. Redeploy? " profile-name))
-	  (setq overwrite t)
-	(user-error aborted)))
-    (let* ((profile-dir (tlon-init-profile-dir profile-name))
-	   (package-dir (file-name-concat profile-dir "elpaca/repos/tlon-init/"))
-	   (init-file-source (file-name-concat package-dir "init.el"))
-	   (init-file-target (file-name-concat profile-dir "init.el"))
-	   (tlon-init-repo "git@github.com:tlon-team/tlon-init"))
-      (when (file-exists-p package-dir)
-	(if (or overwrite
-		(y-or-n-p (format "`%s' is not empty. Overwrite? " package-dir)))
-	    (progn
-	      (delete-directory package-dir t t)
-	      (setq overwrite t))
-	  (user-error aborted)))
-      (shell-command (format "git clone %s %s" tlon-init-repo package-dir))
-      (when (file-exists-p init-file-target)
-	(if (or overwrite
-		(y-or-n-p (format "`%s' already exists. Overwrite? " init-file-target)))
-	    (delete-file init-file-target)
-	  (user-error aborted)))
-      (copy-file init-file-source init-file-target t)
-      (let ((message (format "Deployed profile '%s' to '%s'." profile-name profile-dir)))
-	(if (and (boundp 'paths-file-config)
-		 (y-or-n-p (concat message " Build init files?")))
-	    (with-current-buffer (or (find-file-noselect paths-file-config)
-				     (find-buffer-visiting paths-file-config))
-	      (tlon-init-build profile-dir))
-	  (message message))))))
+  (when (tlon-init-profile-exists-p profile-name)
+    (unless (y-or-n-p (format "Profile `%s' already exists. Redeploy? " profile-name))
+      (user-error "Aborted")))
+  (tlon-init-create-profile profile-name t)
+  (if (and (boundp 'paths-file-config)
+	   (y-or-n-p (concat message " Build init files?")))
+      (with-current-buffer (or (find-file-noselect paths-file-config)
+			       (find-buffer-visiting paths-file-config))
+	(tlon-init-build (tlon-init-profile-dir profile-name)))
+    (message (format "Deployed profile '%s'." profile-name))))
 
-(defun tlon-init-check-paths-loaded ()
-  "Check that `paths.el' has been loaded, else signal an error."
-  (unless (boundp 'paths-file-config)
-    (user-error "Error: `paths.el' not loaded")))
+(defun tlon-init-profile-exists-p (profile-name)
+  "Return non-nil if Chemacs profile PROFILE-NAME exists."
+  (when-let ((profile-dir (tlon-init-profile-dir profile-name)))
+    (file-directory-p profile-dir)))
+
 (defun tlon-init-act-on-chemacs-profiles (profile-name &optional profile-dir action)
   "Create, delete or set PROFILE-NAME as default in PROFILE-DIR.
 When ACTION is `'set-default', set PROFILE-NAME as default. When ACTION is
