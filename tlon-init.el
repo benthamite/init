@@ -45,6 +45,17 @@
 
 ;;;;; Files
 
+(defvar tlon-init-file-early-init
+  (file-name-concat user-emacs-directory "early-init.el")
+  "Path to `early-init.el'.")
+
+(defvar tlon-init-file-user-init
+  (file-name-concat user-emacs-directory "init.el")
+  "Path to `init.el'.")
+
+(defvar tlon-init-file-late-init
+  (file-name-concat user-emacs-directory "late-init.el")
+  "Path to `late-init.el'.")
 
 (defvar tlon-init-file-paths-override
   (file-name-concat user-emacs-directory "paths-override.el")
@@ -57,18 +68,6 @@
 (defvar tlon-init-file-tangle-flags
   (file-name-concat user-emacs-directory "tangle-flags.el")
   "Path to `tangle-flags.el'.")
-
-(defvar tlon-init-file-early-init
-  (file-name-concat user-emacs-directory "early-init.el")
-  "Path to `early-init.el'.")
-
-(defvar tlon-init-file-user-init
-  (file-name-concat user-emacs-directory "init.el")
-  "Path to `init.el'.")
-
-(defvar tlon-init-file-late-init
-  (file-name-concat user-emacs-directory "late-init.el")
-  "Path to `late-init.el'.")
 
 ;;;;; Other
 
