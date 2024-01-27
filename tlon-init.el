@@ -255,13 +255,24 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 	  (tlon-init-tangle))
       (user-error "Extra config file for user %s not found" user-first-name))))
 
-;;;;;  
+;;;;; Startup
 
-(defun tlon-init-eval-value-if-possible (value)
-  "Evaluate variable VALUE if possible, else return unevaluated VALUE."
-  (condition-case _
-      (eval value)
-    (error value)))
+(defun tlon-init-startup ()
+  "Start up Emacs with `tlon-init' config."
+  (message "Running startup...")
+  (tlon-init-load-paths)
+  (tlon-init-load-code-overrides)
+  (tlon-init-set-tangle-flags user-emacs-directory)
+  (tlon-init-load-init-files)
+  (add-hook 'elpaca-after-init-hook #'tlon-init-run-post-init-hook))
+
+(defun tlon-init-run-post-init-hook ()
+  "Run `tlon-init-post-init-hook'."
+  (when (tlon-init-machine-pablo-p)
+    (dolist (hook tlon-init-post-init-hook)
+      (message "Running `%s'" (symbol-name hook)))
+    (message "Running of hooks in `tlon-init-post-init-hook' complete")
+    (run-hooks 'tlon-init-post-init-hook)))
 
 (defvar chemacs-profile-name)
 (defun tlon-init-load-code-overrides ()
@@ -314,10 +325,15 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 	  (push `(,option . ,(symbol-value option)) result))))
     (nreverse result)))
 
+(defun tlon-init-eval-value-if-possible (value)
+  "Evaluate variable VALUE if possible, else return unevaluated VALUE."
+  (condition-case _
+      (eval value)
+    (error value)))
+
 (defun tlon-init-profile-dir (profile-name)
   "Return the directory of the Chemacs profile PROFILE-NAME."
   (alist-get profile-name (tlon-init-available-init-dirs t) nil nil 'string=))
-
 
 ;;;;; Profile management
 
@@ -416,25 +432,6 @@ When ACTION is `'set-default', set PROFILE-NAME as default. When ACTION is
       (replace-match regex-replace)
       (delete-blank-lines)
       (save-buffer))))
-
-;;;;; 
-
-(defun tlon-init-startup ()
-  "Start up Emacs with `tlon-init' config."
-  (message "Running startup...")
-  (tlon-init-load-paths)
-  (tlon-init-load-code-overrides)
-  (tlon-init-set-tangle-flags user-emacs-directory)
-  (tlon-init-load-init-files)
-  (add-hook 'elpaca-after-init-hook #'tlon-init-run-post-init-hook))
-
-(defun tlon-init-run-post-init-hook ()
-  "Run `tlon-init-post-init-hook'."
-  (when (tlon-init-machine-pablo-p)
-    (dolist (hook tlon-init-post-init-hook)
-      (message "Running `%s'" (symbol-name hook)))
-    (message "Running of hooks in `tlon-init-post-init-hook' complete")
-    (run-hooks 'tlon-init-post-init-hook)))
 
 (provide 'tlon-init)
 
