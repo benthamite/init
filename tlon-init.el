@@ -96,6 +96,8 @@ always load at the end of `config.org', even when the user is not Pablo.")
 
 ;;;; Functions
 
+;;;;; Functions used in code blocks
+
 (defun tlon-init-get-tangle-flag (key &optional tangle-to-early-init)
   "Get a `yes' / `no' tangle flag for a given KEY.
 Use the default config as a base, which is overridden by values in the active
@@ -139,6 +141,8 @@ default will be overridden by that code."
     (dolist (row (alist-get key tlon-init-code-overrides code-block))
       (insert (prin1-to-string row)))
     (eval-buffer)))
+
+;;;;; 
 
 (defun tlon-init-read-file (fname)
   "Read FNAME and return its contents."
