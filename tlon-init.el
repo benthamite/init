@@ -24,9 +24,9 @@
 
 ;;; Commentary:
 
-;;; Code:
+;; Convenience functions to manage Tlön's Emacs config
 
-;;;; Requirements
+;;; Code:
 
 (require 'cus-edit)
 
@@ -224,6 +224,8 @@ machine"
 
 (defun tlon-init-set-babel-paths ()
   "Set the paths for the `org-babel' code blocks."
+;;;;; org-babel
+
   (setq tlon-init-file-paths-override (file-name-concat init-dir "paths-override.el")
 	tlon-init-file-code-override (file-name-concat init-dir "code-override.el")
 	tlon-init-file-tangle-flags (file-name-concat init-dir "tangle-flags.el")
@@ -253,6 +255,8 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 				 (find-buffer-visiting extra-config-file))
 	  (tlon-init-tangle))
       (user-error "Extra config file for user %s not found" user-first-name))))
+
+;;;;;  
 
 (defun tlon-init-eval-value-if-possible (value)
   "Evaluate variable VALUE if possible, else return unevaluated VALUE."
@@ -451,6 +455,7 @@ but will leave the rest of the profile intact. To delete the entire profile, use
   "Check that `paths.el' has been loaded, else signal an error."
   (unless (boundp 'paths-file-config)
     (user-error "Error: `paths.el' not loaded")))
+;;;;; 
 
 (defun tlon-init-startup ()
   "Start up Emacs with `tlon-init' config.
