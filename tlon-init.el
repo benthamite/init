@@ -320,35 +320,6 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
   "Return the directory of the Chemacs profile PROFILE-NAME."
   (alist-get profile-name (tlon-init-available-init-dirs) nil nil 'string=))
 
-(defun tlon-init-act-on-chemacs-profiles (profile-name &optional profile-dir action)
-  "Create, delete or set PROFILE-NAME as default in PROFILE-DIR.
-When ACTION is `'set-default', set PROFILE-NAME as default. When ACTION is
-`'create', create PROFILE-NAME. Otherwise, delete PROFILE-NAME."
-  (let* ((emacs-profiles (file-truename "~/.emacs-profiles.el"))
-	 (regex-default (format "(\"default\" . ((user-emacs-directory . \"%s\")))" (tlon-init-profile-dir "default")))
-	 (regex-search (if (member action '(create set-default))
-			   "(\"default\" . ((user-emacs-directory . \".+?\")))"
-			 (format "(\"%s\" . ((user-emacs-directory . \".+?\")))" profile-name)))
-	 (regex-replace (pcase action
-			  ('create
-			   (concat regex-default "\n"
-				   (format "(\"%s\" . ((user-emacs-directory . \"%s\")))" profile-name profile-dir)))
-			  ('set-default
-			   (format "(\"default\" . ((user-emacs-directory . \"%s\")))" profile-dir))
-			  (_
-			   ""))))
-    (with-current-buffer (or (find-buffer-visiting emacs-profiles)
-			     (find-file-noselect emacs-profiles))
-      (goto-char (point-min))
-      (re-search-forward regex-search nil t)
-      (replace-match regex-replace)
-      (delete-blank-lines)
-      (save-buffer))))
-
-(defun tlon-init-profile-exists-p (profile-name)
-  "Return non-nil if Chemacs profile PROFILE-NAME exists."
-  (when-let ((profile-dir (tlon-init-profile-dir profile-name)))
-    (file-directory-p profile-dir)))
 
 ;;;;; Profile management
 
@@ -456,6 +427,31 @@ but will leave the rest of the profile intact. To delete the entire profile, use
   "Check that `paths.el' has been loaded, else signal an error."
   (unless (boundp 'paths-file-config)
     (user-error "Error: `paths.el' not loaded")))
+(defun tlon-init-act-on-chemacs-profiles (profile-name &optional profile-dir action)
+  "Create, delete or set PROFILE-NAME as default in PROFILE-DIR.
+When ACTION is `'set-default', set PROFILE-NAME as default. When ACTION is
+`'create', create PROFILE-NAME. Otherwise, delete PROFILE-NAME."
+  (let* ((emacs-profiles (file-truename "~/.emacs-profiles.el"))
+	 (regex-default (format "(\"default\" . ((user-emacs-directory . \"%s\")))" (tlon-init-profile-dir "default")))
+	 (regex-search (if (member action '(create set-default))
+			   "(\"default\" . ((user-emacs-directory . \".+?\")))"
+			 (format "(\"%s\" . ((user-emacs-directory . \".+?\")))" profile-name)))
+	 (regex-replace (pcase action
+			  ('create
+			   (concat regex-default "\n"
+				   (format "(\"%s\" . ((user-emacs-directory . \"%s\")))" profile-name profile-dir)))
+			  ('set-default
+			   (format "(\"default\" . ((user-emacs-directory . \"%s\")))" profile-dir))
+			  (_
+			   ""))))
+    (with-current-buffer (or (find-buffer-visiting emacs-profiles)
+			     (find-file-noselect emacs-profiles))
+      (goto-char (point-min))
+      (re-search-forward regex-search nil t)
+      (replace-match regex-replace)
+      (delete-blank-lines)
+      (save-buffer))))
+
 ;;;;; 
 
 (defun tlon-init-startup ()
