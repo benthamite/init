@@ -209,13 +209,7 @@ machine"
       (tlon-init-available-init-dirs)))))
   (unless (string-equal major-mode "org-mode")
     (user-error "Error: cannot build init from a buffer that is not visiting an `org-mode' file"))
-  ;; set paths for code blocks
-  (setq tlon-init-file-paths-override (file-name-concat init-dir "paths-override.el"))
-  (setq tlon-init-file-code-override (file-name-concat init-dir "code-override.el"))
-  (setq tlon-init-file-tangle-flags (file-name-concat init-dir "tangle-flags.el"))
-  (setq tlon-init-file-early-init (file-name-concat init-dir "early-init.el"))
-  (setq tlon-init-file-user-init (file-name-concat init-dir "init-pablo.el"))
-  (setq tlon-init-file-late-init (file-name-concat init-dir "late-init.el"))
+  (tlon-init-set-babel-paths)
   ;; conditionally tangle extra config file, pass 1: get tangle flags only
   (setq tlon-init-extra-config-tangle-pass 1)
   (unless (tlon-init-machine-pablo-p)
@@ -227,6 +221,15 @@ machine"
   (setq tlon-init-extra-config-tangle-pass 2)
   (unless (tlon-init-machine-pablo-p)
     (tlon-init-tangle-extra-config-file)))
+
+(defun tlon-init-set-babel-paths ()
+  "Set the paths for the `org-babel' code blocks."
+  (setq tlon-init-file-paths-override (file-name-concat init-dir "paths-override.el")
+	tlon-init-file-code-override (file-name-concat init-dir "code-override.el")
+	tlon-init-file-tangle-flags (file-name-concat init-dir "tangle-flags.el")
+	tlon-init-file-early-init (file-name-concat init-dir "early-init.el")
+	tlon-init-file-user-init (file-name-concat init-dir "init-pablo.el")
+	tlon-init-file-late-init (file-name-concat init-dir "late-init.el")))
 
 (defvar org-babel-pre-tangle-hook)
 (declare-function org-babel-tangle "file-name")
