@@ -377,7 +377,7 @@ profile already exists, throw a user error message, unless OVERWRITE is non-nil.
     ;; first delete profile dir, if it exists
     (when (and (file-exists-p profile-dir)
 	       (y-or-n-p (format "Are you sure you want to delete the directory '%s'? "
-				 (tlon-init-profile-dir profile-name))))
+				 profile-dir)))
       (delete-directory profile-dir t t))
     ;; then delete profile from `~/.emacs-profiles.el'
     (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'delete)
