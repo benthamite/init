@@ -222,10 +222,11 @@ machine"
   (unless (tlon-init-machine-pablo-p)
     (tlon-init-tangle-extra-config-file)))
 
-(defun tlon-init-set-babel-paths ()
-  "Set the paths for the `org-babel' code blocks."
+
 ;;;;; org-babel
 
+(defun tlon-init-set-babel-paths (init-dir)
+  "Set the paths for the `org-babel' code blocks relative to INIT-DIR."
   (setq tlon-init-file-paths-override (file-name-concat init-dir "paths-override.el")
 	tlon-init-file-code-override (file-name-concat init-dir "code-override.el")
 	tlon-init-file-tangle-flags (file-name-concat init-dir "tangle-flags.el")
