@@ -263,8 +263,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
   (tlon-init-load-paths)
   (tlon-init-load-code-overrides)
   (tlon-init-set-tangle-flags user-emacs-directory)
-  (tlon-init-load-init-files)
-  (add-hook 'elpaca-after-init-hook #'tlon-init-run-post-init-hook))
+  (tlon-init-load-init-files))
 
 (defun tlon-init-run-post-init-hook ()
   "Run `tlon-init-post-init-hook'."
