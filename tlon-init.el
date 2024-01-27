@@ -209,7 +209,7 @@ machine"
       (tlon-init-available-init-dirs)))))
   (unless (string-equal major-mode "org-mode")
     (user-error "Error: cannot build init from a buffer that is not visiting an `org-mode' file"))
-  (tlon-init-set-babel-paths)
+  (tlon-init-set-babel-paths init-dir)
   ;; conditionally tangle extra config file, pass 1: get tangle flags only
   (setq tlon-init-extra-config-tangle-pass 1)
   (unless (tlon-init-machine-pablo-p)
