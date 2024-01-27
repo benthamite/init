@@ -172,11 +172,12 @@ default will be overridden by that code."
   ;; now return an alist of profile names and their associated init file locations
   (let (target-directories)
     (dolist (chemacs-profile chemacs-profiles target-directories)
-      (push
-       (cons
-	(car chemacs-profile)
-	(cdadr chemacs-profile))
-       target-directories))))
+      (unless (string= (car chemacs-profile) "default")
+	(push
+	 (cons
+	  (car chemacs-profile)
+	  (cdadr chemacs-profile))
+	 target-directories)))))
 
 (defun tlon-init-machine-pablo-p ()
   "Return t if Pablo's machine is the current machine, and nil otherwise.
