@@ -157,8 +157,9 @@ default will be overridden by that code."
 
 (defvar chemacs-profiles)
 (defvar chemacs-profiles-path)
-(defun tlon-init-available-init-dirs ()
-  "Return Alist of Chemacs profiles and associated init locations."
+(defun tlon-init-available-init-dirs (&optional include-default)
+  "Return Alist of Chemacs profiles and associated init locations.
+If INCLUDE-DEFAULT is non-nil, include the ‘default’ profile."
   ;; update `chemacs-profiles' in case a new profile was added
   ;; this is just the `defvar' of `chemacs-profiles' copied from chemacs.el
   (setq chemacs-profiles
@@ -172,7 +173,7 @@ default will be overridden by that code."
   ;; now return an alist of profile names and their associated init file locations
   (let (target-directories)
     (dolist (chemacs-profile chemacs-profiles target-directories)
-      (unless (string= (car chemacs-profile) "default")
+      (when (or include-default (not (string= (car chemacs-profile) "default")))
 	(push
 	 (cons
 	  (car chemacs-profile)
@@ -221,7 +222,6 @@ machine"
   (setq tlon-init-extra-config-tangle-pass 2)
   (unless (tlon-init-machine-pablo-p)
     (tlon-init-tangle-extra-config-file)))
-
 
 ;;;;; org-babel
 
@@ -316,7 +316,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
 
 (defun tlon-init-profile-dir (profile-name)
   "Return the directory of the Chemacs profile PROFILE-NAME."
-  (alist-get profile-name (tlon-init-available-init-dirs) nil nil 'string=))
+  (alist-get profile-name (tlon-init-available-init-dirs t) nil nil 'string=))
 
 
 ;;;;; Profile management
