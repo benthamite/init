@@ -67,7 +67,7 @@
 
 (defvar tlon-init-file-user-init
   (file-name-concat user-emacs-directory "init.el")
-  "Path to `init-pablo.el'.")
+  "Path to `init.el'.")
 
 (defvar tlon-init-file-late-init
   (file-name-concat user-emacs-directory "late-init.el")
