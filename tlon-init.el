@@ -381,7 +381,7 @@ profile already exists, throw a user error message, unless OVERWRITE is non-nil.
       (user-error "Aborted")))
   (tlon-init-create-profile profile-name t)
   (if (and (boundp 'paths-file-config)
-	   (y-or-n-p (concat message " Build init files?")))
+	   (y-or-n-p " Build init files?"))
       (with-current-buffer (or (find-file-noselect paths-file-config)
 			       (find-buffer-visiting paths-file-config))
 	(tlon-init-build (tlon-init-profile-dir profile-name)))
