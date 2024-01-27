@@ -409,18 +409,15 @@ profile already exists, throw a user error message, unless OVERWRITE is non-nil.
 When ACTION is `'set-default', set PROFILE-NAME as default. When ACTION is
 `'create', create PROFILE-NAME. Otherwise, delete PROFILE-NAME."
   (let* ((emacs-profiles (file-truename "~/.emacs-profiles.el"))
-	 (regex-default (format "(\"default\" . ((user-emacs-directory . \"%s\")))" (tlon-init-profile-dir "default")))
+	 (regex-pattern "(\"%s\" . ((user-emacs-directory . \"%s\")))")
+	 (default (format regex-pattern "default" (tlon-init-profile-dir "default")))
 	 (regex-search (if (member action '(create set-default))
-			   "(\"default\" . ((user-emacs-directory . \".+?\")))"
-			 (format "(\"%s\" . ((user-emacs-directory . \".+?\")))" profile-name)))
+			   (format regex-pattern "default" ".+?")
+			 (format regex-pattern profile-name ".+?")))
 	 (regex-replace (pcase action
-			  ('create
-			   (concat regex-default "\n"
-				   (format "(\"%s\" . ((user-emacs-directory . \"%s\")))" profile-name profile-dir)))
-			  ('set-default
-			   (format "(\"default\" . ((user-emacs-directory . \"%s\")))" profile-dir))
-			  (_
-			   ""))))
+			  ('create (concat default "\n" (format regex-pattern profile-name profile-dir)))
+			  ('set-default (format regex-pattern "default" profile-dir))
+			  (_ ""))))
     (with-current-buffer (or (find-buffer-visiting emacs-profiles)
 			     (find-file-noselect emacs-profiles))
       (goto-char (point-min))
