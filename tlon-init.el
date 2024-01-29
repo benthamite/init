@@ -242,11 +242,11 @@ machine"
   (widen)
   (save-buffer)
   (org-babel-tangle)
-  (message "Tangled init files to Chemacs profile `%s'" tlon-init-file-user-init))
+  (message "Tangled init files to Chemacs profile `%s'." tlon-init-file-user-init))
 
 (defun tlon-init-tangle-extra-config-file ()
   "Tangle extra config file.
-The extra config file is the file with the name `config-{user-first-name}.org'"
+The extra config file is the file with the name `config-{user-first-name}.org'."
   (let* ((user-first-name (downcase (car (split-string user-full-name))))
 	 (extra-config-file (file-name-concat tlon-init-dir-dotemacs
 					      (concat "config-" user-first-name ".org"))))
@@ -270,7 +270,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
   "Run `tlon-init-post-init-hook'."
   (when (tlon-init-machine-pablo-p)
     (dolist (hook tlon-init-post-init-hook)
-      (message "Running `%s'" (symbol-name hook)))
+      (message "Running `%s'." (symbol-name hook)))
     (message "Running of hooks in `tlon-init-post-init-hook' complete")
     (run-hooks 'tlon-init-post-init-hook)))
 
@@ -306,7 +306,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
     (set (car row)
 	 (tlon-init-eval-value-if-possible
 	  (alist-get (car row) (tlon-init-read-file tlon-init-file-paths-override) (cdr row))))
-    (message "Set `%s' to `%s'" (car row) (symbol-value (car row)))))
+    (message "Set `%s' to `%s'." (car row) (symbol-value (car row)))))
 
 (defun tlon-init-load-override-paths ()
   "Set paths in `paths-override.el' not present in `paths.el'."
@@ -314,7 +314,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'"
     (unless (boundp (car row))
       (set (car row)
 	   (tlon-init-eval-value-if-possible (cdr row)))
-      (message "Set `%s' to `%s'" (car row) (symbol-value (car row))))))
+      (message "Set `%s' to `%s'." (car row) (symbol-value (car row))))))
 
 (defun tlon-init-get-variables-and-values (group)
   "Return a list of lists of all variables and corresponding values in GROUP."
@@ -374,7 +374,7 @@ profile already exists, throw a user error message, unless OVERWRITE is non-nil.
       (delete-directory profile-dir t t))
     ;; then delete profile from `~/.emacs-profiles.el'
     (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'delete)
-    (message "Deleted Chemacs profile '%s'" profile-name)
+    (message "Deleted Chemacs profile '%s'." profile-name)
     (when (string= profile-dir (tlon-init-profile-dir "default"))
       (call-interactively 'tlon-init-set-default-profile))))
 
@@ -387,7 +387,7 @@ profile already exists, throw a user error message, unless OVERWRITE is non-nil.
     (when (not (file-exists-p profile-dir))
       (user-error "Profile does not exist"))
     (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'set-default)
-    (message "Set default Chemacs profile to '%s'" profile-name)))
+    (message "Set default Chemacs profile to '%s'." profile-name)))
 
 (defun tlon-init-deploy-profile (profile-name)
   "Deploy PROFILE-NAME."
