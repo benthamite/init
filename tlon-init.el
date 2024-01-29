@@ -29,19 +29,9 @@
 ;;; Code:
 
 (require 'cus-edit)
+(require 'paths)
 
 ;;;; Variables
-
-;;;;; Dirs
-
-(defvar tlon-init-dir-dotemacs
-  (let ((dir (pcase (getenv "HOME")
-	       ("/Users/pablostafforini" "Library/CloudStorage/Dropbox/dotfiles/emacs/")
-	       ("/Users/fede" "source/dotfiles/emacs/")
-	       ("/Users/cartago" "source/dotfiles/emacs/")
-	       (_ (user-error "Home directory does not match that of a known user")))))
-    (file-name-concat (getenv "HOME") dir))
-  "Path to `tlon-init/' directory.")
 
 ;;;;; Files
 
@@ -247,7 +237,7 @@ machine"
   "Tangle extra config file.
 The extra config file is the file with the name `config-{user-first-name}.org'."
   (let* ((user-first-name (downcase (car (split-string user-full-name))))
-	 (extra-config-file (file-name-concat tlon-init-dir-dotemacs
+	 (extra-config-file (file-name-concat paths-dir-dotemacs
 					      (concat "config-" user-first-name ".org"))))
     (if (file-exists-p extra-config-file)
 	(with-current-buffer (or (find-file-noselect extra-config-file)
