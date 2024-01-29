@@ -196,7 +196,7 @@ machine"
       (error err
 	     (setq tlon-init-tangle-flags nil)))
     (if tlon-init-tangle-flags
-	(message (concat "Re-read init tangle flags from filename: " tangle-flags-filename))
+	(message "Set tangle flags for Chemacs profile `%s'." chemacs-profile-name)
       (unless (tlon-init-machine-pablo-p)
 	(user-error "`tangle-flags.el' not present present in init dir")))))
 
@@ -289,7 +289,8 @@ The extra config file is the file with the name `config-{user-first-name}.org'."
 
 (defun tlon-init-load-late-init ()
   "Load `late-init.el'."
-  (load tlon-init-file-late-init))
+  (load tlon-init-file-late-init)
+  (message "Loaded `late-init.el' for Chemacs profile `%s'." chemacs-profile-name))
 
 (defun tlon-init-load-paths ()
   "Set paths from the currently booted init profile."
