@@ -264,7 +264,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'."
   (tlon-init-load-paths)
   (tlon-init-load-code-overrides)
   (tlon-init-set-tangle-flags user-emacs-directory)
-  (tlon-init-load-init-files))
+  (tlon-init-defer-load-late-init))
 
 (defun tlon-init-run-post-init-hook ()
   "Run `tlon-init-post-init-hook'."
@@ -282,8 +282,8 @@ The extra config file is the file with the name `config-{user-first-name}.org'."
 	  (tlon-init-read-file tlon-init-file-code-override)))
   (message "Loaded code overrides for Chemacs profile `%s'" chemacs-profile-name))
 
-(defun tlon-init-load-init-files ()
-  "Load user init file and, if appropriate, late init file."
+(defun tlon-init-defer-load-late-init ()
+  "Load `late-init.el' file."
   (unless (tlon-init-machine-pablo-p)
     (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init))
   (message "Loaded init files for Chemacs profile `%s'" chemacs-profile-name))
