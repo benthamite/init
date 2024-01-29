@@ -187,6 +187,7 @@ machine"
   (and (string= (system-name) "Pablos-MacBook-Pro.local")
        (not tlon-init-boot-as-if-not-pablo)))
 
+(defvar chemacs-profile-name)
 (defun tlon-init-set-tangle-flags (init-dir)
   "Set tangle flags for INIT-DIR."
   (let ((tangle-flags-filename (file-name-concat init-dir "tangle-flags.el")))
