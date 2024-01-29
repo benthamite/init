@@ -198,8 +198,7 @@ machine"
     (if tlon-init-tangle-flags
 	(message (concat "Re-read init tangle flags from filename: " tangle-flags-filename))
       (unless (tlon-init-machine-pablo-p)
-	(user-error "`tangle-flags.el' not present present in init dir"))))
-  (message "Set tangle flags for `%s'" init-dir))
+	(user-error "`tangle-flags.el' not present present in init dir")))))
 
 (defun tlon-init-build (init-dir)
   "Build or rebuild a profile in INIT-DIR."
