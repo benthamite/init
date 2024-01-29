@@ -278,14 +278,14 @@ The extra config file is the file with the name `config-{user-first-name}.org'."
   "Load or re-load code overrides and from the currently booted init profile."
   (unless (tlon-init-machine-pablo-p)
     (setq tlon-init-code-overrides
-	  (tlon-init-read-file tlon-init-file-code-override)))
-  (message "Loaded code overrides for Chemacs profile `%s'" chemacs-profile-name))
+	  (tlon-init-read-file tlon-init-file-code-override))
+    (message "Loaded code overrides for Chemacs profile `%s'." chemacs-profile-name)))
 
 (defun tlon-init-defer-load-late-init ()
   "Load `late-init.el' file."
   (unless (tlon-init-machine-pablo-p)
-    (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init))
-  (message "Loaded init files for Chemacs profile `%s'" chemacs-profile-name))
+    (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init)
+    (message "Added `tlon-init-load-late-init' to `elpaca-after-init-hook'.")))
 
 (defun tlon-init-load-late-init ()
   "Load `late-init.el'."
@@ -297,8 +297,8 @@ The extra config file is the file with the name `config-{user-first-name}.org'."
   (interactive)
   (unless (tlon-init-machine-pablo-p)
     (tlon-init-load-default-paths)
-    (tlon-init-load-override-paths))
-  (message "Loaded paths for Chemacs profile `%s'" chemacs-profile-name))
+    (tlon-init-load-override-paths)
+    (message "Loaded paths for Chemacs profile `%s'." chemacs-profile-name)))
 
 (defun tlon-init-load-default-paths ()
   "Set paths in `paths.el', overriding them with `paths-override.el’ if present."
