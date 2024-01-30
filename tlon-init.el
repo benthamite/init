@@ -203,7 +203,7 @@ machine"
   (tlon-init-set-babel-paths init-dir)
   ;; conditionally tangle extra config file, pass 1: get tangle flags only
   (setq tlon-init-extra-config-tangle-pass 1)
-  (tlon-init-tangle-extra-config-file))
+  (tlon-init-tangle-extra-config-file)
   (tlon-init-set-tangle-flags init-dir)
   ;; tangle `config.org'
   (tlon-init-tangle)
