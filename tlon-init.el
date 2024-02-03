@@ -106,7 +106,7 @@ With optional TANGLE-TO-EARLY-INIT, tangle to the `early-init.el' file."
 	tlon-init-file-user-init)
     "no"))
 
-(defun tlon-init-override-code-if-available (key code-block)
+(defun tlon-init-override-code (key code-block)
   "Return CODE-BLOCK of KEY in `tlon-init-code-overrides'.
 When KEY is not present in `tlon-init-code-overrides', return the default,
 non-overridden code. The variable `tlon-init-code-overrides' is populated during
@@ -117,7 +117,7 @@ the name of the package. Examples: `:general', `:embark', `:hydra'.
 
 Example usage:
 
-\(tlon-init-override-code-if-available
+\(tlon-init-override-code
  :embark
  \='(
   (use-package embark
