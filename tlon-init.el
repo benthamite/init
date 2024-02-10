@@ -1,8 +1,8 @@
 ;;; tlon-init.el --- Convenience functions to manage Tlön's Emacs config -*- lexical-binding: t -*-
 
 ;; Author: Federico Stafforini & Pablo Stafforini
-;; Version: 0.1.0
-;; Homepage: https://tlon.team
+;; Version: 1.0.0
+;; Homepage: https://github.com/tlon-team/tlon-init
 ;; Keywords: convenience tools
 
 
