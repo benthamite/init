@@ -31,6 +31,12 @@
 (require 'cus-edit)
 (require 'paths)
 
+(defcustom tlon-init-post-init-hook nil
+  "Hook run at the end of the user’s config file.
+If the user is Pablo, it is run at the end of `config.org'. Otherwise, it is run
+at the end the user’s personal config file, e.g. `config-leonardo.org' if the
+user is Leo.
+
 ;;;; Variables
 
 ;;;;; Files
@@ -74,15 +80,6 @@
   "If non-nil, boot as if the current machine is not Pablo’s.
 This variable allows Pablo to test other people’s configs from his own computer.
 It should be set in `init.el'.")
-
-(defvar tlon-init-post-init-hook nil
-  "Hook run at the end of the user’s config file.
-If the user is Pablo, it is run at the end of `config.org'. Otherwise, it is run
-at the end the user’s personal config file, e.g. `config-leonardo.org' if the
-user is Leo.
-
-The advantage of this hook over `elpaca-after-init-hook' is that the latter will
-always load at the end of `config.org', even when the user is not Pablo.")
 
 ;;;; Functions
 
