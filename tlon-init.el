@@ -31,11 +31,32 @@
 (require 'cus-edit)
 (require 'paths)
 
+;;;; User options
+
+(defgroup tlon-init ()
+  "Convenience functions to manage Tlön's Emacs config."
+  :group 'emacs)
+
 (defcustom tlon-init-post-init-hook nil
   "Hook run at the end of the user’s config file.
 If the user is Pablo, it is run at the end of `config.org'. Otherwise, it is run
 at the end the user’s personal config file, e.g. `config-leonardo.org' if the
 user is Leo.
+
+The advantage of this hook over `elpaca-after-init-hook' is that the latter will
+always load at the end of `config.org', even when the user is not Pablo."
+  :type 'hook
+  :group 'tlon-init)
+
+(defcustom tlon-init-post-build-hook nil
+  "Hook run after building a profile."
+  :type 'hook
+  :group 'tlon-init)
+
+(defcustom tlon-init-post-deploy-hook nil
+  "Hook run after deploying a profile."
+  :type 'hook
+  :group 'tlon-init)
 
 ;;;; Variables
 
@@ -207,7 +228,8 @@ machine"
   ;; conditionally tangle extra config file, pass 2: get the rest of extra config
   (setq tlon-init-extra-config-tangle-pass 2)
   (unless (tlon-init-machine-pablo-p)
-    (tlon-init-tangle-extra-config-file)))
+    (tlon-init-tangle-extra-config-file))
+  (run-hooks 'tlon-init-post-build-hook))
 
 ;;;;; org-babel
 
@@ -388,6 +410,7 @@ profile already exists, throw a user error message, unless OVERWRITE is non-nil.
       (with-current-buffer (or (find-file-noselect paths-file-config)
 			       (find-buffer-visiting paths-file-config))
 	(tlon-init-build (tlon-init-profile-dir profile-name)))
+    (run-hooks 'tlon-init-post-deploy-hook)
     (message (format "Deployed profile '%s'." profile-name))))
 
 (defun tlon-init-profile-exists-p (profile-name)
