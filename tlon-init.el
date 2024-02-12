@@ -203,7 +203,8 @@ machine"
     (tlon-init-profile-dir
      (completing-read
       "Select Chemacs profile to build: "
-      (tlon-init-available-init-dirs)))))
+      (tlon-init-available-init-dirs)
+      nil t))))
   (unless (string-equal major-mode "org-mode")
     (user-error "Error: cannot build init from a buffer that is not visiting an `org-mode' file"))
   (tlon-init-set-babel-paths init-dir)
