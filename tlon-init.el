@@ -214,13 +214,11 @@ machine"
     (user-error "Error: cannot build init from a buffer that is not visiting an `org-mode' file"))
   (tlon-init-set-babel-paths init-dir)
   ;; conditionally tangle extra config file, pass 1: get tangle flags only
-  (setq tlon-init-extra-config-tangle-pass 1)
   (tlon-init-tangle-extra-config-file)
   (tlon-init-set-tangle-flags init-dir)
   ;; tangle `config.org'
   (tlon-init-tangle)
   ;; conditionally tangle extra config file, pass 2: get the rest of extra config
-  (setq tlon-init-extra-config-tangle-pass 2)
   (unless (tlon-init-machine-pablo-p)
     (tlon-init-tangle-extra-config-file))
   (run-hooks 'tlon-init-post-build-hook))
