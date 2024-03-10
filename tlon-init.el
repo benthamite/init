@@ -197,14 +197,10 @@ machine"
 (defun tlon-init-set-tangle-flags (init-dir)
   "Set tangle flags for INIT-DIR."
   (let ((tangle-flags-filename (file-name-concat init-dir "tangle-flags.el")))
-    (condition-case err
-	(setq tlon-init-tangle-flags (tlon-init-read-file tangle-flags-filename))
-      (error err
-	     (setq tlon-init-tangle-flags nil)))
-    (if tlon-init-tangle-flags
-	(message "`tlon-init': Set tangle flags for Chemacs profile `%s'." chemacs-profile-name)
-      (unless (tlon-init-machine-pablo-p)
-	(user-error "`tangle-flags.el' not present present in init dir")))))
+    (if (file-regular-p tangle-flags-filename)
+	(load-file tangle-flags-filename))
+    (user-error "`tangle-flags.el' not present present in init directory `%s'" init-dir))
+  (message "tlon-init: Set tangle flags for Chemacs profile `%s'." chemacs-profile-name)))
 
 (defun tlon-init-build (init-dir)
   "Build or rebuild a profile in INIT-DIR."
