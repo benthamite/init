@@ -82,20 +82,17 @@ always load at the end of `config.org', even when the user is not Pablo."
   (file-name-concat user-emacs-directory "code-override.el")
   "Path to `code-override.el'.")
 
-(defvar tlon-init-file-tangle-flags
-  (file-name-concat user-emacs-directory "tangle-flags.el")
-  "Path to `tangle-flags.el'.")
+(defvar tlon-init-file-excluded-packages
+  (file-name-concat user-emacs-directory "excluded-packages.el")
+  "Path to `excluded-packages.el'.")
 
 ;;;;; Other
 
-(defvar tlon-init-tangle-flags '()
-  "Alist of tangle flags for each package.")
+(defvar tlon-init-excluded-packages '()
+  "List of packages to be excluded in the tangle process.")
 
 (defvar tlon-init-code-overrides '()
   "Alist of code overrides for each package.")
-
-(defvar tlon-init-extra-config-tangle-pass nil
-  "Pass number for extra config tangle.")
 
 (defvar tlon-init-boot-as-if-not-pablo nil
   "If non-nil, boot as if the current machine is not Pablo’s.
@@ -110,21 +107,18 @@ It should be set in `init.el'.")
 ;;;;; Functions used in code blocks
 
 (declare-function org-get-heading "org")
-(defun tlon-init-tangle-conditionally (&optional key tangle-to-early-init)
-  "Conditionally tangle block based on value of KEY in `tlon-init-tangle-flags'.
-The block will be tangled if either the value of KEY is t or if no key is
-present in the alist.
-
-If KEY is nil, use the current heading, as a symbol.
+(defun tlon-init-tangle-conditionally (&optional package tangle-to-early-init)
+  "Tangle code block for PACKAGE unless listed in `tlon-init-excluded-packages'.
+If PACKAGE is nil, use the parent heading, as a symbol.
 
 By default, tangle to `init.el'. If TANGLE-TO-EARLY-INIT is non-nil, tangle to
 `early-init.el' instead."
-  (let ((key (or key (intern (org-get-heading t t t t)))))
-    (if (alist-get key tlon-init-tangle-flags t)
-	(if tangle-to-early-init
-	    tlon-init-file-early-init
-	  tlon-init-file-user-init)
-      "no")))
+  (let ((package (or package (intern (org-get-heading t t t t)))))
+    (if (member package tlon-init-excluded-packages)
+	"no"
+      (if tangle-to-early-init
+	  tlon-init-file-early-init
+	tlon-init-file-user-init))))
 
 (defun tlon-init-override-code (key code-block)
   "Return CODE-BLOCK of KEY in `tlon-init-code-overrides'.
@@ -198,17 +192,12 @@ machine"
        (not tlon-init-boot-as-if-not-pablo)))
 
 (defvar chemacs-profile-name)
-(defun tlon-init-set-tangle-flags (init-dir)
-  "Set tangle flags for INIT-DIR."
-  (let ((tangle-flags-filename (file-name-concat init-dir "tangle-flags.el")))
-    (condition-case err
-	(setq tlon-init-tangle-flags (tlon-init-read-file tangle-flags-filename))
-      (error err
-	     (setq tlon-init-tangle-flags nil)))
-    (if tlon-init-tangle-flags
-	(message "`tlon-init': Set tangle flags for Chemacs profile `%s'." chemacs-profile-name)
-      (unless (tlon-init-machine-pablo-p)
-	(user-error "`tangle-flags.el' not present present in init dir")))))
+(defun tlon-init-load-excluded-packages-file (init-dir)
+  "Load the excluded packages list for INIT-DIR."
+  (if (file-regular-p tlon-init-file-excluded-packages)
+      (load-file tlon-init-file-excluded-packages)
+    (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
+  (message "tlon-init: Loaded excluded packages for Chemacs profile `%s'." chemacs-profile-name))
 
 (defun tlon-init-build (init-dir)
   "Build or rebuild a profile in INIT-DIR."
@@ -221,10 +210,9 @@ machine"
   (unless (string-equal major-mode "org-mode")
     (user-error "Error: cannot build init from a buffer that is not visiting an `org-mode' file"))
   (tlon-init-set-babel-paths init-dir)
-  ;; conditionally tangle extra config file, pass 1: get tangle flags only
-  (setq tlon-init-extra-config-tangle-pass 1)
+  ;; conditionally tangle extra config file, pass 1: get excluded packages only
   (tlon-init-tangle-extra-config-file)
-  (tlon-init-set-tangle-flags init-dir)
+  (tlon-init-load-excluded-packages-file init-dir)
   ;; tangle `config.org'
   (tlon-init-tangle)
   ;; conditionally tangle extra config file, pass 2: get the rest of extra config
@@ -239,7 +227,7 @@ machine"
   "Set the paths for the `org-babel' code blocks relative to INIT-DIR."
   (setq tlon-init-file-paths-override (file-name-concat init-dir "paths-override.el")
 	tlon-init-file-code-override (file-name-concat init-dir "code-override.el")
-	tlon-init-file-tangle-flags (file-name-concat init-dir "tangle-flags.el")
+	tlon-init-file-excluded-packages (file-name-concat init-dir "excluded-packages.el")
 	tlon-init-file-early-init (file-name-concat init-dir "early-init.el")
 	tlon-init-file-user-init (file-name-concat init-dir "init.el")
 	tlon-init-file-late-init (file-name-concat init-dir "late-init.el")))
@@ -273,7 +261,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'."
   (message "`tlon-init': Running startup...")
   (tlon-init-load-paths)
   (tlon-init-load-code-overrides)
-  (tlon-init-set-tangle-flags user-emacs-directory)
+  (tlon-init-load-excluded-packages-file user-emacs-directory)
   (tlon-init-defer-load-late-init))
 
 (defun tlon-init-run-post-init-hook ()
