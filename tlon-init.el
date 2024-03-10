@@ -244,17 +244,20 @@ machine"
   (message "`tlon-init': Tangled init files to Chemacs profile `%s'." tlon-init-file-user-init))
 
 (defun tlon-init-tangle-extra-config-file ()
-"Tangle extra config file.
-The extra config file is the file with the name `config-{user-first-name}.org'."
-(unless (tlon-init-machine-pablo-p)
+  "Tangle extra config file.
+For Pablo, the extra config file is the same as the main config
+faile (`paths-file-config'). For all other users, the extra config file is the
+file with the name `config-{user-first-name}.org'."
   (let* ((user-first-name (downcase (car (split-string user-full-name))))
-	 (extra-config-file (file-name-concat paths-dir-dotemacs
-					      (concat "config-" user-first-name ".org"))))
+	 (extra-config-file (if (tlon-init-machine-pablo-p)
+				paths-file-config
+			      (file-name-concat paths-dir-dotemacs
+						(concat "config-" user-first-name ".org")))))
     (if (file-exists-p extra-config-file)
 	(with-current-buffer (or (find-file-noselect extra-config-file)
 				 (find-buffer-visiting extra-config-file))
 	  (tlon-init-tangle))
-      (user-error "Extra config file for user %s not found" user-first-name)))))
+      (user-error "Extra config file for user %s not found" user-first-name))))
 
 ;;;;; Startup
 
