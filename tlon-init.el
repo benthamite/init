@@ -106,23 +106,21 @@ It should be set in `init.el'.")
 
 ;;;;; Functions used in code blocks
 
-(defun tlon-init-get-tangle-flag (key &optional tangle-to-early-init)
-  "Get a `yes' / `no' tangle flag for a given KEY.
-Use the default config as a base, which is overridden by values in the active
-config when present.
+(defun tlon-init-tangle-conditionally (&optional key tangle-to-early-init)
+  "Conditionally tangle block based on value of KEY in `tlon-init-tangle-flags'.
+The block will be tangled if either the value of KEY is t or if no key is
+present in the alist.
 
-If no key is present returns `yes', so that the default behavior is to tangle
-blocks that are not present in `tlon-init-flags'.
+If KEY is nil, use the current heading, as a symbol.
 
-The syntax for the KEY parameter is `:{package-name}' where `{package-name}' is
-the name of the package. Examples: `:general', `:embark', `:hydra'.
-
-With optional TANGLE-TO-EARLY-INIT, tangle to the `early-init.el' file."
-  (if (alist-get key tlon-init-tangle-flags t)
-      (if tangle-to-early-init
-	  tlon-init-file-early-init
-	tlon-init-file-user-init)
-    "no"))
+By default, tangle to `init.el'. If TANGLE-TO-EARLY-INIT is non-nil, tangle to
+`early-init.el' instead."
+  (let ((key (or key (intern (org-get-heading t t t t)))))
+    (if (alist-get key tlon-init-tangle-flags t)
+	(if tangle-to-early-init
+	    tlon-init-file-early-init
+	  tlon-init-file-user-init)
+      "no")))
 
 (defun tlon-init-override-code (key code-block)
   "Return CODE-BLOCK of KEY in `tlon-init-code-overrides'.
