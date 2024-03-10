@@ -148,7 +148,7 @@ default will be overridden by that code."
       (insert (prin1-to-string row)))
     (eval-buffer)))
 
-;;;;; 
+;;;;;
 
 (defun tlon-init-read-file (fname)
   "Read FNAME and return its contents."
@@ -194,13 +194,13 @@ machine"
        (not tlon-init-boot-as-if-not-pablo)))
 
 (defvar chemacs-profile-name)
-(defun tlon-init-set-tangle-flags (init-dir)
-  "Set tangle flags for INIT-DIR."
+(defun tlon-init-load-tangle-flags (init-dir)
+  "Load the tangle flags for INIT-DIR."
   (let ((tangle-flags-filename (file-name-concat init-dir "tangle-flags.el")))
     (if (file-regular-p tangle-flags-filename)
-	(load-file tangle-flags-filename))
-    (user-error "`tangle-flags.el' not present present in init directory `%s'" init-dir))
-  (message "tlon-init: Set tangle flags for Chemacs profile `%s'." chemacs-profile-name)))
+	(load-file tangle-flags-filename)
+      (user-error "`tangle-flags.el' not present in init directory `%s'" init-dir))
+    (message "tlon-init: Loaded tangle flags for Chemacs profile `%s'." chemacs-profile-name)))
 
 (defun tlon-init-build (init-dir)
   "Build or rebuild a profile in INIT-DIR."
@@ -215,7 +215,7 @@ machine"
   (tlon-init-set-babel-paths init-dir)
   ;; conditionally tangle extra config file, pass 1: get tangle flags only
   (tlon-init-tangle-extra-config-file)
-  (tlon-init-set-tangle-flags init-dir)
+  (tlon-init-load-tangle-flags init-dir)
   ;; tangle `config.org'
   (tlon-init-tangle)
   ;; conditionally tangle extra config file, pass 2: get the rest of extra config
@@ -263,7 +263,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'."
   (message "`tlon-init': Running startup...")
   (tlon-init-load-paths)
   (tlon-init-load-code-overrides)
-  (tlon-init-set-tangle-flags user-emacs-directory)
+  (tlon-init-load-tangle-flags user-emacs-directory)
   (tlon-init-defer-load-late-init))
 
 (defun tlon-init-run-post-init-hook ()
