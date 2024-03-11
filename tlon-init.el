@@ -29,6 +29,7 @@
 ;;; Code:
 
 (require 'cus-edit)
+(require 'ob-tangle)
 (require 'paths)
 
 ;;;; User options
@@ -229,8 +230,6 @@ machine"
       tlon-init-file-user-init (file-name-concat init-dir "init.el")
       tlon-init-file-late-init (file-name-concat init-dir "late-init.el")))
 
-(defvar org-babel-pre-tangle-hook)
-(declare-function org-babel-tangle "file-name")
 (defun tlon-init-tangle ()
   "Tangle the current buffer."
   (widen)
