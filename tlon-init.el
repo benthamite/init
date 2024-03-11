@@ -105,18 +105,29 @@ It should be set in `init.el'.")
 ;;;;; Functions used in code blocks
 
 (declare-function org-get-heading "org")
-(defun tlon-init-tangle-conditionally (&optional package tangle-to-early-init)
+(defun tlon-init-tangle-conditionally (&optional package early-init bisect)
   "Tangle code block for PACKAGE unless listed in `tlon-init-excluded-packages'.
 If PACKAGE is nil, use the parent heading, as a symbol.
 
-By default, tangle to `init.el'. If TANGLE-TO-EARLY-INIT is non-nil, tangle to
-`early-init.el' instead."
+By default, tangle to `init.el'. If EARLY-INIT is non-nil, tangle to
+`early-init.el' instead.
+
+BISECT is a reserved argument for a functionality that has not yet been
+developed."
   (let ((package (or package (intern (org-get-heading t t t t)))))
-    (if (member package tlon-init-excluded-packages)
-	"no"
-      (if tangle-to-early-init
-	  tlon-init-file-early-init
-	tlon-init-file-user-init))))
+    (if bisect
+	(tlon-init-process-for-bisection package)
+      (tlon-init-get-tangle-target package early-init))))
+
+(defun tlon-init-get-tangle-target (package early-init)
+  "Return the file to which code block for PACKAGE should be tangled.
+If EARLY-INIT is non-nil, return the early init file; else, return the main init
+file."
+  (if (member package tlon-init-excluded-packages)
+      "no"
+    (if early-init
+	tlon-init-file-early-init
+      tlon-init-file-user-init)))
 
 (defun tlon-init-override-code (key code-block)
   "Return CODE-BLOCK of KEY in `tlon-init-code-overrides'.
@@ -428,6 +439,13 @@ When ACTION is `'set-default', set PROFILE-NAME as default. When ACTION is
       (replace-match regex-replace)
       (delete-blank-lines)
       (save-buffer))))
+
+;;;;; Bisection
+
+(defun tlon-init-process-for-bisection (package)
+  "<explain behavior> PACKAGE."
+  package
+  (user-error "This function is not yet defined"))
 
 (provide 'tlon-init)
 
