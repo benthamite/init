@@ -100,6 +100,9 @@ always load at the end of `config.org', even when the user is not Pablo."
 This variable allows Pablo to test other people’s configs from his own computer.
 It should be set in `init.el'.")
 
+(defvar tlon-init-chemacs-profile-name ""
+  "The name of the active Chemacs profile.")
+
 ;;;; Functions
 
 ;;;;; Functions used in code blocks
@@ -439,6 +442,23 @@ When ACTION is `'set-default', set PROFILE-NAME as default. When ACTION is
       (replace-match regex-replace)
       (delete-blank-lines)
       (save-buffer))))
+
+(defun tlon-init-chemacs-actual-profile-name ()
+  "Return the actual name of the active Chemacs profile, handling defaults.
+If the profile is the default one, return its name, not \"default\"."
+  (if (string= chemacs-profile-name "default")
+      (tlon-init-get-default-profile-name)
+    chemacs-profile-name))
+
+(defun tlon-init-get-default-profile-name ()
+  "Find the name of the default Chemacs profile."
+  (let ((default-dir (cdar (alist-get "default" chemacs-profiles nil nil #'string=))))
+    ;; Iterate over the profiles to find a match with default-dir (excluding "default").
+    (cl-loop for (name . attrs) in (remove (assoc "default" chemacs-profiles) chemacs-profiles)
+             if (equal (cdr (assoc 'user-emacs-directory attrs)) default-dir)
+             return name)))
+
+(setq tlon-init-chemacs-profile-name (tlon-init-chemacs-actual-profile-name))
 
 ;;;;; Bisection
 
