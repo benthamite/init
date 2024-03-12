@@ -425,9 +425,9 @@ When ACTION is `'set-default', set PROFILE-NAME as default. When ACTION is
   (let* ((emacs-profiles (file-truename "~/.emacs-profiles.el"))
 	 (regex-pattern "(\"%s\" . ((user-emacs-directory . \"%s\")))")
 	 (default (format regex-pattern "default" (tlon-init-profile-dir "default")))
-	 (regex-search (if (member action '(create set-default))
-			   (format regex-pattern "default" ".+?")
-			 (format regex-pattern profile-name ".+?")))
+	 (regex-search (pcase action
+			 ((or 'create 'set-default) (format regex-pattern "default" ".+?"))
+			 (_ (format regex-pattern profile-name ".+?"))))
 	 (regex-replace (pcase action
 			  ('create (concat default "\n" (format regex-pattern profile-name profile-dir)))
 			  ('set-default (format regex-pattern "default" profile-dir))
