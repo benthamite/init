@@ -285,7 +285,6 @@ file with the name `config-{user-first-name}.org'."
     (message "`tlon-init': Running of hooks in `tlon-init-post-init-hook' complete")
     (run-hooks 'tlon-init-post-init-hook)))
 
-(defvar chemacs-profile-name)
 (defun tlon-init-load-code-overrides ()
   "Load or re-load code overrides and from the currently booted init profile."
   (unless (tlon-init-machine-pablo-p)
