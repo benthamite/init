@@ -274,7 +274,7 @@ machine"
 (defun tlon-init-tangle-extra-config-file ()
   "Tangle extra config file.
 For Pablo, the extra config file is the same as the main config
-faile (`paths-file-config'). For all other users, the extra config file is the
+file (`paths-file-config'). For all other users, the extra config file is the
 file with the name `config-{user-first-name}.org'."
   (let* ((user-first-name (downcase (car (split-string user-full-name))))
 	 (extra-config-file (if (tlon-init-machine-pablo-p)
