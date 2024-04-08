@@ -229,7 +229,7 @@ machine"
   (if (file-regular-p tlon-init-file-excluded-packages)
       (load-file tlon-init-file-excluded-packages)
     (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
-  (message "tlon-init: Loaded excluded packages for Chemacs profile `%s'." chemacs-profile-name))
+  (message "tlon-init: Loaded excluded packages for Chemacs profile `%s'." tlon-init-chemacs-profile-name))
 
 (defun tlon-init-build (init-dir)
   "Build or rebuild a profile in INIT-DIR."
@@ -310,7 +310,7 @@ file with the name `config-{user-first-name}.org'."
   (unless (tlon-init-machine-pablo-p)
     (setq tlon-init-code-overrides
 	  (tlon-init-read-file tlon-init-file-code-override))
-    (message "`tlon-init': Loaded code overrides for Chemacs profile `%s'." chemacs-profile-name)))
+    (message "`tlon-init': Loaded code overrides for Chemacs profile `%s'." tlon-init-chemacs-profile-name)))
 
 (defun tlon-init-defer-load-late-init ()
   "Load `late-init.el' file."
@@ -321,7 +321,7 @@ file with the name `config-{user-first-name}.org'."
 (defun tlon-init-load-late-init ()
   "Load `late-init.el'."
   (load tlon-init-file-late-init)
-  (message "`tlon-init': Loaded `late-init.el' for Chemacs profile `%s'." chemacs-profile-name))
+  (message "`tlon-init': Loaded `late-init.el' for Chemacs profile `%s'." tlon-init-chemacs-profile-name))
 
 (defun tlon-init-load-paths ()
   "Set paths from the currently booted init profile."
@@ -329,7 +329,7 @@ file with the name `config-{user-first-name}.org'."
   (unless (tlon-init-machine-pablo-p)
     (tlon-init-load-default-paths)
     (tlon-init-load-override-paths)
-    (message "`tlon-init': Loaded paths for Chemacs profile `%s'." chemacs-profile-name)))
+    (message "`tlon-init': Loaded paths for Chemacs profile `%s'." tlon-init-chemacs-profile-name)))
 
 (defun tlon-init-load-default-paths ()
   "Set paths in `paths.el', overriding them with `paths-override.el’ if present."
@@ -393,7 +393,7 @@ profile already exists, throw a user error message, unless OVERWRITE is non-nil.
   (interactive
    (list (completing-read "Chemacs profile name to delete: "
 			  (mapcar 'car (tlon-init-available-init-dirs)))))
-  (when (string= profile-name chemacs-profile-name)
+  (when (string= profile-name tlon-init-chemacs-profile-name)
     (unless (y-or-n-p (format "You have chosen to delete profile %s, which is currently active. Proceed? "
 			      profile-name))
       (user-error "Aborted")))
