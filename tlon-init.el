@@ -106,6 +106,7 @@ It should be set in `init.el'.")
 
 ;;;;; Functions used in code blocks
 
+(declare-function org-get-heading "org")
 (defun tlon-init-tangle-conditionally (&optional key tangle-to-early-init)
   "Conditionally tangle block based on value of KEY in `tlon-init-tangle-flags'.
 The block will be tangled if either the value of KEY is t or if no key is
