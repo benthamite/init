@@ -61,6 +61,10 @@ always load at the end of `config.org', even when the user is not Pablo."
 
 ;;;; Variables
 
+(defvar chemacs-profiles)
+(defvar chemacs-profile-name)
+(defvar chemacs-profiles-path)
+
 ;;;;; Files
 
 (defvar tlon-init-file-early-init
@@ -190,8 +194,6 @@ default will be overridden by that code."
 	(error
 	 (error "Failed to parse %s: %s" fname (error-message-string err)))))))
 
-(defvar chemacs-profiles)
-(defvar chemacs-profiles-path)
 (defun tlon-init-available-init-dirs (&optional include-default)
   "Return Alist of Chemacs profiles and associated init locations.
 If INCLUDE-DEFAULT is non-nil, include the ‘default’ profile."
@@ -222,7 +224,6 @@ machine"
   (and (string= (system-name) "Pablos-MacBook-Pro.local")
        (not tlon-init-boot-as-if-not-pablo)))
 
-(defvar chemacs-profile-name)
 (defun tlon-init-load-excluded-packages-file (init-dir)
   "Load the excluded packages list for INIT-DIR."
   (if (file-regular-p tlon-init-file-excluded-packages)
