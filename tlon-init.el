@@ -270,7 +270,7 @@ machine"
   (widen)
   (save-buffer)
   (org-babel-tangle)
-  (message "`tlon-init': Tangled init files to Chemacs profile `%s'." tlon-init-file-user-init))
+  (message "tlon-init: Tangled init files to Chemacs profile `%s'." tlon-init-file-user-init))
 
 (defun tlon-init-tangle-extra-config-file ()
   "Tangle extra config file.
@@ -292,7 +292,7 @@ file with the name `config-{user-first-name}.org'."
 
 (defun tlon-init-startup ()
   "Start up Emacs with `tlon-init' config."
-  (message "`tlon-init': Running startup...")
+  (message "tlon-init: Running startup...")
   (tlon-init-load-paths)
   (tlon-init-load-code-overrides)
   (tlon-init-load-excluded-packages-file user-emacs-directory)
@@ -302,8 +302,8 @@ file with the name `config-{user-first-name}.org'."
   "Run `tlon-init-post-init-hook'."
   (when (tlon-init-machine-pablo-p)
     (dolist (hook tlon-init-post-init-hook)
-      (message "`tlon-init': Running `%s'." (symbol-name hook)))
-    (message "`tlon-init': Running of hooks in `tlon-init-post-init-hook' complete")
+      (message "tlon-init: Running `%s'." (symbol-name hook)))
+    (message "tlon-init: Running of hooks in `tlon-init-post-init-hook' complete")
     (run-hooks 'tlon-init-post-init-hook)))
 
 (defun tlon-init-load-code-overrides ()
@@ -311,18 +311,18 @@ file with the name `config-{user-first-name}.org'."
   (unless (tlon-init-machine-pablo-p)
     (setq tlon-init-code-overrides
 	  (tlon-init-read-file tlon-init-file-code-override))
-    (message "`tlon-init': Loaded code overrides for Chemacs profile `%s'." tlon-init-chemacs-profile-name)))
+    (message "tlon-init: Loaded code overrides for Chemacs profile `%s'." tlon-init-chemacs-profile-name)))
 
 (defun tlon-init-defer-load-late-init ()
   "Load `late-init.el' file."
   (unless (tlon-init-machine-pablo-p)
     (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init)
-    (message "`tlon-init': Added `tlon-init-load-late-init' to `elpaca-after-init-hook'.")))
+    (message "tlon-init: Added `tlon-init-load-late-init' to `elpaca-after-init-hook'.")))
 
 (defun tlon-init-load-late-init ()
   "Load `late-init.el'."
   (load tlon-init-file-late-init)
-  (message "`tlon-init': Loaded `late-init.el' for Chemacs profile `%s'." tlon-init-chemacs-profile-name))
+  (message "tlon-init: Loaded `late-init.el' for Chemacs profile `%s'." tlon-init-chemacs-profile-name))
 
 (defun tlon-init-load-paths ()
   "Set paths from the currently booted init profile."
@@ -330,7 +330,7 @@ file with the name `config-{user-first-name}.org'."
   (unless (tlon-init-machine-pablo-p)
     (tlon-init-load-default-paths)
     (tlon-init-load-override-paths)
-    (message "`tlon-init': Loaded paths for Chemacs profile `%s'." tlon-init-chemacs-profile-name)))
+    (message "tlon-init: Loaded paths for Chemacs profile `%s'." tlon-init-chemacs-profile-name)))
 
 (defun tlon-init-load-default-paths ()
   "Set paths in `paths.el', overriding them with `paths-override.el’ if present."
@@ -338,7 +338,7 @@ file with the name `config-{user-first-name}.org'."
     (set (car row)
 	 (tlon-init-eval-value-when-possible
 	  (alist-get (car row) (tlon-init-read-file tlon-init-file-paths-override) (cdr row))))
-    (message "`tlon-init': Set `%s' to `%s'." (car row) (symbol-value (car row)))))
+    (message "tlon-init: Set `%s' to `%s'." (car row) (symbol-value (car row)))))
 
 (defun tlon-init-load-override-paths ()
   "Set paths in `paths-override.el' not present in `paths.el'."
@@ -346,7 +346,7 @@ file with the name `config-{user-first-name}.org'."
     (unless (boundp (car row))
       (set (car row)
 	   (tlon-init-eval-value-when-possible (cdr row)))
-      (message "`tlon-init': Set `%s' to `%s'." (car row) (symbol-value (car row))))))
+      (message "tlon-init: Set `%s' to `%s'." (car row) (symbol-value (car row))))))
 
 (defun tlon-init-get-variables-and-values (group)
   "Return a list of lists of all variables and corresponding values in GROUP."
@@ -384,7 +384,7 @@ profile already exists, throw a user error message, unless OVERWRITE is non-nil.
       (user-error "Profile already exists"))
     (make-directory profile-dir t)
     (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'create)
-    (message "`tlon-init': Created new Chemacs profile `%s'. Default profile is `%s'."
+    (message "tlon-init: Created new Chemacs profile `%s'. Default profile is `%s'."
 	     profile-name
 	     (file-name-nondirectory (tlon-init-profile-dir "default")))
     profile-name))
@@ -406,7 +406,7 @@ profile already exists, throw a user error message, unless OVERWRITE is non-nil.
       (delete-directory profile-dir t t))
     ;; then delete profile from `~/.emacs-profiles.el'
     (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'delete)
-    (message "`tlon-init': Deleted Chemacs profile '%s'." profile-name)
+    (message "tlon-init: Deleted Chemacs profile '%s'." profile-name)
     (when (string= profile-dir (tlon-init-profile-dir "default"))
       (call-interactively 'tlon-init-set-default-profile))))
 
@@ -419,7 +419,7 @@ profile already exists, throw a user error message, unless OVERWRITE is non-nil.
     (when (not (file-exists-p profile-dir))
       (user-error "Profile does not exist"))
     (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'set-default)
-    (message "`tlon-init': Set default Chemacs profile to '%s'." profile-name)))
+    (message "tlon-init: Set default Chemacs profile to '%s'." profile-name)))
 
 (defun tlon-init-deploy-profile (profile-name)
   "Deploy PROFILE-NAME."
