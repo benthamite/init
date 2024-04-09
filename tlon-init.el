@@ -131,12 +131,10 @@ If the profile is the default one, return its name, not \"default\"."
 ;;;;; Functions used in code blocks
 
 (declare-function org-get-heading "org")
-(defun tlon-init-tangle-conditionally (&optional key tangle-to-early-init)
-  "Conditionally tangle block based on value of KEY in `tlon-init-tangle-flags'.
-The block will be tangled if either the value of KEY is t or if no key is
-present in the alist.
-
-By default, tangle to `init.el'. If EARLY-INIT is non-nil, tangle to
+;; TODO: consider removing the first argument
+(defun tlon-init-tangle-conditionally (&optional package tangle-to-early-init bisect)
+  "Tangle PACKAGE unless listed in `tlon-init-excluded-packages'.
+By default, tangle to `init.el'. If TANGLE-TO-EARLY-INIT is non-nil, tangle to
 `early-init.el' instead.
 
 BISECT is a reserved argument for a functionality that has not yet been
@@ -144,7 +142,7 @@ developed."
   (let ((package (or package (intern (org-get-heading t t t t)))))
     (if bisect
 	(tlon-init-process-for-bisection package)
-      (tlon-init-get-tangle-target package early-init))))
+      (tlon-init-get-tangle-target package tangle-to-early-init))))
 
 (defun tlon-init-get-tangle-target (package early-init)
   "Return the file to which code block for PACKAGE should be tangled.
