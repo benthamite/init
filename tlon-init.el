@@ -29,6 +29,7 @@
 ;;; Code:
 
 (require 'cus-edit)
+(require 'ob-tangle)
 (require 'paths)
 
 ;;;; User options
@@ -59,6 +60,10 @@ always load at the end of `config.org', even when the user is not Pablo."
   :group 'tlon-init)
 
 ;;;; Variables
+
+(defvar chemacs-profiles)
+(defvar chemacs-profile-name)
+(defvar chemacs-profiles-path)
 
 ;;;;; Files
 
@@ -104,21 +109,52 @@ It should be set in `init.el'.")
 
 ;;;; Functions
 
+;;;;; Profile names
+
+(defun tlon-init-chemacs-actual-profile-name ()
+  "Return the actual name of the active Chemacs profile, handling defaults.
+If the profile is the default one, return its name, not \"default\"."
+  (if (string= chemacs-profile-name "default")
+      (tlon-init-get-default-profile-name)
+    chemacs-profile-name))
+
+(defun tlon-init-get-default-profile-name ()
+  "Find the name of the default Chemacs profile."
+  (let ((default-dir (cdar (alist-get "default" chemacs-profiles nil nil #'string=))))
+    ;; Iterate over the profiles to find a match with default-dir (excluding "default").
+    (cl-loop for (name . attrs) in (remove (assoc "default" chemacs-profiles) chemacs-profiles)
+             if (equal (cdr (assoc 'user-emacs-directory attrs)) default-dir)
+             return name)))
+
+(setq tlon-init-chemacs-profile-name (tlon-init-chemacs-actual-profile-name))
+
 ;;;;; Functions used in code blocks
 
 (declare-function org-get-heading "org")
-(defun tlon-init-tangle-conditionally (&optional package tangle-to-early-init)
-  "Tangle code block for PACKAGE unless listed in `tlon-init-excluded-packages'.
-If PACKAGE is nil, use the parent heading, as a symbol.
+(defun tlon-init-tangle-conditionally (&optional key tangle-to-early-init)
+  "Conditionally tangle block based on value of KEY in `tlon-init-tangle-flags'.
+The block will be tangled if either the value of KEY is t or if no key is
+present in the alist.
 
-By default, tangle to `init.el'. If TANGLE-TO-EARLY-INIT is non-nil, tangle to
-`early-init.el' instead."
+By default, tangle to `init.el'. If EARLY-INIT is non-nil, tangle to
+`early-init.el' instead.
+
+BISECT is a reserved argument for a functionality that has not yet been
+developed."
   (let ((package (or package (intern (org-get-heading t t t t)))))
-    (if (member package tlon-init-excluded-packages)
-	"no"
-      (if tangle-to-early-init
-	  tlon-init-file-early-init
-	tlon-init-file-user-init))))
+    (if bisect
+	(tlon-init-process-for-bisection package)
+      (tlon-init-get-tangle-target package early-init))))
+
+(defun tlon-init-get-tangle-target (package early-init)
+  "Return the file to which code block for PACKAGE should be tangled.
+If EARLY-INIT is non-nil, return the early init file; else, return the main init
+file."
+  (if (member package tlon-init-excluded-packages)
+      "no"
+    (if early-init
+	tlon-init-file-early-init
+      tlon-init-file-user-init)))
 
 (defun tlon-init-override-code (key code-block)
   "Return CODE-BLOCK of KEY in `tlon-init-code-overrides'.
@@ -146,7 +182,7 @@ default will be overridden by that code."
       (insert (prin1-to-string row)))
     (eval-buffer)))
 
-;;;;; 
+;;;;;
 
 (defun tlon-init-read-file (fname)
   "Read FNAME and return its contents."
@@ -159,8 +195,6 @@ default will be overridden by that code."
 	(error
 	 (error "Failed to parse %s: %s" fname (error-message-string err)))))))
 
-(defvar chemacs-profiles)
-(defvar chemacs-profiles-path)
 (defun tlon-init-available-init-dirs (&optional include-default)
   "Return Alist of Chemacs profiles and associated init locations.
 If INCLUDE-DEFAULT is non-nil, include the ‘default’ profile."
@@ -191,13 +225,12 @@ machine"
   (and (string= (system-name) "Pablos-MacBook-Pro.local")
        (not tlon-init-boot-as-if-not-pablo)))
 
-(defvar chemacs-profile-name)
 (defun tlon-init-load-excluded-packages-file (init-dir)
   "Load the excluded packages list for INIT-DIR."
   (if (file-regular-p tlon-init-file-excluded-packages)
       (load-file tlon-init-file-excluded-packages)
     (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
-  (message "tlon-init: Loaded excluded packages for Chemacs profile `%s'." chemacs-profile-name))
+  (message "tlon-init: Loaded excluded packages for Chemacs profile `%s'." tlon-init-chemacs-profile-name))
 
 (defun tlon-init-build (init-dir)
   "Build or rebuild a profile in INIT-DIR."
@@ -206,7 +239,8 @@ machine"
     (tlon-init-profile-dir
      (completing-read
       "Select Chemacs profile to build: "
-      (tlon-init-available-init-dirs)))))
+      (tlon-init-available-init-dirs)
+      nil t))))
   (unless (string-equal major-mode "org-mode")
     (user-error "Error: cannot build init from a buffer that is not visiting an `org-mode' file"))
   (tlon-init-set-babel-paths init-dir)
@@ -216,7 +250,6 @@ machine"
   ;; tangle `config.org'
   (tlon-init-tangle)
   ;; conditionally tangle extra config file, pass 2: get the rest of extra config
-  (setq tlon-init-extra-config-tangle-pass 2)
   (unless (tlon-init-machine-pablo-p)
     (tlon-init-tangle-extra-config-file))
   (run-hooks 'tlon-init-post-build-hook))
@@ -232,8 +265,6 @@ machine"
 	tlon-init-file-user-init (file-name-concat init-dir "init.el")
 	tlon-init-file-late-init (file-name-concat init-dir "late-init.el")))
 
-(defvar org-babel-pre-tangle-hook)
-(declare-function org-babel-tangle "file-name")
 (defun tlon-init-tangle ()
   "Tangle the current buffer."
   (widen)
@@ -242,17 +273,20 @@ machine"
   (message "`tlon-init': Tangled init files to Chemacs profile `%s'." tlon-init-file-user-init))
 
 (defun tlon-init-tangle-extra-config-file ()
-"Tangle extra config file.
-The extra config file is the file with the name `config-{user-first-name}.org'."
-(unless (tlon-init-machine-pablo-p)
+  "Tangle extra config file.
+For Pablo, the extra config file is the same as the main config
+file (`paths-file-config'). For all other users, the extra config file is the
+file with the name `config-{user-first-name}.org'."
   (let* ((user-first-name (downcase (car (split-string user-full-name))))
-	 (extra-config-file (file-name-concat paths-dir-dotemacs
-					      (concat "config-" user-first-name ".org"))))
+	 (extra-config-file (if (tlon-init-machine-pablo-p)
+				paths-file-config
+			      (file-name-concat paths-dir-dotemacs
+						(concat "config-" user-first-name ".org")))))
     (if (file-exists-p extra-config-file)
 	(with-current-buffer (or (find-file-noselect extra-config-file)
 				 (find-buffer-visiting extra-config-file))
 	  (tlon-init-tangle))
-      (user-error "Extra config file for user %s not found" user-first-name)))))
+      (user-error "Extra config file for user %s not found" user-first-name))))
 
 ;;;;; Startup
 
@@ -272,13 +306,12 @@ The extra config file is the file with the name `config-{user-first-name}.org'."
     (message "`tlon-init': Running of hooks in `tlon-init-post-init-hook' complete")
     (run-hooks 'tlon-init-post-init-hook)))
 
-(defvar chemacs-profile-name)
 (defun tlon-init-load-code-overrides ()
   "Load or re-load code overrides and from the currently booted init profile."
   (unless (tlon-init-machine-pablo-p)
     (setq tlon-init-code-overrides
 	  (tlon-init-read-file tlon-init-file-code-override))
-    (message "`tlon-init': Loaded code overrides for Chemacs profile `%s'." chemacs-profile-name)))
+    (message "`tlon-init': Loaded code overrides for Chemacs profile `%s'." tlon-init-chemacs-profile-name)))
 
 (defun tlon-init-defer-load-late-init ()
   "Load `late-init.el' file."
@@ -289,7 +322,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'."
 (defun tlon-init-load-late-init ()
   "Load `late-init.el'."
   (load tlon-init-file-late-init)
-  (message "`tlon-init': Loaded `late-init.el' for Chemacs profile `%s'." chemacs-profile-name))
+  (message "`tlon-init': Loaded `late-init.el' for Chemacs profile `%s'." tlon-init-chemacs-profile-name))
 
 (defun tlon-init-load-paths ()
   "Set paths from the currently booted init profile."
@@ -297,7 +330,7 @@ The extra config file is the file with the name `config-{user-first-name}.org'."
   (unless (tlon-init-machine-pablo-p)
     (tlon-init-load-default-paths)
     (tlon-init-load-override-paths)
-    (message "`tlon-init': Loaded paths for Chemacs profile `%s'." chemacs-profile-name)))
+    (message "`tlon-init': Loaded paths for Chemacs profile `%s'." tlon-init-chemacs-profile-name)))
 
 (defun tlon-init-load-default-paths ()
   "Set paths in `paths.el', overriding them with `paths-override.el’ if present."
@@ -361,7 +394,7 @@ profile already exists, throw a user error message, unless OVERWRITE is non-nil.
   (interactive
    (list (completing-read "Chemacs profile name to delete: "
 			  (mapcar 'car (tlon-init-available-init-dirs)))))
-  (when (string= profile-name chemacs-profile-name)
+  (when (string= profile-name tlon-init-chemacs-profile-name)
     (unless (y-or-n-p (format "You have chosen to delete profile %s, which is currently active. Proceed? "
 			      profile-name))
       (user-error "Aborted")))
@@ -415,9 +448,9 @@ When ACTION is `'set-default', set PROFILE-NAME as default. When ACTION is
   (let* ((emacs-profiles (file-truename "~/.emacs-profiles.el"))
 	 (regex-pattern "(\"%s\" . ((user-emacs-directory . \"%s\")))")
 	 (default (format regex-pattern "default" (tlon-init-profile-dir "default")))
-	 (regex-search (if (member action '(create set-default))
-			   (format regex-pattern "default" ".+?")
-			 (format regex-pattern profile-name ".+?")))
+	 (regex-search (pcase action
+			 ((or 'create 'set-default) (format regex-pattern "default" ".+?"))
+			 (_ (format regex-pattern profile-name ".+?"))))
 	 (regex-replace (pcase action
 			  ('create (concat default "\n" (format regex-pattern profile-name profile-dir)))
 			  ('set-default (format regex-pattern "default" profile-dir))
@@ -429,23 +462,6 @@ When ACTION is `'set-default', set PROFILE-NAME as default. When ACTION is
       (replace-match regex-replace)
       (delete-blank-lines)
       (save-buffer))))
-
-(defun tlon-init-chemacs-actual-profile-name ()
-  "Return the actual name of the active Chemacs profile, handling defaults.
-If the profile is the default one, return its name, not \"default\"."
-  (if (string= chemacs-profile-name "default")
-      (tlon-init-get-default-profile-name)
-    chemacs-profile-name))
-
-(defun tlon-init-get-default-profile-name ()
-  "Find the name of the default Chemacs profile."
-  (let ((default-dir (cdar (alist-get "default" chemacs-profiles nil nil #'string=))))
-    ;; Iterate over the profiles to find a match with default-dir (excluding "default").
-    (cl-loop for (name . attrs) in (remove (assoc "default" chemacs-profiles) chemacs-profiles)
-             if (equal (cdr (assoc 'user-emacs-directory attrs)) default-dir)
-             return name)))
-
-(setq tlon-init-chemacs-profile-name (tlon-init-chemacs-actual-profile-name))
 
 ;;;;; Bisection
 
