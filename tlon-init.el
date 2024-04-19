@@ -225,10 +225,11 @@ machine"
 
 (defun tlon-init-load-excluded-packages-file (init-dir)
   "Load the excluded packages list for INIT-DIR."
-  (if (file-regular-p tlon-init-file-excluded-packages)
-      (load-file tlon-init-file-excluded-packages)
-    (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
-  (message "tlon-init: Loaded excluded packages for Chemacs profile `%s'." tlon-init-chemacs-profile-name))
+  (unless (tlon-init-machine-pablo-p)
+    (if (file-regular-p tlon-init-file-excluded-packages)
+	(load-file tlon-init-file-excluded-packages)
+      (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
+    (message "tlon-init: Loaded excluded packages for Chemacs profile `%s'." tlon-init-chemacs-profile-name)))
 
 (defun tlon-init-build (init-dir)
   "Build or rebuild a profile in INIT-DIR."
