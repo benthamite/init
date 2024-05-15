@@ -238,14 +238,11 @@ machine"
 		       "Select Chemacs profile to build: "
 		       (tlon-init-available-init-dirs)
 		       nil t))))
-  (unless (string-equal major-mode "org-mode")
-    (user-error "Error: cannot build init from a buffer that is not visiting an `org-mode' file"))
   (tlon-init-set-babel-paths init-dir)
   ;; conditionally tangle extra config file, pass 1: get excluded packages only
   (tlon-init-tangle-extra-config-file)
   (tlon-init-load-excluded-packages-file init-dir)
-  ;; tangle `config.org'
-  (tlon-init-tangle)
+  (tlon-init-tangle-main-config-file)
   ;; conditionally tangle extra config file, pass 2: get the rest of extra config
   (unless (tlon-init-machine-pablo-p)
     (tlon-init-tangle-extra-config-file))
@@ -268,6 +265,12 @@ machine"
   (save-buffer)
   (org-babel-tangle)
   (message "tlon-init: Tangled init files to Chemacs profile `%s'." tlon-init-file-user-init))
+
+(defun tlon-init-tangle-main-config-file ()
+  "Tangle the main config file."
+  (with-current-buffer (or (find-file-noselect paths-file-config)
+			   (find-buffer-visiting paths-file-config))
+    (tlon-init-tangle)))
 
 (defun tlon-init-tangle-extra-config-file ()
   "Tangle extra config file.
