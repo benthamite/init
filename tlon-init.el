@@ -244,8 +244,7 @@ machine"
   (tlon-init-load-excluded-packages-file init-dir)
   (tlon-init-tangle-main-config-file)
   ;; conditionally tangle extra config file, pass 2: get the rest of extra config
-  (unless (tlon-init-machine-pablo-p)
-    (tlon-init-tangle-extra-config-file))
+  (tlon-init-tangle-extra-config-file)
   (run-hooks 'tlon-init-post-build-hook))
 
 ;;;;; org-babel
@@ -273,20 +272,17 @@ machine"
     (tlon-init-tangle)))
 
 (defun tlon-init-tangle-extra-config-file ()
-  "Tangle extra config file.
-For Pablo, the extra config file is the same as the main config
-file (`paths-file-config'). For all other users, the extra config file is the
-file with the name `config-{user-first-name}.org'."
-  (let* ((user-first-name (downcase (car (split-string user-full-name))))
-	 (extra-config-file (if (tlon-init-machine-pablo-p)
-				paths-file-config
-			      (file-name-concat paths-dir-dotemacs
-						(concat "config-" user-first-name ".org")))))
-    (if (file-exists-p extra-config-file)
-	(with-current-buffer (or (find-file-noselect extra-config-file)
-				 (find-buffer-visiting extra-config-file))
-	  (tlon-init-tangle))
-      (user-error "Extra config file for user %s not found" user-first-name))))
+  "Tangle the extra config file.
+The extra config file is the file named `config-{user-first-name}.org'."
+  (unless (tlon-init-machine-pablo-p)
+    (let* ((user-first-name (downcase (car (split-string user-full-name))))
+	   (extra-config-file (file-name-concat paths-dir-dotemacs
+						(concat "config-" user-first-name ".org"))))
+      (if (file-exists-p extra-config-file)
+	  (with-current-buffer (or (find-file-noselect extra-config-file)
+				   (find-buffer-visiting extra-config-file))
+	    (tlon-init-tangle))
+	(user-error "Extra config file for user %s not found" user-first-name)))))
 
 ;;;;; Startup
 
