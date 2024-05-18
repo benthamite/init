@@ -298,7 +298,10 @@ The extra config file is the file named `config-{user-first-name}.org'."
   "Run `tlon-init-post-init-hook'."
   (when (tlon-init-machine-pablo-p)
     (dolist (hook tlon-init-post-init-hook)
-      (message "tlon-init: Running `%s'." (symbol-name hook)))
+      (let ((hook-name (if (symbolp hook)
+			   (symbol-name hook)
+			 "a lambda function")))
+	(message "Running `%s'." hook-name)))
     (message "tlon-init: Running of hooks in `tlon-init-post-init-hook' complete")
     (run-hooks 'tlon-init-post-init-hook)))
 
