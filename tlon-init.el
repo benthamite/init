@@ -167,11 +167,10 @@ Example usage:
 
 \(tlon-init-override-code
  :embark
- \='(
-  (use-package embark
-   ;; Default, non-overridden code goes here,
-   ;; in this case, the full use-package call
-   )))
+ \\='((use-package embark
+       ;; Default, non-overridden code goes here,
+       ;; in this case, the full use-package call
+       )))
 
 If `:embark' is found within `tlon-init-code-overrides' in this example, the
 default will be overridden by that code."
