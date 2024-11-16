@@ -59,11 +59,12 @@ always load at the end of `config.org', even when the user is not Pablo."
   :type 'hook
   :group 'tlon-init)
 
-;;;; Variables
+(defcustom tlon-init-profiles-directory (expand-file-name "~/.config/emacs-profiles/")
+  "Directory containing all Emacs profile directories."
+  :type 'directory
+  :group 'tlon-init)
 
-(defvar chemacs-profiles)
-(defvar chemacs-profile-name)
-(defvar chemacs-profiles-path)
+;;;; Variables
 
 ;;;;; Files
 
@@ -104,29 +105,11 @@ always load at the end of `config.org', even when the user is not Pablo."
 This variable allows Pablo to test other people’s configs from his own computer.
 It should be set in `init.el'.")
 
-(defvar tlon-init-chemacs-profile-name ""
-  "The name of the active Chemacs profile.")
+(defvar tlon-init-current-profile
+  (file-name-nondirectory (directory-file-name user-emacs-directory))
+  "Name of the current profile being used.")
 
 ;;;; Functions
-
-;;;;; Profile names
-
-(defun tlon-init-chemacs-actual-profile-name ()
-  "Return the actual name of the active Chemacs profile, handling defaults.
-If the profile is the default one, return its name, not \"default\"."
-  (if (string= chemacs-profile-name "default")
-      (tlon-init-get-default-profile-name)
-    chemacs-profile-name))
-
-(defun tlon-init-get-default-profile-name ()
-  "Find the name of the default Chemacs profile."
-  (let ((default-dir (cdar (alist-get "default" chemacs-profiles nil nil #'string=))))
-    ;; Iterate over the profiles to find a match with default-dir (excluding "default").
-    (cl-loop for (name . attrs) in (remove (assoc "default" chemacs-profiles) chemacs-profiles)
-             if (equal (cdr (assoc 'user-emacs-directory attrs)) default-dir)
-             return name)))
-
-(setq tlon-init-chemacs-profile-name (tlon-init-chemacs-actual-profile-name))
 
 ;;;;; Functions used in code blocks
 
@@ -192,28 +175,11 @@ default will be overridden by that code."
 	(error
 	 (error "Failed to parse %s: %s" fname (error-message-string err)))))))
 
-(defun tlon-init-available-init-dirs (&optional include-default)
-  "Return Alist of Chemacs profiles and associated init locations.
-If INCLUDE-DEFAULT is non-nil, include the ‘default’ profile."
-  ;; update `chemacs-profiles' in case a new profile was added
-  ;; this is just the `defvar' of `chemacs-profiles' copied from chemacs.el
-  (setq chemacs-profiles
-	(with-temp-buffer
-	  (insert-file-contents chemacs-profiles-path)
-	  (goto-char (point-min))
-	  (condition-case err
-	      (read (current-buffer))
-	    (error
-	     (error "Failed to parse %s: %s" chemacs-profiles-path (error-message-string err))))))
-  ;; now return an alist of profile names and their associated init file locations
-  (let (target-directories)
-    (dolist (chemacs-profile chemacs-profiles target-directories)
-      (when (or include-default (not (string= (car chemacs-profile) "default")))
-	(push
-	 (cons
-	  (car chemacs-profile)
-	  (cdadr chemacs-profile))
-	 target-directories)))))
+(defun tlon-init-available-init-dirs ()
+  "Return alist of profile names and their directories."
+  (mapcar (lambda (name)
+            (cons name (tlon-init-profile-dir name)))
+          (tlon-init-list-profiles)))
 
 (defun tlon-init-machine-pablo-p ()
   "Return t if Pablo's machine is the current machine, and nil otherwise.
@@ -228,7 +194,7 @@ machine"
     (if (file-regular-p tlon-init-file-excluded-packages)
 	(load-file tlon-init-file-excluded-packages)
       (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
-    (message "tlon-init: Loaded excluded packages for Chemacs profile `%s'." tlon-init-chemacs-profile-name)))
+    (message "tlon-init: Loaded excluded packages for Chemacs profile `%s'." tlon-init-current-profile)))
 
 (defun tlon-init-build (init-dir)
   "Build or rebuild a profile in INIT-DIR."
@@ -309,7 +275,7 @@ The extra config file is the file named `config-{user-first-name}.org'."
   (unless (tlon-init-machine-pablo-p)
     (setq tlon-init-code-overrides
 	  (tlon-init-read-file tlon-init-file-code-override))
-    (message "tlon-init: Loaded code overrides for Chemacs profile `%s'." tlon-init-chemacs-profile-name)))
+    (message "tlon-init: Loaded code overrides for Chemacs profile `%s'." tlon-init-current-profile)))
 
 (defun tlon-init-defer-load-late-init ()
   "Load `late-init.el' file."
@@ -320,7 +286,7 @@ The extra config file is the file named `config-{user-first-name}.org'."
 (defun tlon-init-load-late-init ()
   "Load `late-init.el'."
   (load tlon-init-file-late-init)
-  (message "tlon-init: Loaded `late-init.el' for Chemacs profile `%s'." tlon-init-chemacs-profile-name))
+  (message "tlon-init: Loaded `late-init.el' for Chemacs profile `%s'." tlon-init-current-profile))
 
 (defun tlon-init-load-paths ()
   "Set paths from the currently booted init profile."
@@ -328,7 +294,7 @@ The extra config file is the file named `config-{user-first-name}.org'."
   (unless (tlon-init-machine-pablo-p)
     (tlon-init-load-default-paths)
     (tlon-init-load-override-paths)
-    (message "tlon-init: Loaded paths for Chemacs profile `%s'." tlon-init-chemacs-profile-name)))
+    (message "tlon-init: Loaded paths for Chemacs profile `%s'." tlon-init-current-profile)))
 
 (defun tlon-init-load-default-paths ()
   "Set paths in `paths.el', overriding them with `paths-override.el’ if present."
@@ -362,62 +328,41 @@ The extra config file is the file named `config-{user-first-name}.org'."
     (error value)))
 
 (defun tlon-init-profile-dir (profile-name)
-  "Return the directory of the Chemacs profile PROFILE-NAME."
-  (alist-get profile-name (tlon-init-available-init-dirs t) nil nil 'string=))
+  "Return the directory of profile PROFILE-NAME."
+  (file-name-concat tlon-init-profiles-directory profile-name))
 
 ;;;;; Profile management
 
 (defun tlon-init-create-profile (profile-name &optional overwrite)
-  "Create a new Chemacs profile named PROFILE-NAME.
-This adds a new profile to `~/.emacs-profiles.el' and creates a directory in the
-Chemacs profiles directory. The directory will have PROFILE-NAME as its name. If
-profile already exists, throw a user error message, unless OVERWRITE is non-nil."
-  (let ((profile-dir (file-name-concat
-		      (file-name-directory (directory-file-name user-emacs-directory))
-		      profile-name)))
+  "Create a new profile named PROFILE-NAME.
+If profile already exists, throw error unless OVERWRITE is non-nil."
+  (let ((profile-dir (file-name-concat tlon-init-profiles-directory profile-name)))
     (when (string-match file-name-invalid-regexp profile-name)
       (user-error "Invalid profile name"))
-    (when (and (tlon-init-profile-exists-p profile-name)
-	       (not overwrite))
+    (when (and (file-exists-p profile-dir) (not overwrite))
       (user-error "Profile already exists"))
     (make-directory profile-dir t)
-    (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'create)
-    (message "tlon-init: Created new Chemacs profile `%s'. Default profile is `%s'."
-	     profile-name
-	     (file-name-nondirectory (tlon-init-profile-dir "default")))
-    profile-name))
+    (message "Created new profile '%s'" profile-name)
+    profile-dir))
 
 (defun tlon-init-delete-profile (profile-name)
-  "Delete a Chemacs profile with name PROFILE-NAME."
+  "Delete profile with name PROFILE-NAME."
   (interactive
-   (list (completing-read "Chemacs profile name to delete: "
-			  (mapcar 'car (tlon-init-available-init-dirs)))))
-  (when (string= profile-name tlon-init-chemacs-profile-name)
-    (unless (y-or-n-p (format "You have chosen to delete profile %s, which is currently active. Proceed? "
-			      profile-name))
-      (user-error "Aborted")))
-  (let ((profile-dir (tlon-init-profile-dir profile-name)))
-    ;; first delete profile dir, if it exists
+   (list (completing-read "Profile to delete: "
+                          (tlon-init-list-profiles))))
+  (let ((profile-dir (file-name-concat tlon-init-profiles-directory profile-name)))
     (when (and (file-exists-p profile-dir)
-	       (y-or-n-p (format "Are you sure you want to delete the directory '%s'? "
-				 profile-dir)))
-      (delete-directory profile-dir t t))
-    ;; then delete profile from `~/.emacs-profiles.el'
-    (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'delete)
-    (message "tlon-init: Deleted Chemacs profile '%s'." profile-name)
-    (when (string= profile-dir (tlon-init-profile-dir "default"))
-      (call-interactively 'tlon-init-set-default-profile))))
+               (yes-or-no-p (format "Really delete profile '%s'? " profile-name)))
+      (delete-directory profile-dir t)
+      (message "Deleted profile '%s'" profile-name))))
 
-(defun tlon-init-set-default-profile (profile-name)
-  "Set the default Chemacs profile to PROFILE-NAME."
-  (interactive
-   (list (completing-read "Chemacs profile name to set as new default: "
-			  (mapcar 'car (tlon-init-available-init-dirs)))))
-  (let ((profile-dir (tlon-init-profile-dir profile-name)))
-    (when (not (file-exists-p profile-dir))
-      (user-error "Profile does not exist"))
-    (tlon-init-act-on-chemacs-profiles profile-name profile-dir 'set-default)
-    (message "tlon-init: Set default Chemacs profile to '%s'." profile-name)))
+(defun tlon-init-list-profiles ()
+  "Return a list of available profile names."
+  (when (file-exists-p tlon-init-profiles-directory)
+    (seq-filter (lambda (name)
+                  (and (not (string-prefix-p "." name))
+                       (file-directory-p (file-name-concat tlon-init-profiles-directory name))))
+                (directory-files tlon-init-profiles-directory))))
 
 (defun tlon-init-get-tag ()
   "Get the tag of local `dotfiles' repository."
@@ -430,42 +375,19 @@ profile already exists, throw a user error message, unless OVERWRITE is non-nil.
   (let ((profile-name (or profile-name (read-string "Profile name: " (tlon-init-get-tag)))))
     (when (tlon-init-profile-exists-p profile-name)
       (unless (y-or-n-p (format "Profile `%s' already exists. Redeploy? " profile-name))
-	(user-error "Aborted")))
+        (user-error "Aborted")))
     (tlon-init-create-profile profile-name t)
     (if (and (boundp 'paths-file-config)
-	     (y-or-n-p " Build init files?"))
-	(with-current-buffer (or (find-file-noselect paths-file-config)
+             (y-or-n-p " Build init files?"))
+        (with-current-buffer (or (find-file-noselect paths-file-config)
 				 (find-buffer-visiting paths-file-config))
-	  (tlon-init-build (tlon-init-profile-dir profile-name)))
+          (tlon-init-build (tlon-init-profile-dir profile-name)))
       (run-hooks 'tlon-init-post-deploy-hook)
       (message (format "Deployed profile '%s'." profile-name)))))
 
 (defun tlon-init-profile-exists-p (profile-name)
-  "Return non-nil if Chemacs profile PROFILE-NAME exists."
-  (when-let ((profile-dir (tlon-init-profile-dir profile-name)))
-    (file-directory-p profile-dir)))
-
-(defun tlon-init-act-on-chemacs-profiles (profile-name &optional profile-dir action)
-  "Create, delete or set PROFILE-NAME as default in PROFILE-DIR.
-When ACTION is `'set-default', set PROFILE-NAME as default. When ACTION is
-`'create', create PROFILE-NAME. Otherwise, delete PROFILE-NAME."
-  (let* ((emacs-profiles (file-truename "~/.emacs-profiles.el"))
-	 (regex-pattern "(\"%s\" . ((user-emacs-directory . \"%s\")))")
-	 (default (format regex-pattern "default" (tlon-init-profile-dir "default")))
-	 (regex-search (pcase action
-			 ((or 'create 'set-default) (format regex-pattern "default" ".+?"))
-			 (_ (format regex-pattern profile-name ".+?"))))
-	 (regex-replace (pcase action
-			  ('create (concat default "\n" (format regex-pattern profile-name profile-dir)))
-			  ('set-default (format regex-pattern "default" profile-dir))
-			  (_ ""))))
-    (with-current-buffer (or (find-buffer-visiting emacs-profiles)
-			     (find-file-noselect emacs-profiles))
-      (goto-char (point-min))
-      (re-search-forward regex-search nil t)
-      (replace-match regex-replace)
-      (delete-blank-lines)
-      (save-buffer))))
+  "Return non-nil if profile PROFILE-NAME exists."
+  (file-directory-p (file-name-concat tlon-init-profiles-directory profile-name)))
 
 ;;;;; Bisection
 
