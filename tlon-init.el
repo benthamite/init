@@ -194,13 +194,13 @@ machine"
     (if (file-regular-p tlon-init-file-excluded-packages)
 	(load-file tlon-init-file-excluded-packages)
       (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
-    (message "tlon-init: Loaded excluded packages for Chemacs profile `%s'." tlon-init-current-profile)))
+    (message "tlon-init: Loaded excluded packages for Emacs profile `%s'." tlon-init-current-profile)))
 
 (defun tlon-init-build (init-dir)
   "Build or rebuild a profile in INIT-DIR."
   (interactive (list (tlon-init-profile-dir
 		      (completing-read
-		       "Select Chemacs profile to build: "
+		       "Select Emacs profile to build: "
 		       (tlon-init-available-init-dirs)
 		       nil t))))
   (tlon-init-set-babel-paths init-dir)
@@ -228,7 +228,7 @@ machine"
   (widen)
   (save-buffer)
   (org-babel-tangle)
-  (message "tlon-init: Tangled init files to Chemacs profile `%s'." tlon-init-file-user-init))
+  (message "tlon-init: Tangled init files to Emacs profile `%s'." tlon-init-file-user-init))
 
 (defun tlon-init-tangle-main-config-file ()
   "Tangle the main config file."
@@ -275,7 +275,7 @@ The extra config file is the file named `config-{user-first-name}.org'."
   (unless (tlon-init-machine-pablo-p)
     (setq tlon-init-code-overrides
 	  (tlon-init-read-file tlon-init-file-code-override))
-    (message "tlon-init: Loaded code overrides for Chemacs profile `%s'." tlon-init-current-profile)))
+    (message "tlon-init: Loaded code overrides for Emacs profile `%s'." tlon-init-current-profile)))
 
 (defun tlon-init-defer-load-late-init ()
   "Load `late-init.el' file."
@@ -286,7 +286,7 @@ The extra config file is the file named `config-{user-first-name}.org'."
 (defun tlon-init-load-late-init ()
   "Load `late-init.el'."
   (load tlon-init-file-late-init)
-  (message "tlon-init: Loaded `late-init.el' for Chemacs profile `%s'." tlon-init-current-profile))
+  (message "tlon-init: Loaded `late-init.el' for Emacs profile `%s'." tlon-init-current-profile))
 
 (defun tlon-init-load-paths ()
   "Set paths from the currently booted init profile."
@@ -294,7 +294,7 @@ The extra config file is the file named `config-{user-first-name}.org'."
   (unless (tlon-init-machine-pablo-p)
     (tlon-init-load-default-paths)
     (tlon-init-load-override-paths)
-    (message "tlon-init: Loaded paths for Chemacs profile `%s'." tlon-init-current-profile)))
+    (message "tlon-init: Loaded paths for Emacs profile `%s'." tlon-init-current-profile)))
 
 (defun tlon-init-load-default-paths ()
   "Set paths in `paths.el', overriding them with `paths-override.el’ if present."
