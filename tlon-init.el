@@ -131,11 +131,15 @@ developed."
   "Return the file to which code block for PACKAGE should be tangled.
 If EARLY-INIT is non-nil, return the early init file; else, return the main init
 file."
-  (if (member package tlon-init-excluded-packages)
-      "no"
-    (if early-init
-	tlon-init-file-early-init
-      tlon-init-file-user-init)))
+  (let ((all-excluded (append tlon-init-excluded-packages
+			      (mapcar (lambda (package)
+					(intern (concat (symbol-name package) "-extras")))
+				      tlon-init-excluded-packages))))
+    (if (member package all-excluded)
+	"no"
+      (if early-init
+	  tlon-init-file-early-init
+	tlon-init-file-user-init))))
 
 (defun tlon-init-override-code (key code-block)
   "Return CODE-BLOCK of KEY in `tlon-init-code-overrides'.
