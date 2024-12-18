@@ -199,20 +199,12 @@ default will be overridden by that code."
             (cons name (tlon-init-profile-dir name)))
           (tlon-init-list-profiles)))
 
-(defun tlon-init-machine-pablo-p ()
-  "Return t if Pablo's machine is the current machine, and nil otherwise.
-Set `tlon-init-boot-as-if-not-pablo' to t in `init.el' to test from Pablo's
-machine"
-  (and (string= (system-name) "Pablos-MacBook-Pro.local")
-       (not tlon-init-boot-as-if-not-pablo)))
-
 (defun tlon-init-load-excluded-packages-file (init-dir)
   "Load the excluded packages list for INIT-DIR."
-  (unless (tlon-init-machine-pablo-p)
-    (if (file-regular-p tlon-init-file-excluded-packages)
-	(load-file tlon-init-file-excluded-packages)
-      (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
-    (message "tlon-init: Loaded excluded packages for Emacs profile `%s'." tlon-init-current-profile)))
+  (if (file-regular-p tlon-init-file-excluded-packages)
+      (load-file tlon-init-file-excluded-packages)
+    (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
+  (message "tlon-init: Loaded excluded packages for Emacs profile `%s'." tlon-init-current-profile))
 
 (defun tlon-init-build (init-dir)
   "Build or rebuild a profile in INIT-DIR."
@@ -274,27 +266,24 @@ See `tlon-init-user-config-file' for details."
 
 (defun tlon-init-run-post-init-hook ()
   "Run `tlon-init-post-init-hook'."
-  (when (tlon-init-machine-pablo-p)
-    (dolist (hook tlon-init-post-init-hook)
-      (let ((hook-name (if (symbolp hook)
-			   (symbol-name hook)
-			 "a lambda function")))
-	(message "Running `%s'." hook-name)))
-    (message "tlon-init: Running of hooks in `tlon-init-post-init-hook' complete")
-    (run-hooks 'tlon-init-post-init-hook)))
+  (dolist (hook tlon-init-post-init-hook)
+    (let ((hook-name (if (symbolp hook)
+			 (symbol-name hook)
+		       "a lambda function")))
+      (message "Running `%s'." hook-name)))
+  (message "tlon-init: Running of hooks in `tlon-init-post-init-hook' complete")
+  (run-hooks 'tlon-init-post-init-hook))
 
 (defun tlon-init-load-code-overrides ()
   "Load or re-load code overrides and from the currently booted init profile."
-  (unless (tlon-init-machine-pablo-p)
-    (setq tlon-init-code-overrides
-	  (tlon-init-read-file tlon-init-file-code-override))
-    (message "tlon-init: Loaded code overrides for Emacs profile `%s'." tlon-init-current-profile)))
+  (setq tlon-init-code-overrides
+	(tlon-init-read-file tlon-init-file-code-override))
+  (message "tlon-init: Loaded code overrides for Emacs profile `%s'." tlon-init-current-profile))
 
 (defun tlon-init-defer-load-late-init ()
   "Load `late-init.el' file."
-  (unless (tlon-init-machine-pablo-p)
-    (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init)
-    (message "tlon-init: Added `tlon-init-load-late-init' to `elpaca-after-init-hook'.")))
+  (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init)
+  (message "tlon-init: Added `tlon-init-load-late-init' to `elpaca-after-init-hook'."))
 
 (defun tlon-init-load-late-init ()
   "Load `late-init.el'."
@@ -304,10 +293,9 @@ See `tlon-init-user-config-file' for details."
 (defun tlon-init-load-paths ()
   "Set paths from the currently booted init profile."
   (interactive)
-  (unless (tlon-init-machine-pablo-p)
-    (tlon-init-load-default-paths)
-    (tlon-init-load-override-paths)
-    (message "tlon-init: Loaded paths for Emacs profile `%s'." tlon-init-current-profile)))
+  (tlon-init-load-default-paths)
+  (tlon-init-load-override-paths)
+  (message "tlon-init: Loaded paths for Emacs profile `%s'." tlon-init-current-profile))
 
 (defun tlon-init-load-default-paths ()
   "Set paths in `paths.el', overriding them with `paths-override.el’ if present."
