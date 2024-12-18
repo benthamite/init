@@ -424,12 +424,11 @@ If profile already exists, throw error unless OVERWRITE is non-nil."
   [["Profile"
     ("b" "build"                           tlon-init-build-profile)
     ("d" "deploy"                          tlon-init-deploy-profile)
-    ("x" "delete"                          tlon-init-delete-profile)
-    ""
-    "Config"
-    ""
-    "Package"
-    ("u" "update & reload"                 tlon-init-update-and-reload)]])
+    ("x" "delete"                          tlon-init-delete-profile)]
+   ["Config"
+    ("u" "update"                          tlon-init-update-config)]
+   ["Package"
+    ("H-u" "update & reload"                 tlon-init-update-and-reload)]])
 
 (provide 'tlon-init)
 
