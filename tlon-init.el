@@ -31,6 +31,7 @@
 (require 'cus-edit)
 (require 'ob-tangle)
 (require 'paths)
+(require 'transient)
 
 ;;;; User options
 
@@ -414,6 +415,21 @@ If profile already exists, throw error unless OVERWRITE is non-nil."
   "<explain behavior> PACKAGE."
   package
   (user-error "This function is not yet defined"))
+
+;;;;; Menu
+
+;;;###autoload (autoload 'tlon-init-menu "tlon-init" nil t)
+(transient-define-prefix tlon-init-menu ()
+  "`tlon-init' menu."
+  [["Profile"
+    ("b" "build"                           tlon-init-build-profile)
+    ("d" "deploy"                          tlon-init-deploy-profile)
+    ("x" "delete"                          tlon-init-delete-profile)
+    ""
+    "Config"
+    ""
+    "Package"
+    ("u" "update & reload"                 tlon-init-update-and-reload)]])
 
 (provide 'tlon-init)
 
