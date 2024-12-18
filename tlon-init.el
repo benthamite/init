@@ -1,7 +1,7 @@
 ;;; tlon-init.el --- Convenience functions to manage Tlön's Emacs config -*- lexical-binding: t -*-
 
 ;; Author: Federico Stafforini & Pablo Stafforini
-;; Version: 1.0.0
+;; Version: 1.2
 ;; Homepage: https://github.com/tlon-team/tlon-init
 ;; Keywords: convenience tools
 
@@ -37,6 +37,19 @@
 (defgroup tlon-init ()
   "Convenience functions to manage Tlön's Emacs config."
   :group 'emacs)
+
+(defcustom tlon-init-user-config-file (getenv "USER_CONFIG_FILE")
+  "File with the user-specific configuration.
+This is an `org-mode' file that contains the code blocks to be tangled into the
+various user-specific Elisp files. See the `example.org' file for an example of
+how this file should be organized.
+
+The path to this file is specified via an environmental variable,
+`USER_CONFIG_FILE', in your `.bashrc' or `.zshrc' file:
+
+export USER_CONFIG_FILE=\"path/to/file.org\""
+  :type 'file
+  :group 'tlon-init)
 
 (defcustom tlon-init-post-init-hook nil
   "Hook run at the end of the user’s config file.
@@ -135,6 +148,7 @@ file."
 			      (mapcar (lambda (package)
 					(intern (concat (symbol-name package) "-extras")))
 				      tlon-init-excluded-packages))))
+    ;; TODO: convert logic to `cond'
     (if (member package all-excluded)
 	"no"
       (if early-init
@@ -209,11 +223,11 @@ machine"
 		       nil t))))
   (tlon-init-set-babel-paths init-dir)
   ;; conditionally tangle extra config file, pass 1: get excluded packages only
-  (tlon-init-tangle-extra-config-file)
+  (tlon-init-tangle-user-config-file)
   (tlon-init-load-excluded-packages-file init-dir)
   (tlon-init-tangle-main-config-file)
   ;; conditionally tangle extra config file, pass 2: get the rest of extra config
-  (tlon-init-tangle-extra-config-file)
+  (tlon-init-tangle-user-config-file)
   (run-hooks 'tlon-init-post-build-hook))
 
 ;;;;; org-babel
@@ -240,18 +254,13 @@ machine"
 			   (find-buffer-visiting paths-file-config))
     (tlon-init-tangle)))
 
-(defun tlon-init-tangle-extra-config-file ()
-  "Tangle the extra config file.
-The extra config file is the file named `config-{user-first-name}.org'."
-  (unless (tlon-init-machine-pablo-p)
-    (let* ((user-first-name (downcase (car (split-string user-full-name))))
-	   (extra-config-file (file-name-concat paths-dir-dotemacs
-						(concat "config-" user-first-name ".org"))))
-      (if (file-exists-p extra-config-file)
-	  (with-current-buffer (or (find-file-noselect extra-config-file)
-				   (find-buffer-visiting extra-config-file))
-	    (tlon-init-tangle))
-	(user-error "Extra config file for user %s not found" user-first-name)))))
+(defun tlon-init-tangle-user-config-file ()
+  "Tangle the user config file.
+See `tlon-init-user-config-file' for details."
+  (if (file-exists-p tlon-init-user-config-file)
+      (with-current-buffer (find-file-noselect tlon-init-user-config-file)
+	(tlon-init-tangle))
+    (user-error "Extra config file for user %s not found" user-full-name)))
 
 ;;;;; Startup
 
