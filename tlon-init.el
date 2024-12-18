@@ -388,6 +388,14 @@ If profile already exists, throw error unless OVERWRITE is non-nil."
   "Return non-nil if profile PROFILE-NAME exists."
   (file-directory-p (file-name-concat tlon-init-profiles-directory profile-name)))
 
+;;;;; Update package
+
+(declare-function elpaca-extras-update-and-reload "elpaca-extras")
+(defun tlon-init-update-and-reload ()
+  "Update and reload the `tlon-init' package."
+  (interactive)
+  (elpaca-extras-update-and-reload 'tlon-init))
+
 ;;;;; Bisection
 
 (defun tlon-init-process-for-bisection (package)
