@@ -396,6 +396,18 @@ If profile already exists, throw error unless OVERWRITE is non-nil."
   (interactive)
   (elpaca-extras-update-and-reload 'tlon-init))
 
+;;;;; Update conifg
+
+(autoload 'magit-pull-from-upstream "magit-pull")
+(defun tlon-init-update-config ()
+  "Update the user-specific configuration."
+  ;; TODO: allow user to check out a specific tag
+  (interactive)
+  (let* ((default-directory paths-dir-dotemacs))
+    (call-interactively #'magit-pull-from-upstream nil)
+    (when (y-or-n-p "Deploy new profile? ")
+      (tlon-init-deploy-profile))))
+
 ;;;;; Bisection
 
 (defun tlon-init-process-for-bisection (package)
