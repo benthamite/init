@@ -60,7 +60,7 @@ always load at the end of `config.org', even when the user is not Pablo."
   :group 'tlon-init)
 
 (defcustom tlon-init-profiles-directory (expand-file-name "~/.config/emacs-profiles/")
-  "Directory containing all Emacs profile directories."
+  "Directory containing the Emacs profiles."
   :type 'directory
   :group 'tlon-init)
 
