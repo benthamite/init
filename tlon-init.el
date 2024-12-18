@@ -38,19 +38,6 @@
   "Convenience functions to manage Tlön's Emacs config."
   :group 'emacs)
 
-(defcustom tlon-init-user-config-file (getenv "USER_CONFIG_FILE")
-  "File with the user-specific configuration.
-This is an `org-mode' file that contains the code blocks to be tangled into the
-various user-specific Elisp files. See the `example.org' file for an example of
-how this file should be organized.
-
-The path to this file is specified via an environmental variable,
-`USER_CONFIG_FILE', in your `.bashrc' or `.zshrc' file:
-
-export USER_CONFIG_FILE=\"path/to/file.org\""
-  :type 'file
-  :group 'tlon-init)
-
 (defcustom tlon-init-post-init-hook nil
   "Hook run at the end of the user’s config file.
 If the user is Pablo, it is run at the end of `config.org'. Otherwise, it is run
@@ -78,6 +65,17 @@ always load at the end of `config.org', even when the user is not Pablo."
   :group 'tlon-init)
 
 ;;;; Variables
+
+(defconst tlon-init-user-config-file (getenv "USER_CONFIG_FILE")
+  "File with the user-specific configuration.
+This is an `org-mode' file that contains the code blocks to be tangled into the
+various user-specific Elisp files. See the `example.org' file for an example of
+how this file should be organized.
+
+The path to this file is specified via an environmental variable,
+`USER_CONFIG_FILE', in your `.bashrc' or `.zshrc' file:
+
+export USER_CONFIG_FILE=\"path/to/file.org\"")
 
 ;;;;; Files
 
