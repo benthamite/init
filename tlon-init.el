@@ -204,7 +204,7 @@ default will be overridden by that code."
     (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
   (message "tlon-init: Loaded excluded packages for Emacs profile `%s'." tlon-init-current-profile))
 
-(defun tlon-init-build (init-dir)
+(defun tlon-init-build-profile (init-dir)
   "Build or rebuild a profile in INIT-DIR."
   (interactive (list (tlon-init-profile-dir
 		      (completing-read
@@ -380,7 +380,7 @@ If profile already exists, throw error unless OVERWRITE is non-nil."
              (y-or-n-p " Build init files?"))
         (with-current-buffer (or (find-file-noselect paths-file-config)
 				 (find-buffer-visiting paths-file-config))
-          (tlon-init-build (tlon-init-profile-dir profile-name)))
+          (tlon-init-build-profile (tlon-init-profile-dir profile-name)))
       (run-hooks 'tlon-init-post-deploy-hook)
       (message (format "Deployed profile '%s'." profile-name)))))
 
