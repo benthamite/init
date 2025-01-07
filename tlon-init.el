@@ -399,15 +399,15 @@ If profile already exists, throw error unless OVERWRITE is non-nil."
 
 ;;;;; Update conifg
 
-(autoload 'magit-pull-from-upstream "magit-pull")
+(autoload 'magit-git-exit-code "magit-git")
 (defun tlon-init-update-config ()
   "Update the user-specific configuration."
-  ;; TODO: allow user to check out a specific tag
   (interactive)
   (let* ((default-directory paths-dir-dotemacs))
-    (call-interactively #'magit-pull-from-upstream nil)
-    (when (y-or-n-p "Deploy new profile? ")
-      (tlon-init-deploy-profile))))
+    (if (zerop (magit-git-exit-code "pull"))
+        (when (y-or-n-p "Config updated. Deploy new profile? ")
+          (tlon-init-deploy-profile))
+      (user-error "Pull failed. Please check repository status"))))
 
 ;;;;; Bisection
 
