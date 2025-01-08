@@ -263,16 +263,6 @@ See `tlon-init-user-config-file' for details."
   (tlon-init-load-excluded-packages-file user-emacs-directory)
   (tlon-init-defer-load-late-init))
 
-(defun tlon-init-run-post-init-hook ()
-  "Run `tlon-init-post-init-hook'."
-  (dolist (hook tlon-init-post-init-hook)
-    (let ((hook-name (if (symbolp hook)
-			 (symbol-name hook)
-		       "a lambda function")))
-      (message "Running `%s'." hook-name)))
-  (message "tlon-init: Running of hooks in `tlon-init-post-init-hook' complete")
-  (run-hooks 'tlon-init-post-init-hook))
-
 (defun tlon-init-load-code-overrides ()
   "Load or re-load code overrides and from the currently booted init profile."
   (setq tlon-init-code-overrides
