@@ -1,7 +1,7 @@
 ;;; init.el --- Convenience functions to manage config profiles -*- lexical-binding: t -*-
 
 ;; Author: Federico Stafforini & Pablo Stafforini
-;; Version: 1.2
+;; Version: 1.3
 ;; Homepage: https://github.com/benthamite/init
 ;; Keywords: convenience tools
 ;; Package-Requires: ((paths "0.1"))
