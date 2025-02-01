@@ -1,10 +1,10 @@
-;;; tlon-init.el --- Convenience functions to manage Tlön's Emacs config -*- lexical-binding: t -*-
+;;; init.el --- Convenience functions to manage config profiles -*- lexical-binding: t -*-
 
 ;; Author: Federico Stafforini & Pablo Stafforini
 ;; Version: 1.2
-;; Homepage: https://github.com/tlon-team/tlon-init
+;; Homepage: https://github.com/benthamite/init
 ;; Keywords: convenience tools
-
+;; Package-Requires: ((paths "0.1"))
 
 ;; This file is not part of GNU Emacs
 
@@ -35,11 +35,11 @@
 
 ;;;; User options
 
-(defgroup tlon-init ()
+(defgroup init ()
   "Convenience functions to manage Tlön's Emacs config."
   :group 'emacs)
 
-(defcustom tlon-init-post-init-hook nil
+(defcustom init-post-init-hook nil
   "Hook run at the end of the user’s config file.
 If the user is Pablo, it is run at the end of `config.org'. Otherwise, it is run
 at the end the user’s personal config file, e.g. `config-leonardo.org' if the
@@ -48,26 +48,26 @@ user is Leo.
 The advantage of this hook over `elpaca-after-init-hook' is that the latter will
 always load at the end of `config.org', even when the user is not Pablo."
   :type 'hook
-  :group 'tlon-init)
+  :group 'init)
 
-(defcustom tlon-init-post-build-hook nil
+(defcustom init-post-build-hook nil
   "Hook run after building a profile."
   :type 'hook
-  :group 'tlon-init)
+  :group 'init)
 
-(defcustom tlon-init-post-deploy-hook nil
+(defcustom init-post-deploy-hook nil
   "Hook run after deploying a profile."
   :type 'hook
-  :group 'tlon-init)
+  :group 'init)
 
-(defcustom tlon-init-profiles-directory (expand-file-name "~/.config/emacs-profiles/")
+(defcustom init-profiles-directory (expand-file-name "~/.config/emacs-profiles/")
   "Directory containing the Emacs profiles."
   :type 'directory
-  :group 'tlon-init)
+  :group 'init)
 
 ;;;; Variables
 
-(defconst tlon-init-user-config-file (getenv "USER_CONFIG_FILE")
+(defconst init-user-config-file (getenv "USER_CONFIG_FILE")
   "File with the user-specific configuration.
 This is an `org-mode' file that contains the code blocks to be tangled into the
 various user-specific Elisp files. See the `example.org' file for an example of
@@ -80,44 +80,44 @@ export USER_CONFIG_FILE=\"path/to/file.org\"")
 
 ;;;;; Files
 
-(defvar tlon-init-file-early-init
+(defvar init-file-early-init
   (file-name-concat user-emacs-directory "early-init.el")
   "Path to `early-init.el'.")
 
-(defvar tlon-init-file-user-init
+(defvar init-file-user-init
   (file-name-concat user-emacs-directory "init.el")
   "Path to `init.el'.")
 
-(defvar tlon-init-file-late-init
+(defvar init-file-late-init
   (file-name-concat user-emacs-directory "late-init.el")
   "Path to `late-init.el'.")
 
-(defvar tlon-init-file-paths-override
+(defvar init-file-paths-override
   (file-name-concat user-emacs-directory "paths-override.el")
   "Path to `paths-override.el'.")
 
-(defvar tlon-init-file-code-override
+(defvar init-file-code-override
   (file-name-concat user-emacs-directory "code-override.el")
   "Path to `code-override.el'.")
 
-(defvar tlon-init-file-excluded-packages
+(defvar init-file-excluded-packages
   (file-name-concat user-emacs-directory "excluded-packages.el")
   "Path to `excluded-packages.el'.")
 
 ;;;;; Other
 
-(defvar tlon-init-excluded-packages '()
+(defvar init-excluded-packages '()
   "List of packages to be excluded in the tangle process.")
 
-(defvar tlon-init-code-overrides '()
+(defvar init-code-overrides '()
   "Alist of code overrides for each package.")
 
-(defvar tlon-init-boot-as-if-not-pablo nil
+(defvar init-boot-as-if-not-pablo nil
   "If non-nil, boot as if the current machine is not Pablo’s.
 This variable allows Pablo to test other people’s configs from his own computer.
 It should be set in `init.el'.")
 
-(defvar tlon-init-current-profile
+(defvar init-current-profile
   (file-name-nondirectory (directory-file-name user-emacs-directory))
   "Name of the current profile being used.")
 
@@ -127,8 +127,8 @@ It should be set in `init.el'.")
 
 (declare-function org-get-heading "org")
 ;; TODO: consider removing the first argument
-(defun tlon-init-tangle-conditionally (&optional package tangle-to-early-init bisect)
-  "Tangle PACKAGE unless listed in `tlon-init-excluded-packages'.
+(defun init-tangle-conditionally (&optional package tangle-to-early-init bisect)
+  "Tangle PACKAGE unless listed in `init-excluded-packages'.
 By default, tangle to `init.el'. If TANGLE-TO-EARLY-INIT is non-nil, tangle to
 `early-init.el' instead.
 
@@ -136,28 +136,28 @@ BISECT is a reserved argument for a functionality that has not yet been
 developed."
   (let ((package (or package (intern (org-get-heading t t t t)))))
     (if bisect
-	(tlon-init-process-for-bisection package)
-      (tlon-init-get-tangle-target package tangle-to-early-init))))
+	(init-process-for-bisection package)
+      (init-get-tangle-target package tangle-to-early-init))))
 
-(defun tlon-init-get-tangle-target (package early-init)
+(defun init-get-tangle-target (package early-init)
   "Return the file to which code block for PACKAGE should be tangled.
 If EARLY-INIT is non-nil, return the early init file; else, return the main init
 file."
-  (let ((all-excluded (append tlon-init-excluded-packages
+  (let ((all-excluded (append init-excluded-packages
 			      (mapcar (lambda (package)
 					(intern (concat (symbol-name package) "-extras")))
-				      tlon-init-excluded-packages))))
+				      init-excluded-packages))))
     ;; TODO: convert logic to `cond'
     (if (member package all-excluded)
 	"no"
       (if early-init
-	  tlon-init-file-early-init
-	tlon-init-file-user-init))))
+	  init-file-early-init
+	init-file-user-init))))
 
-(defun tlon-init-override-code (key code-block)
-  "Return CODE-BLOCK of KEY in `tlon-init-code-overrides'.
-When KEY is not present in `tlon-init-code-overrides', return the default,
-non-overridden code. The variable `tlon-init-code-overrides' is populated during
+(defun init-override-code (key code-block)
+  "Return CODE-BLOCK of KEY in `init-code-overrides'.
+When KEY is not present in `init-code-overrides', return the default,
+non-overridden code. The variable `init-code-overrides' is populated during
 the init process.
 
 The syntax for the KEY parameter is `:{package-name}' where `{package-name}' is
@@ -165,23 +165,23 @@ the name of the package. Examples: `:general', `:embark', `:hydra'.
 
 Example usage:
 
-\(tlon-init-override-code
+\(init-override-code
  :embark
  \\='((use-package embark
        ;; Default, non-overridden code goes here,
        ;; in this case, the full use-package call
        )))
 
-If `:embark' is found within `tlon-init-code-overrides' in this example, the
+If `:embark' is found within `init-code-overrides' in this example, the
 default will be overridden by that code."
   (with-temp-buffer
-    (dolist (row (alist-get key tlon-init-code-overrides code-block))
+    (dolist (row (alist-get key init-code-overrides code-block))
       (insert (prin1-to-string row)))
     (eval-buffer)))
 
 ;;;;;
 
-(defun tlon-init-read-file (fname)
+(defun init-read-file (fname)
   "Read FNAME and return its contents."
   (when fname
     (with-temp-buffer
@@ -192,117 +192,117 @@ default will be overridden by that code."
 	(error
 	 (error "Failed to parse %s: %s" fname (error-message-string err)))))))
 
-(defun tlon-init-available-init-dirs ()
+(defun init-available-init-dirs ()
   "Return alist of profile names and their directories."
   (mapcar (lambda (name)
-            (cons name (tlon-init-profile-dir name)))
-          (tlon-init-list-profiles)))
+            (cons name (init-profile-dir name)))
+          (init-list-profiles)))
 
-(defun tlon-init-load-excluded-packages-file (init-dir)
+(defun init-load-excluded-packages-file (init-dir)
   "Load the excluded packages list for INIT-DIR."
-  (if (file-regular-p tlon-init-file-excluded-packages)
-      (load-file tlon-init-file-excluded-packages)
+  (if (file-regular-p init-file-excluded-packages)
+      (load-file init-file-excluded-packages)
     (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
-  (message "tlon-init: Loaded excluded packages for Emacs profile `%s'." tlon-init-current-profile))
+  (message "init: Loaded excluded packages for Emacs profile `%s'." init-current-profile))
 
-(defun tlon-init-build-profile (init-dir)
+(defun init-build-profile (init-dir)
   "Build or rebuild a profile in INIT-DIR."
-  (interactive (list (tlon-init-profile-dir
+  (interactive (list (init-profile-dir
 		      (completing-read
 		       "Select Emacs profile to build: "
-		       (tlon-init-available-init-dirs)
+		       (init-available-init-dirs)
 		       nil t))))
-  (tlon-init-set-babel-paths init-dir)
+  (init-set-babel-paths init-dir)
   ;; conditionally tangle extra config file, pass 1: get excluded packages only
-  (tlon-init-tangle-user-config-file)
-  (tlon-init-load-excluded-packages-file init-dir)
-  (tlon-init-tangle-main-config-file)
+  (init-tangle-user-config-file)
+  (init-load-excluded-packages-file init-dir)
+  (init-tangle-main-config-file)
   ;; conditionally tangle extra config file, pass 2: get the rest of extra config
-  (tlon-init-tangle-user-config-file)
-  (run-hooks 'tlon-init-post-build-hook))
+  (init-tangle-user-config-file)
+  (run-hooks 'init-post-build-hook))
 
 ;;;;; org-babel
 
-(defun tlon-init-set-babel-paths (init-dir)
+(defun init-set-babel-paths (init-dir)
   "Set the paths for the `org-babel' code blocks relative to INIT-DIR."
-  (setq tlon-init-file-paths-override (file-name-concat init-dir "paths-override.el")
-	tlon-init-file-code-override (file-name-concat init-dir "code-override.el")
-	tlon-init-file-excluded-packages (file-name-concat init-dir "excluded-packages.el")
-	tlon-init-file-early-init (file-name-concat init-dir "early-init.el")
-	tlon-init-file-user-init (file-name-concat init-dir "init.el")
-	tlon-init-file-late-init (file-name-concat init-dir "late-init.el")))
+  (setq init-file-paths-override (file-name-concat init-dir "paths-override.el")
+	init-file-code-override (file-name-concat init-dir "code-override.el")
+	init-file-excluded-packages (file-name-concat init-dir "excluded-packages.el")
+	init-file-early-init (file-name-concat init-dir "early-init.el")
+	init-file-user-init (file-name-concat init-dir "init.el")
+	init-file-late-init (file-name-concat init-dir "late-init.el")))
 
-(defun tlon-init-tangle ()
+(defun init-tangle ()
   "Tangle the current buffer."
   (widen)
   (save-buffer)
   (org-babel-tangle)
-  (message "tlon-init: Tangled init files to Emacs profile `%s'." tlon-init-file-user-init))
+  (message "init: Tangled init files to Emacs profile `%s'." init-file-user-init))
 
-(defun tlon-init-tangle-main-config-file ()
+(defun init-tangle-main-config-file ()
   "Tangle the main config file."
   (with-current-buffer (or (find-file-noselect paths-file-config)
 			   (find-buffer-visiting paths-file-config))
-    (tlon-init-tangle)))
+    (init-tangle)))
 
-(defun tlon-init-tangle-user-config-file ()
+(defun init-tangle-user-config-file ()
   "Tangle the user config file.
-See `tlon-init-user-config-file' for details."
-  (if (file-exists-p tlon-init-user-config-file)
-      (with-current-buffer (find-file-noselect tlon-init-user-config-file)
-	(tlon-init-tangle))
+See `init-user-config-file' for details."
+  (if (file-exists-p init-user-config-file)
+      (with-current-buffer (find-file-noselect init-user-config-file)
+	(init-tangle))
     (user-error "Extra config file for user %s not found" user-full-name)))
 
 ;;;;; Startup
 
-(defun tlon-init-startup ()
-  "Start up Emacs with `tlon-init' config."
-  (message "tlon-init: Running startup...")
-  (tlon-init-load-paths)
-  (tlon-init-load-code-overrides)
-  (tlon-init-load-excluded-packages-file user-emacs-directory)
-  (tlon-init-defer-load-late-init))
+(defun init-startup ()
+  "Start up Emacs with `init' config."
+  (message "init: Running startup...")
+  (init-load-paths)
+  (init-load-code-overrides)
+  (init-load-excluded-packages-file user-emacs-directory)
+  (init-defer-load-late-init))
 
-(defun tlon-init-load-code-overrides ()
+(defun init-load-code-overrides ()
   "Load or re-load code overrides and from the currently booted init profile."
-  (setq tlon-init-code-overrides
-	(tlon-init-read-file tlon-init-file-code-override))
-  (message "tlon-init: Loaded code overrides for Emacs profile `%s'." tlon-init-current-profile))
+  (setq init-code-overrides
+	(init-read-file init-file-code-override))
+  (message "init: Loaded code overrides for Emacs profile `%s'." init-current-profile))
 
-(defun tlon-init-defer-load-late-init ()
+(defun init-defer-load-late-init ()
   "Load `late-init.el' file."
-  (add-hook 'elpaca-after-init-hook #'tlon-init-load-late-init)
-  (message "tlon-init: Added `tlon-init-load-late-init' to `elpaca-after-init-hook'."))
+  (add-hook 'elpaca-after-init-hook #'init-load-late-init)
+  (message "init: Added `init-load-late-init' to `elpaca-after-init-hook'."))
 
-(defun tlon-init-load-late-init ()
+(defun init-load-late-init ()
   "Load `late-init.el'."
-  (load tlon-init-file-late-init)
-  (message "tlon-init: Loaded `late-init.el' for Emacs profile `%s'." tlon-init-current-profile))
+  (load init-file-late-init)
+  (message "init: Loaded `late-init.el' for Emacs profile `%s'." init-current-profile))
 
-(defun tlon-init-load-paths ()
+(defun init-load-paths ()
   "Set paths from the currently booted init profile."
   (interactive)
-  (tlon-init-load-default-paths)
-  (tlon-init-load-override-paths)
-  (message "tlon-init: Loaded paths for Emacs profile `%s'." tlon-init-current-profile))
+  (init-load-default-paths)
+  (init-load-override-paths)
+  (message "init: Loaded paths for Emacs profile `%s'." init-current-profile))
 
-(defun tlon-init-load-default-paths ()
+(defun init-load-default-paths ()
   "Set paths in `paths.el', overriding them with `paths-override.el’ if present."
-  (dolist (row (tlon-init-get-variables-and-values 'paths))
+  (dolist (row (init-get-variables-and-values 'paths))
     (set (car row)
-	 (tlon-init-eval-value-when-possible
-	  (alist-get (car row) (tlon-init-read-file tlon-init-file-paths-override) (cdr row))))
-    (message "tlon-init: Set `%s' to `%s'." (car row) (symbol-value (car row)))))
+	 (init-eval-value-when-possible
+	  (alist-get (car row) (init-read-file init-file-paths-override) (cdr row))))
+    (message "init: Set `%s' to `%s'." (car row) (symbol-value (car row)))))
 
-(defun tlon-init-load-override-paths ()
+(defun init-load-override-paths ()
   "Set paths in `paths-override.el' not present in `paths.el'."
-  (dolist (row (tlon-init-read-file tlon-init-file-paths-override))
+  (dolist (row (init-read-file init-file-paths-override))
     (unless (boundp (car row))
       (set (car row)
-	   (tlon-init-eval-value-when-possible (cdr row)))
-      (message "tlon-init: Set `%s' to `%s'." (car row) (symbol-value (car row))))))
+	   (init-eval-value-when-possible (cdr row)))
+      (message "init: Set `%s' to `%s'." (car row) (symbol-value (car row))))))
 
-(defun tlon-init-get-variables-and-values (group)
+(defun init-get-variables-and-values (group)
   "Return a list of lists of all variables and corresponding values in GROUP."
   (let (result)
     (dolist (member (custom-group-members group nil))
@@ -311,22 +311,22 @@ See `tlon-init-user-config-file' for details."
 	  (push `(,option . ,(symbol-value option)) result))))
     (nreverse result)))
 
-(defun tlon-init-eval-value-when-possible (value)
+(defun init-eval-value-when-possible (value)
   "Evaluate variable VALUE when possible, else return unevaluated VALUE."
   (condition-case _
       (eval value)
     (error value)))
 
-(defun tlon-init-profile-dir (profile-name)
+(defun init-profile-dir (profile-name)
   "Return the directory of profile PROFILE-NAME."
-  (file-name-concat tlon-init-profiles-directory profile-name))
+  (file-name-concat init-profiles-directory profile-name))
 
 ;;;;; Profile management
 
-(defun tlon-init-create-profile (profile-name &optional overwrite)
+(defun init-create-profile (profile-name &optional overwrite)
   "Create a new profile named PROFILE-NAME.
 If profile already exists, throw error unless OVERWRITE is non-nil."
-  (let ((profile-dir (file-name-concat tlon-init-profiles-directory profile-name)))
+  (let ((profile-dir (file-name-concat init-profiles-directory profile-name)))
     (when (string-match file-name-invalid-regexp profile-name)
       (user-error "Invalid profile name"))
     (when (and (file-exists-p profile-dir) (not overwrite))
@@ -335,91 +335,91 @@ If profile already exists, throw error unless OVERWRITE is non-nil."
     (message "Created new profile '%s'" profile-name)
     profile-dir))
 
-(defun tlon-init-delete-profile (profile-name)
+(defun init-delete-profile (profile-name)
   "Delete profile with name PROFILE-NAME."
   (interactive
    (list (completing-read "Profile to delete: "
-                          (tlon-init-list-profiles))))
-  (let ((profile-dir (file-name-concat tlon-init-profiles-directory profile-name)))
+                          (init-list-profiles))))
+  (let ((profile-dir (file-name-concat init-profiles-directory profile-name)))
     (when (and (file-exists-p profile-dir)
                (yes-or-no-p (format "Really delete profile '%s'? " profile-name)))
       (delete-directory profile-dir t)
       (message "Deleted profile '%s'" profile-name))))
 
-(defun tlon-init-list-profiles ()
+(defun init-list-profiles ()
   "Return a list of available profile names."
-  (when (file-exists-p tlon-init-profiles-directory)
+  (when (file-exists-p init-profiles-directory)
     (seq-filter (lambda (name)
                   (and (not (string-prefix-p "." name))
-                       (file-directory-p (file-name-concat tlon-init-profiles-directory name))))
-                (directory-files tlon-init-profiles-directory))))
+                       (file-directory-p (file-name-concat init-profiles-directory name))))
+                (directory-files init-profiles-directory))))
 
-(defun tlon-init-get-tag ()
+(defun init-get-tag ()
   "Get the tag of local `dotfiles' repository."
   (let ((default-directory paths-dir-dotemacs))
     (string-trim (shell-command-to-string "git describe --tags --abbrev=0"))))
 
-(defun tlon-init-deploy-profile (&optional profile-name)
+(defun init-deploy-profile (&optional profile-name)
   "Deploy PROFILE-NAME."
   (interactive)
-  (let ((profile-name (or profile-name (read-string "Profile name: " (tlon-init-get-tag)))))
-    (when (tlon-init-profile-exists-p profile-name)
+  (let ((profile-name (or profile-name (read-string "Profile name: " (init-get-tag)))))
+    (when (init-profile-exists-p profile-name)
       (unless (y-or-n-p (format "Profile `%s' already exists. Redeploy? " profile-name))
         (user-error "Aborted")))
-    (tlon-init-create-profile profile-name t)
+    (init-create-profile profile-name t)
     (if (and (boundp 'paths-file-config)
              (y-or-n-p " Build init files?"))
         (with-current-buffer (or (find-file-noselect paths-file-config)
 				 (find-buffer-visiting paths-file-config))
-          (tlon-init-build-profile (tlon-init-profile-dir profile-name)))
-      (run-hooks 'tlon-init-post-deploy-hook)
+          (init-build-profile (init-profile-dir profile-name)))
+      (run-hooks 'init-post-deploy-hook)
       (message (format "Deployed profile '%s'." profile-name)))))
 
-(defun tlon-init-profile-exists-p (profile-name)
+(defun init-profile-exists-p (profile-name)
   "Return non-nil if profile PROFILE-NAME exists."
-  (file-directory-p (file-name-concat tlon-init-profiles-directory profile-name)))
+  (file-directory-p (file-name-concat init-profiles-directory profile-name)))
 
 ;;;;; Update package
 
 (declare-function elpaca-extras-update-and-reload "elpaca-extras")
-(defun tlon-init-update-and-reload ()
-  "Update and reload the `tlon-init' package."
+(defun init-update-and-reload ()
+  "Update and reload the `init' package."
   (interactive)
-  (elpaca-extras-update-and-reload 'tlon-init))
+  (elpaca-extras-update-and-reload 'init))
 
 ;;;;; Update conifg
 
 (autoload 'magit-git-exit-code "magit-git")
-(defun tlon-init-update-config ()
+(defun init-update-config ()
   "Update the user-specific configuration."
   (interactive)
   (let* ((default-directory paths-dir-dotemacs))
     (if (zerop (magit-git-exit-code "pull"))
         (when (y-or-n-p "Config updated. Deploy new profile? ")
-          (tlon-init-deploy-profile))
+          (init-deploy-profile))
       (user-error "Pull failed. Please check repository status"))))
 
 ;;;;; Bisection
 
-(defun tlon-init-process-for-bisection (package)
+(defun init-process-for-bisection (package)
   "<explain behavior> PACKAGE."
   package
   (user-error "This function is not yet defined"))
 
 ;;;;; Menu
 
-;;;###autoload (autoload 'tlon-init-menu "tlon-init" nil t)
-(transient-define-prefix tlon-init-menu ()
-  "`tlon-init' menu."
+;;;###autoload (autoload 'init-menu "init" nil t)
+(transient-define-prefix init-menu ()
+  "`init' menu."
   [["Profile"
-    ("b" "build"                           tlon-init-build-profile)
-    ("d" "deploy"                          tlon-init-deploy-profile)
-    ("x" "delete"                          tlon-init-delete-profile)]
+    ("b" "build"                           init-build-profile)
+    ("d" "deploy"                          init-deploy-profile)
+    ("x" "delete"                          init-delete-profile)]
    ["Config"
-    ("u" "update"                          tlon-init-update-config)]
+    ("u" "update"                          init-update-config)]
    ["Package"
-    ("H-u" "update & reload"                 tlon-init-update-and-reload)]])
+    ("H-u" "update & reload"                 init-update-and-reload)]])
 
-(provide 'tlon-init)
+(provide 'init)
 
-;;; tlon-init.el ends here
+;;; init.el ends here
