@@ -335,14 +335,16 @@ If profile already exists, throw error unless OVERWRITE is non-nil."
     (message "Created new profile '%s'" profile-name)
     profile-dir))
 
-(defun init-delete-profile (profile-name)
-  "Delete profile with name PROFILE-NAME."
+(defun init-delete-profile (profile-name &optional skip-confirmation)
+  "Delete profile with name PROFILE-NAME.
+If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
   (interactive
    (list (completing-read "Profile to delete: "
                           (init-list-profiles))))
   (let ((profile-dir (file-name-concat init-profiles-directory profile-name)))
     (when (and (file-exists-p profile-dir)
-               (yes-or-no-p (format "Really delete profile '%s'? " profile-name)))
+               (or skip-confirmation
+		   (yes-or-no-p (format "Really delete profile '%s'? " profile-name))))
       (delete-directory profile-dir t)
       (message "Deleted profile '%s'" profile-name))))
 
@@ -364,12 +366,13 @@ If profile already exists, throw error unless OVERWRITE is non-nil."
   (interactive)
   (let ((profile-name (or profile-name (read-string "Profile name: " (init-get-tag)))))
     (when (init-profile-exists-p profile-name)
-      (unless (y-or-n-p (format "Profile `%s' already exists. Redeploy? " profile-name))
-        (user-error "Aborted")))
+      (if (y-or-n-p (format "Profile %s already exists. Delete existing profile and redeploy? " profile-name))
+	  (init-delete-profile profile-name 'skip-confirmation)
+	(user-error "Aborted")))
     (init-create-profile profile-name t)
     (if (and (boundp 'paths-file-config)
              (y-or-n-p " Build init files?"))
-        (with-current-buffer (or (find-file-noselect paths-file-config)
+	(with-current-buffer (or (find-file-noselect paths-file-config)
 				 (find-buffer-visiting paths-file-config))
           (init-build-profile (init-profile-dir profile-name)))
       (run-hooks 'init-post-deploy-hook)
