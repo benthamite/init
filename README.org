@@ -28,14 +28,14 @@ The main entry point is the `init-menu` transient command, which provides access
 
 *** Package Update
 
-- ~init-update-and-reload~: Update the `init` package itself using `elpaca-extras-update-and-reload`.
+- ~init-update-and-reload~: Update the =init= package itself using =elpaca-extras-update-and-reload=.
 
 ** Configuration
 
-- `init-profiles-directory`: Directory where profiles are stored (default: `~/.config/emacs-profiles/`).
-- `init-user-config-file`: Path to the user-specific Org configuration file (set via environment variable `USER_CONFIG_FILE`).
-- Hooks: `init-post-init-hook`, `init-post-build-hook`, `init-post-deploy-hook`.
+- =init-profiles-directory=: Directory where profiles are stored (default: =~/.config/emacs-profiles/=).
+- =init-user-config-file=: Path to the user-specific Org configuration file (set via environment variable =USER_CONFIG_FILE=).
+- Hooks: =init-post-init-hook=, =init-post-build-hook=, =init-post-deploy-hook=.
 
 * tlon.el
 
-This file likely contains Tlön-specific configurations or functions, complementing the profile management provided by `init.el`. (Further details about `tlon.el` would go here once its purpose is clarified).
+This file likely contains Tlön-specific configurations or functions, complementing the profile management provided by =init.el=. (Further details about =tlon.el= would go here once its purpose is clarified).
