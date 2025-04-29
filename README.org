@@ -1,0 +1,41 @@
+* init.el
+
+Convenience functions to manage Emacs configuration profiles.
+
+** Features
+
+- Create, delete, list, and deploy configuration profiles.
+- Tangle configuration files (`config.org`, `user-config.org`) into Elisp files (`init.el`, `early-init.el`, `late-init.el`).
+- Handle user-specific configurations and overrides.
+- Update configuration from a git repository.
+- Integrate with `elpaca` for package management.
+
+** Usage
+
+The main entry point is the `init-menu` transient command, which provides access to common profile management tasks.
+
+*** Profile Management
+
+- ~init-create-profile~: Create a new profile.
+- ~init-delete-profile~: Delete an existing profile.
+- ~init-list-profiles~: List available profiles.
+- ~init-deploy-profile~: Deploy a profile, optionally building it first.
+- ~init-build-profile~: Build (tangle) the Elisp files for a profile.
+
+*** Configuration Update
+
+- ~init-update-config~: Pull changes from the configuration repository and offer to deploy a new profile.
+
+*** Package Update
+
+- ~init-update-and-reload~: Update the `init` package itself using `elpaca-extras-update-and-reload`.
+
+** Configuration
+
+- `init-profiles-directory`: Directory where profiles are stored (default: `~/.config/emacs-profiles/`).
+- `init-user-config-file`: Path to the user-specific Org configuration file (set via environment variable `USER_CONFIG_FILE`).
+- Hooks: `init-post-init-hook`, `init-post-build-hook`, `init-post-deploy-hook`.
+
+* tlon.el
+
+This file likely contains Tlön-specific configurations or functions, complementing the profile management provided by `init.el`. (Further details about `tlon.el` would go here once its purpose is clarified).
