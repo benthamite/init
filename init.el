@@ -359,6 +359,7 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
 (defun init-get-tag ()
   "Get the tag of local `dotfiles' repository."
   (let ((default-directory paths-dir-dotemacs))
+    (shell-command-to-string "git fetch --tags")
     (string-trim (shell-command-to-string "git describe --tags --abbrev=0"))))
 
 (defun init-deploy-profile (&optional profile-name)
