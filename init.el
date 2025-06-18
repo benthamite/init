@@ -370,6 +370,7 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
 	  (init-delete-profile profile-name 'skip-confirmation)
 	(user-error "Aborted")))
     (init-create-profile profile-name t)
+    (init-copy-lockfile (init-profile-dir profile-name))
     (if (and (boundp 'paths-file-config)
              (y-or-n-p " Build init files?"))
 	(with-current-buffer (or (find-file-noselect paths-file-config)
@@ -381,6 +382,16 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
 (defun init-profile-exists-p (profile-name)
   "Return non-nil if profile PROFILE-NAME exists."
   (file-directory-p (file-name-concat init-profiles-directory profile-name)))
+
+(defun init-copy-lockfile (dest-dir)
+  "Copy lockfile.el from dotfiles directory to DEST-DIR.
+If the source lockfile is missing, do nothing."
+  (let* ((src (file-name-concat (file-name-directory paths-file-config)
+				"lockfile.el"))
+	 (dest (file-name-concat dest-dir "lockfile.el")))
+    (when (file-exists-p src)
+      (copy-file src dest t)
+      (message "init: Copied lockfile.el to `%s'." dest))))
 
 ;;;;; Update package
 
