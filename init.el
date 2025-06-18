@@ -364,20 +364,23 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
 (defun init-deploy-profile (&optional profile-name)
   "Deploy PROFILE-NAME."
   (interactive)
-  (let ((profile-name (or profile-name (read-string "Profile name: " (init-get-tag)))))
-    (when (init-profile-exists-p profile-name)
-      (if (y-or-n-p (format "Profile %s already exists. Delete existing profile and redeploy? " profile-name))
-	  (init-delete-profile profile-name 'skip-confirmation)
-	(user-error "Aborted")))
-    (init-create-profile profile-name t)
-    (init-copy-lockfile (init-profile-dir profile-name))
-    (if (and (boundp 'paths-file-config)
-             (y-or-n-p " Build init files?"))
-	(with-current-buffer (or (find-file-noselect paths-file-config)
-				 (find-buffer-visiting paths-file-config))
-          (init-build-profile (init-profile-dir profile-name)))
-      (run-hooks 'init-post-deploy-hook)
-      (message (format "Deployed profile '%s'." profile-name)))))
+  (let ((default-directory paths-dir-dotemacs))
+    (if (zerop (magit-git-exit-code "pull"))
+	(let ((profile-name (or profile-name (read-string "Profile name: " (init-get-tag)))))
+	  (when (init-profile-exists-p profile-name)
+	    (if (y-or-n-p (format "Profile %s already exists. Delete existing profile and redeploy? " profile-name))
+		(init-delete-profile profile-name 'skip-confirmation)
+	      (user-error "Aborted")))
+	  (init-create-profile profile-name t)
+	  (init-copy-lockfile (init-profile-dir profile-name))
+	  (if (and (boundp 'paths-file-config)
+		   (y-or-n-p " Build init files?"))
+	      (with-current-buffer (or (find-file-noselect paths-file-config)
+				       (find-buffer-visiting paths-file-config))
+		(init-build-profile (init-profile-dir profile-name)))
+	    (run-hooks 'init-post-deploy-hook)
+	    (message (format "Deployed profile '%s'." profile-name))))
+      (user-error "Pull from dotfiles failed. Please check repository status"))))
 
 (defun init-profile-exists-p (profile-name)
   "Return non-nil if profile PROFILE-NAME exists."
@@ -429,10 +432,8 @@ If the source lockfile is missing, do nothing."
     ("b" "build"                           init-build-profile)
     ("d" "deploy"                          init-deploy-profile)
     ("x" "delete"                          init-delete-profile)]
-   ["Config"
-    ("u" "update"                          init-update-config)]
    ["Package"
-    ("H-u" "update & reload"                 init-update-and-reload)]])
+    ("H-u" "update & reload"               init-update-and-reload)]])
 
 (provide 'init)
 
