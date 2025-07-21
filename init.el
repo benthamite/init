@@ -4,7 +4,7 @@
 ;; Version: 1.3
 ;; Homepage: https://github.com/benthamite/init
 ;; Keywords: convenience tools
-;; Package-Requires: ((paths "0.1"))
+;; Package-Requires: ((paths "0.1") (elpaca "0.0.2"))
 
 ;; This file is not part of GNU Emacs
 
@@ -29,6 +29,7 @@
 ;;; Code:
 
 (require 'cus-edit)
+(require 'elpaca)
 (require 'ob-tangle)
 (require 'paths)
 (require 'transient)
