@@ -432,10 +432,12 @@ If the source lockfile is missing, do nothing."
       (message "init: Copied `%s' to `%s'." init-lockfile-name dest))))
 
 (defun init-maybe-write-lockfile ()
-  "Prompt to write the lockfile if system name equals `init-system-name-pablo'."
+  "Prompt to write the lockfile if system name equals `init-system-name-pablo'.
+Commit and push the lockfile after writing it."
   (when (and (string= (system-name) init-system-name-pablo)
 	     (y-or-n-p "Write lockfile? "))
-    (elpaca-write-lock-file init-master-lockfile-path)))
+    (elpaca-write-lock-file init-master-lockfile-path)
+    (init-commit-and-push-lockfile)))
 
 (defun init-commit-and-push-lockfile ()
   "Commit and push changes, if any, to the master lockfile."
