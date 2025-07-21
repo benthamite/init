@@ -440,7 +440,7 @@ Commit and push the lockfile after writing it."
     (init-commit-and-push-lockfile)))
 
 (defun init-commit-and-push-lockfile ()
-  "Commit and push changes, if any, to the master lockfile."
+  "Commit and push modifications, if any, to the master lockfile."
   (interactive)
   (let ((default-directory paths-dir-dotemacs))
     (if (string-empty-p (shell-command-to-string (format "git status --porcelain %s" (shell-quote-argument init-master-lockfile-path))))
