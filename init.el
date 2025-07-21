@@ -467,7 +467,7 @@ If the source lockfile is missing, do nothing."
     (if (zerop (magit-git-exit-code "pull"))
         (when (y-or-n-p "Config updated. Deploy new profile? ")
           (init-deploy-profile))
-      (user-error "Pull failed. Please check repository status"))))
+      (user-error "Pull failed. Please check status of repository `%s'" paths-dir-dotemacs))))
 
 ;;;;; Bisection
 
