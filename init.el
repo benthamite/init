@@ -422,7 +422,7 @@ If the source lockfile is missing, do nothing."
   "Prompt to write the lockfile if system name equals `init-system-name-pablo'."
   (when (and (string= (system-name) init-system-name-pablo)
 	     (y-or-n-p "Write lockfile? "))
-    (elpaca-write-lock-file elpaca-lock-file)))
+    (elpaca-write-lock-file (file-name-concat paths-dir-dotemacs "lockfile.el"))))
 
 ;;;;; Update package
 
