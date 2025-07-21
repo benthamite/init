@@ -409,7 +409,7 @@ If PROFILE-NAME is nil, return the lockfile for the current profile."
     (file-name-concat elpaca-dir "lockfile.el")))
 
 (defun init-copy-lockfile (dest-dir)
-  "Copy `lockfile.el' from dotfiles directory to DEST-DIR.
+  "Copy \"lockfile.el\" from dotfiles directory to DEST-DIR.
 If the source lockfile is missing, do nothing."
   (let* ((src (file-name-concat (file-name-directory paths-file-config)
 				"lockfile.el"))
