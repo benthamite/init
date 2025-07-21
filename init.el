@@ -353,6 +353,13 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
       (delete-directory profile-dir t)
       (message "Deleted profile '%s'" profile-name))))
 
+(defun init-maybe-delete-profile (profile-name)
+  "Prompt to delete PROFILE-NAME if it already exists."
+  (when (init-profile-exists-p profile-name)
+    (if (y-or-n-p (format "Profile %s already exists. Delete existing profile and redeploy? " profile-name))
+	(init-delete-profile profile-name 'skip-confirmation)
+      (user-error "Aborted"))))
+
 (defun init-list-profiles ()
   "Return a list of available profile names."
   (when (file-exists-p init-profiles-directory)
@@ -374,10 +381,7 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
   (let ((default-directory paths-dir-dotemacs))
     (if (zerop (magit-git-exit-code "pull"))
 	(let ((profile-name (or profile-name (read-string "Profile name: " (init-get-tag)))))
-	  (when (init-profile-exists-p profile-name)
-	    (if (y-or-n-p (format "Profile %s already exists. Delete existing profile and redeploy? " profile-name))
-		(init-delete-profile profile-name 'skip-confirmation)
-	      (user-error "Aborted")))
+	  (init-maybe-delete-profile profile-name)
 	  (init-create-profile profile-name t)
 	  (init-maybe-write-lockfile)
 	  (init-copy-lockfile (init-profile-dir profile-name))
