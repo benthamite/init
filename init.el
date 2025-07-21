@@ -122,6 +122,10 @@ It should be set in `init.el'.")
   (file-name-nondirectory (directory-file-name user-emacs-directory))
   "Name of the current profile being used.")
 
+(defconst init-system-name-pablo
+  "Pablos-MacBook-Pro.local"
+  "System name of Pablo's computer.")
+
 ;;;; Functions
 
 ;;;;; Functions used in code blocks
@@ -362,6 +366,8 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
   (let ((default-directory paths-dir-dotemacs))
     (string-trim (shell-command-to-string "git describe --tags --abbrev=0"))))
 
+(defvar elpaca-lock-file)
+(declare-function elpaca-write-lock-file "elpaca")
 (defun init-deploy-profile (&optional profile-name)
   "Deploy PROFILE-NAME."
   (interactive)
@@ -373,6 +379,7 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
 		(init-delete-profile profile-name 'skip-confirmation)
 	      (user-error "Aborted")))
 	  (init-create-profile profile-name t)
+	  (init-maybe-write-lockfile)
 	  (init-copy-lockfile (init-profile-dir profile-name))
 	  (if (and (boundp 'paths-file-config)
 		   (y-or-n-p " Build init files?"))
@@ -387,8 +394,18 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
   "Return non-nil if profile PROFILE-NAME exists."
   (file-directory-p (file-name-concat init-profiles-directory profile-name)))
 
+;;;;; lock-file
+
+(defun init-get-lockfile (&optional profile-name)
+  "Return the path to the lockfile for PROFILE-NAME.
+If PROFILE-NAME is nil, return the lockfile for the current profile."
+  (let ((elpaca-dir (if profile-name
+			(file-name-concat (init-profile-dir profile-name) "elpaca/")
+		      elpaca-directory)))
+    (file-name-concat elpaca-dir "lockfile.el")))
+
 (defun init-copy-lockfile (dest-dir)
-  "Copy lockfile.el from dotfiles directory to DEST-DIR.
+  "Copy `lockfile.el' from dotfiles directory to DEST-DIR.
 If the source lockfile is missing, do nothing."
   (let* ((src (file-name-concat (file-name-directory paths-file-config)
 				"lockfile.el"))
@@ -396,6 +413,12 @@ If the source lockfile is missing, do nothing."
     (when (file-exists-p src)
       (copy-file src dest t)
       (message "init: Copied lockfile.el to `%s'." dest))))
+
+(defun init-maybe-write-lockfile ()
+  "Prompt to write the lockfile if system name equals `init-system-name-pablo'."
+  (when (and (string= (system-name) init-system-name-pablo)
+	     (y-or-n-p "Write lockfile? "))
+    (elpaca-write-lock-file elpaca-lock-file)))
 
 ;;;;; Update package
 
