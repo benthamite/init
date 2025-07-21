@@ -443,7 +443,8 @@ Commit and push the lockfile after writing it."
   "Commit and push modifications, if any, to the master lockfile."
   (interactive)
   (let ((default-directory paths-dir-dotemacs))
-    (if (string-empty-p (shell-command-to-string (format "git status --porcelain %s" (shell-quote-argument init-master-lockfile-path))))
+    (if (string-empty-p (shell-command-to-string (format "git status --porcelain %s"
+							 (shell-quote-argument init-master-lockfile-path))))
         (message "init: No changes to lockfile to commit.")
       (message "init: Staging lockfile...")
       (unless (zerop (magit-git-exit-code "add" init-master-lockfile-path))
