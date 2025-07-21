@@ -126,6 +126,15 @@ It should be set in `init.el'.")
   "Pablos-MacBook-Pro.local"
   "System name of Pablo's computer.")
 
+;;;;; Lockfile
+
+(defconst init-lockfile-name "lockfile.el"
+  "Name of the lockfile.")
+
+(defconst init-master-lockfile-path
+  (file-name-concat paths-dir-dotemacs init-lockfile-name)
+  "Path to the master lockfile to be propagated to the relevant profile dirs.")
+
 ;;;; Functions
 
 ;;;;; Functions used in code blocks
@@ -406,23 +415,22 @@ If PROFILE-NAME is nil, return the lockfile for the current profile."
   (let ((elpaca-dir (if profile-name
 			(file-name-concat (init-profile-dir profile-name) "elpaca/")
 		      elpaca-directory)))
-    (file-name-concat elpaca-dir "lockfile.el")))
+    (file-name-concat elpaca-dir init-lockfile-name)))
 
 (defun init-copy-lockfile (dest-dir)
-  "Copy \"lockfile.el\" from dotfiles directory to DEST-DIR.
+  "Copy `init-lockfile-name' from dotfiles directory to DEST-DIR.
 If the source lockfile is missing, do nothing."
-  (let* ((src (file-name-concat (file-name-directory paths-file-config)
-				"lockfile.el"))
-	 (dest (file-name-concat dest-dir "lockfile.el")))
+  (let* ((src (file-name-concat (file-name-directory paths-file-config) init-lockfile-name))
+	 (dest (file-name-concat dest-dir init-lockfile-name)))
     (when (file-exists-p src)
       (copy-file src dest t)
-      (message "init: Copied lockfile.el to `%s'." dest))))
+      (message "init: Copied `%s' to `%s'." init-lockfile-name dest))))
 
 (defun init-maybe-write-lockfile ()
   "Prompt to write the lockfile if system name equals `init-system-name-pablo'."
   (when (and (string= (system-name) init-system-name-pablo)
 	     (y-or-n-p "Write lockfile? "))
-    (elpaca-write-lock-file (file-name-concat paths-dir-dotemacs "lockfile.el"))))
+    (elpaca-write-lock-file init-master-lockfile-path)))
 
 ;;;;; Update package
 
