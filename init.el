@@ -407,7 +407,7 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
   "Return non-nil if profile PROFILE-NAME exists."
   (file-directory-p (file-name-concat init-profiles-directory profile-name)))
 
-;;;;; lock-file
+;;;;; lockfile
 
 (defun init-get-lockfile (&optional profile-name)
   "Return the path to the lockfile for PROFILE-NAME.
