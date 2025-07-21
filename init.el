@@ -457,18 +457,6 @@ If the source lockfile is missing, do nothing."
   (interactive)
   (elpaca-extras-update-and-reload 'init))
 
-;;;;; Update conifg
-
-(autoload 'magit-git-exit-code "magit-git")
-(defun init-update-config ()
-  "Update the user-specific configuration."
-  (interactive)
-  (let* ((default-directory paths-dir-dotemacs))
-    (if (zerop (magit-git-exit-code "pull"))
-        (when (y-or-n-p "Config updated. Deploy new profile? ")
-          (init-deploy-profile))
-      (user-error "Pull failed. Please check status of repository `%s'" paths-dir-dotemacs))))
-
 ;;;;; Bisection
 
 (defun init-process-for-bisection (package)
