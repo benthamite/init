@@ -432,6 +432,23 @@ If the source lockfile is missing, do nothing."
 	     (y-or-n-p "Write lockfile? "))
     (elpaca-write-lock-file init-master-lockfile-path)))
 
+(defun init-commit-and-push-lockfile ()
+  "Commit and push changes, if any, to the master lockfile."
+  (let ((default-directory paths-dir-dotemacs))
+    (if (string-empty-p (shell-command-to-string (format "git status --porcelain %s" (shell-quote-argument init-master-lockfile-path))))
+        (message "init: No changes to lockfile to commit.")
+      (message "init: Staging lockfile...")
+      (unless (zerop (magit-git-exit-code "add" init-master-lockfile-path))
+        (user-error "Staging lockfile failed"))
+      (message "init: Committing lockfile...")
+      (if (zerop (magit-git-exit-code "commit" "-m" "Update lockfile"))
+          (progn
+            (message "init: Pushing lockfile...")
+            (if (zerop (magit-git-exit-code "push"))
+                (message "init: Lockfile committed and pushed successfully.")
+              (user-error "Pushing lockfile failed")))
+        (user-error "Committing lockfile failed")))))
+
 ;;;;; Update package
 
 (declare-function elpaca-extras-update-and-reload "elpaca-extras")
