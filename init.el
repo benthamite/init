@@ -141,17 +141,12 @@ It should be set in `init.el'.")
 
 (declare-function org-get-heading "org")
 ;; TODO: consider removing the first argument
-(defun init-tangle-conditionally (&optional package tangle-to-early-init bisect)
+(defun init-tangle-conditionally (&optional package tangle-to-early-init)
   "Tangle PACKAGE unless listed in `init-excluded-packages'.
 By default, tangle to `init.el'. If TANGLE-TO-EARLY-INIT is non-nil, tangle to
-`early-init.el' instead.
-
-BISECT is a reserved argument for a functionality that has not yet been
-developed."
+`early-init.el' instead."
   (let ((package (or package (intern (org-get-heading t t t t)))))
-    (if bisect
-	(init-process-for-bisection package)
-      (init-get-tangle-target package tangle-to-early-init))))
+    (init-get-tangle-target package tangle-to-early-init)))
 
 (defun init-get-tangle-target (package early-init)
   "Return appropriate tangle target or \"no\" when PACKAGE is excluded.
@@ -463,13 +458,6 @@ Commit and push the lockfile after writing it."
   "Update and reload the `init' package."
   (interactive)
   (elpaca-extras-update-and-reload 'init))
-
-;;;;; Bisection
-
-(defun init-process-for-bisection (package)
-  "<explain behavior> PACKAGE."
-  package
-  (user-error "This function is not yet defined"))
 
 ;;;;; Menu
 
