@@ -154,19 +154,17 @@ developed."
       (init-get-tangle-target package tangle-to-early-init))))
 
 (defun init-get-tangle-target (package early-init)
-  "Return the file to which code block for PACKAGE should be tangled.
-If EARLY-INIT is non-nil, return the early init file; else, return the main init
-file."
-  (let ((all-excluded (append init-excluded-packages
-			      (mapcar (lambda (package)
-					(intern (concat (symbol-name package) "-extras")))
-				      init-excluded-packages))))
-    ;; TODO: convert logic to `cond'
-    (if (member package all-excluded)
-	"no"
-      (if early-init
-	  init-file-early-init
-	init-file-user-init))))
+  "Return appropriate tangle target or \"no\" when PACKAGE is excluded.
+If EARLY-INIT is non-nil, use the early-init file; otherwise use the main
+init file."
+  (let* ((extras (mapcar (lambda (pkg)
+			   (intern (concat (symbol-name pkg) "-extras")))
+			 init-excluded-packages))
+	 (all-excluded (append init-excluded-packages extras)))
+    (cond
+     ((member package all-excluded) "no")
+     (early-init                init-file-early-init)
+     (t                         init-file-user-init))))
 
 (defun init-override-code (key code-block)
   "Return CODE-BLOCK of KEY in `init-code-overrides'.
