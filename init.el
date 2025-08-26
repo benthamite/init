@@ -4,7 +4,7 @@
 ;; Version: 1.3
 ;; Homepage: https://github.com/benthamite/init
 ;; Keywords: convenience tools
-;; Package-Requires: ((paths "0.1") (elpaca "0.0.2"))
+;; Package-Requires: ((paths "0.1") (elpaca "0.0.2") (elpaca-extras "0.0.1"))
 
 ;; This file is not part of GNU Emacs
 
@@ -424,12 +424,13 @@ If the source lockfile is missing, do nothing."
       (copy-file src dest t)
       (message "init: Copied `%s' to `%s'." init-lockfile-name dest))))
 
+(declare-function elpaca-extras-write-lock-file-excluding "elpaca-extras")
 (defun init-maybe-write-lockfile ()
   "Prompt to write the lockfile if system name equals `init-system-name-pablo'.
 Commit and push the lockfile after writing it."
   (when (and (string= (system-name) init-system-name-pablo)
 	     (y-or-n-p "Write lockfile? "))
-    (elpaca-write-lock-file init-master-lockfile-path)
+    (elpaca-extras-write-lock-file-excluding init-master-lockfile-path)
     (init-commit-and-push-lockfile)))
 
 (defun init-commit-and-push-lockfile ()
