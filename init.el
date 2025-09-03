@@ -394,6 +394,7 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
       (run-hooks 'init-post-deploy-hook)
       (message (format "Deployed profile '%s'." profile-name)))))
 
+(autoload 'magit-process-git "magit-process")
 (autoload 'magit-git-exit-code "magit-git")
 (defun init-pull-from-dotfiles ()
   "Pull the latest modifications from the dotfiles repository."
