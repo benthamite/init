@@ -183,8 +183,8 @@ If `:embark' is found within `init-code-overrides' in this example, the
 default will be overridden by that code."
   (with-temp-buffer
     (dolist (row (alist-get key init-code-overrides code-block))
-      (insert (prin1-to-string row)))
-    (eval-buffer)))
+      (insert (prin1-to-string row) "\n"))
+    (eval-buffer nil nil nil t)))
 
 ;;;;;
 
@@ -207,10 +207,11 @@ default will be overridden by that code."
 
 (defun init-load-excluded-packages-file (init-dir)
   "Load the excluded packages list for INIT-DIR."
-  (if (file-regular-p init-file-excluded-packages)
-      (load-file init-file-excluded-packages)
-    (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
-  (message "init: Loaded excluded packages for Emacs profile `%s'." init-current-profile))
+  (let ((file (file-name-concat init-dir "excluded-packages.el")))
+    (if (file-regular-p file)
+	(load-file file)
+      (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
+    (message "init: Loaded excluded packages for Emacs profile `%s'." init-current-profile)))
 
 (defun init-build-profile (init-dir)
   "Build or rebuild a profile in INIT-DIR."
@@ -255,7 +256,7 @@ default will be overridden by that code."
 (defun init-tangle-user-config-file ()
   "Tangle the user config file.
 See `init-user-config-file' for details."
-  (if (file-exists-p init-user-config-file)
+  (if (and init-user-config-file (file-exists-p init-user-config-file))
       (with-current-buffer (find-file-noselect init-user-config-file)
 	(init-tangle))
     (user-error "Extra config file for user %s not found" user-full-name)))
@@ -294,12 +295,13 @@ See `init-user-config-file' for details."
   (message "init: Loaded paths for Emacs profile `%s'." init-current-profile))
 
 (defun init-load-default-paths ()
-  "Set paths in `paths.el', overriding them with `paths-override.el’ if present."
-  (dolist (row (init-get-variables-and-values 'paths))
-    (set (car row)
-	 (init-eval-value-when-possible
-	  (alist-get (car row) (init-read-file init-file-paths-override) (cdr row))))
-    (message "init: Set `%s' to `%s'." (car row) (symbol-value (car row)))))
+  "Set paths in `paths.el', overriding them with `paths-override.el' if present."
+  (let ((overrides (init-read-file init-file-paths-override)))
+    (dolist (row (init-get-variables-and-values 'paths))
+      (set (car row)
+	   (init-eval-value-when-possible
+	    (alist-get (car row) overrides (cdr row))))
+      (message "init: Set `%s' to `%s'." (car row) (symbol-value (car row))))))
 
 (defun init-load-override-paths ()
   "Set paths in `paths-override.el' not present in `paths.el'."
@@ -321,7 +323,7 @@ See `init-user-config-file' for details."
 (defun init-eval-value-when-possible (value)
   "Evaluate variable VALUE when possible, else return unevaluated VALUE."
   (condition-case _
-      (eval value)
+      (eval value t)
     (error value)))
 
 (defun init-profile-dir (profile-name)
@@ -386,13 +388,13 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
     (init-create-profile profile-name t)
     (init-maybe-write-lockfile)
     (init-copy-lockfile (init-profile-dir profile-name))
-    (if (and (boundp 'paths-file-config)
-	     (y-or-n-p " Build init files?"))
-	(with-current-buffer (or (find-file-noselect paths-file-config)
-				 (find-buffer-visiting paths-file-config))
-	  (init-build-profile (init-profile-dir profile-name)))
-      (run-hooks 'init-post-deploy-hook)
-      (message (format "Deployed profile '%s'." profile-name)))))
+    (when (and (boundp 'paths-file-config)
+	       (y-or-n-p " Build init files?"))
+      (with-current-buffer (or (find-file-noselect paths-file-config)
+			       (find-buffer-visiting paths-file-config))
+	(init-build-profile (init-profile-dir profile-name))))
+    (run-hooks 'init-post-deploy-hook)
+    (message "Deployed profile '%s'." profile-name)))
 
 (autoload 'magit-process-git "magit-process")
 (autoload 'magit-git-exit-code "magit-git")
@@ -401,7 +403,7 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
   "Pull the latest modifications from the dotfiles repository."
   (let ((default-directory paths-dir-dotemacs))
     (unless (zerop (magit-git-exit-code "pull"))
-      (magit-status paths-dir-dotfiles)
+      (magit-status paths-dir-dotemacs)
       (user-error "Pull failed. Please check status of repository `%s'" paths-dir-dotemacs))))
     
 (defun init-profile-exists-p (profile-name)
