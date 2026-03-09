@@ -403,7 +403,7 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
   "Pull the latest modifications from the dotfiles repository."
   (let ((default-directory paths-dir-dotemacs))
     (unless (zerop (magit-git-exit-code "pull"))
-      (magit-status paths-dir-dotemacs)
+      (magit-status (magit-toplevel))
       (user-error "Pull failed. Please check status of repository `%s'" paths-dir-dotemacs))))
     
 (defun init-profile-exists-p (profile-name)
