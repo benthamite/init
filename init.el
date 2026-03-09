@@ -145,8 +145,10 @@ It should be set in `init.el'.")
   "Tangle PACKAGE unless listed in `init-excluded-packages'.
 By default, tangle to `init.el'. If TANGLE-TO-EARLY-INIT is non-nil, tangle to
 `early-init.el' instead."
-  (let ((package (or package (intern (org-get-heading t t t t)))))
-    (init-get-tangle-target package tangle-to-early-init)))
+  (let ((heading (org-get-heading t t t t)))
+    (if heading
+        (init-get-tangle-target (or package (intern heading)) tangle-to-early-init)
+      "no")))
 
 (defun init-get-tangle-target (package early-init)
   "Return appropriate tangle target or \"no\" when PACKAGE is excluded.
