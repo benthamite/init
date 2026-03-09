@@ -399,6 +399,7 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
 (autoload 'magit-process-git "magit-process")
 (autoload 'magit-git-exit-code "magit-git")
 (autoload 'magit-status "magit-status")
+(declare-function magit-toplevel "magit-git")
 (defun init-pull-from-dotfiles ()
   "Pull the latest modifications from the dotfiles repository."
   (let ((default-directory paths-dir-dotemacs))
