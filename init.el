@@ -147,7 +147,9 @@ By default, tangle to `init.el'. If TANGLE-TO-EARLY-INIT is non-nil, tangle to
 `early-init.el' instead."
   (let ((heading (org-get-heading t t t t)))
     (if heading
-        (init-get-tangle-target (or package (intern heading)) tangle-to-early-init)
+        (init-get-tangle-target
+	 (or package (intern (replace-regexp-in-string "^=\\|=$" "" heading)))
+	 tangle-to-early-init)
       "no")))
 
 (defun init-get-tangle-target (package early-init)
