@@ -5,7 +5,8 @@
 ~init-deploy-profile~ asks whether to copy the canonical lockfile when it runs
 on Pablo's system. Answering no leaves the deployed profile without a root
 ~lockfile.el~, which is useful for development profiles that should track live
-package recipes.
+package recipes. This prompt appears only after the existing-profile overwrite
+check has completed.
 
 On other systems, deployment always copies the canonical lockfile into the
 profile. If the canonical lockfile is missing when a profile should use it,

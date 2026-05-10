@@ -437,28 +437,28 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
   "Deploy PROFILE-NAME."
   (interactive)
   (init-pull-from-dotfiles)
-  (let* ((profile-name (or profile-name (read-string "Profile name: " (init-get-tag))))
-	 (use-lockfile (init-deploy-profile-use-lockfile-p profile-name)))
+  (let ((profile-name (or profile-name (read-string "Profile name: " (init-get-tag)))))
     (init-maybe-delete-profile profile-name)
-    (init-create-profile profile-name t)
-    (when use-lockfile
-      (init-maybe-write-lockfile)
-      (init-copy-lockfile (init-profile-dir profile-name)))
-    (when (and (boundp 'paths-file-config)
-	       (y-or-n-p " Build init files?"))
-      (with-current-buffer (or (find-file-noselect paths-file-config)
-			       (find-buffer-visiting paths-file-config))
-	(init-build-profile (init-profile-dir profile-name))))
-    (if init-smoke-test-after-deploy
-	(progn
-	  (init-smoke-test-profile
-	   (init-profile-dir profile-name)
-	   (lambda ()
-	     (run-hooks 'init-post-deploy-hook)
-	     (message "Deployed profile '%s'." profile-name)))
-	  (message "Deploying profile '%s'; smoke test is running." profile-name))
-      (run-hooks 'init-post-deploy-hook)
-      (message "Deployed profile '%s'." profile-name))))
+    (let ((use-lockfile (init-deploy-profile-use-lockfile-p profile-name)))
+      (init-create-profile profile-name t)
+      (when use-lockfile
+	(init-maybe-write-lockfile)
+	(init-copy-lockfile (init-profile-dir profile-name)))
+      (when (and (boundp 'paths-file-config)
+		 (y-or-n-p " Build init files?"))
+	(with-current-buffer (or (find-file-noselect paths-file-config)
+				 (find-buffer-visiting paths-file-config))
+	  (init-build-profile (init-profile-dir profile-name))))
+      (if init-smoke-test-after-deploy
+	  (progn
+	    (init-smoke-test-profile
+	     (init-profile-dir profile-name)
+	     (lambda ()
+	       (run-hooks 'init-post-deploy-hook)
+	       (message "Deployed profile '%s'." profile-name)))
+	    (message "Deploying profile '%s'; smoke test is running." profile-name))
+	(run-hooks 'init-post-deploy-hook)
+	(message "Deployed profile '%s'." profile-name)))))
 
 (defun init-deploy-profile-use-lockfile-p (profile-name)
   "Return non-nil when deployed PROFILE-NAME should use a lockfile.
