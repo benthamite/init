@@ -511,8 +511,10 @@ Run ON-SUCCESS after a successful smoke test."
 	  (output-buffer (generate-new-buffer " *init-profile-smoke-test-output*")))
       (with-current-buffer buffer
 	(erase-buffer)
-	(insert (format "Smoke test running for %s\n" init-dir)))
-      (message "init: Smoke testing profile `%s' in the background..."
+	(insert (format "Smoke test running for %s\n" init-dir))
+	(insert "This may take a while.\n"))
+      (pop-to-buffer buffer)
+      (message "init: Smoke testing profile `%s'. This may take a while..."
 	       (file-name-nondirectory (directory-file-name init-dir)))
       (setq init-smoke-test-process
 	    (make-process
