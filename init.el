@@ -173,7 +173,7 @@ It should be set in `init.el'.")
   "Name of the current profile being used.")
 
 (defconst init-system-name-pablo
-  "Pablos-MacBook-Pro.local"
+  "Pablos-MacBook-Pro-2.local"
   "System name of Pablo's computer.")
 
 ;;;;; Lockfile
@@ -437,11 +437,13 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
   "Deploy PROFILE-NAME."
   (interactive)
   (init-pull-from-dotfiles)
-  (let ((profile-name (or profile-name (read-string "Profile name: " (init-get-tag)))))
+  (let* ((profile-name (or profile-name (read-string "Profile name: " (init-get-tag))))
+	 (use-lockfile (init-deploy-profile-use-lockfile-p profile-name)))
     (init-maybe-delete-profile profile-name)
     (init-create-profile profile-name t)
-    (init-maybe-write-lockfile)
-    (init-copy-lockfile (init-profile-dir profile-name))
+    (when use-lockfile
+      (init-maybe-write-lockfile)
+      (init-copy-lockfile (init-profile-dir profile-name)))
     (when (and (boundp 'paths-file-config)
 	       (y-or-n-p " Build init files?"))
       (with-current-buffer (or (find-file-noselect paths-file-config)
@@ -457,6 +459,17 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
 	  (message "Deploying profile '%s'; smoke test is running." profile-name))
       (run-hooks 'init-post-deploy-hook)
       (message "Deployed profile '%s'." profile-name))))
+
+(defun init-deploy-profile-use-lockfile-p (profile-name)
+  "Return non-nil when deployed PROFILE-NAME should use a lockfile.
+On Pablo's machine, ask because development profiles intentionally run without
+a profile lockfile. On other systems, always use a profile lockfile."
+  (or (not (init-pablo-system-p))
+      (y-or-n-p (format "Use lockfile for profile '%s'? " profile-name))))
+
+(defun init-pablo-system-p ()
+  "Return non-nil when running on Pablo's computer."
+  (string= (system-name) init-system-name-pablo))
 
 (autoload 'magit-process-git "magit-process")
 (autoload 'magit-git-exit-code "magit-git")
@@ -484,13 +497,13 @@ If PROFILE-NAME is nil, return the lockfile for the current profile."
     (file-name-concat elpaca-dir init-lockfile-name)))
 
 (defun init-copy-lockfile (dest-dir)
-  "Copy `init-lockfile-name' from dotfiles directory to DEST-DIR.
-If the source lockfile is missing, do nothing."
-  (let* ((src (file-name-concat (file-name-directory paths-file-config) init-lockfile-name))
+  "Copy `init-lockfile-name' from dotfiles directory to DEST-DIR."
+  (let* ((src init-master-lockfile-path)
 	 (dest (file-name-concat dest-dir init-lockfile-name)))
-    (when (file-exists-p src)
-      (copy-file src dest t)
-      (message "init: Copied `%s' to `%s'." init-lockfile-name dest))))
+    (unless (file-regular-p src)
+      (user-error "Source lockfile not found: %s" src))
+    (copy-file src dest t)
+    (message "init: Copied `%s' to `%s'." init-lockfile-name dest)))
 
 (defun init-smoke-test-profile (init-dir &optional on-success)
   "Load INIT-DIR in a fresh batch Emacs process.
@@ -707,7 +720,7 @@ Diagnose the root cause and implement the systemic fix. Start by reading the art
 (defun init-maybe-write-lockfile ()
   "Prompt to write the lockfile if system name equals `init-system-name-pablo'.
 Commit and push the lockfile after writing it."
-  (when (and (string= (system-name) init-system-name-pablo)
+  (when (and (init-pablo-system-p)
 	     (y-or-n-p "Write lockfile? "))
     (elpaca-extras-write-lock-file-excluding init-master-lockfile-path)
     (init-commit-and-push-lockfile)))

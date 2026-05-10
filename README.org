@@ -21,6 +21,9 @@ The main entry point is the `init-menu` transient command, which provides access
 - ~init-list-profiles~: List available profiles.
 - ~init-deploy-profile~: Deploy a profile, optionally building it first, then
   smoke-test the generated profile in a fresh background batch Emacs process.
+  On Pablo's machine, deployment asks whether the profile should use a
+  lockfile, so development profiles can intentionally run unpinned. On other
+  systems, deployed profiles always receive the canonical lockfile.
 - ~init-build-profile~: Build (tangle) the Elisp files for a profile.
 
 *** Configuration Update
