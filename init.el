@@ -29,9 +29,11 @@
 ;;; Code:
 
 (require 'cus-edit)
+(require 'cl-lib)
 (require 'elpaca)
 (require 'ob-tangle)
 (require 'paths)
+(require 'seq)
 (require 'transient)
 
 ;;;; User options
@@ -60,6 +62,46 @@ always load at the end of `config.org', even when the user is not Pablo."
   "Hook run after deploying a profile."
   :type 'hook
   :group 'init)
+
+(defcustom init-smoke-test-after-deploy t
+  "Whether `init-deploy-profile' should smoke-test deployed profiles.
+The smoke test loads the generated init file with a fresh background Emacs
+process.  This catches stale lockfile refs, missing package dependencies, and
+Elpaca build errors before the profile is opened interactively."
+  :type 'boolean
+  :group 'init)
+
+(defcustom init-smoke-test-emacs-command
+  (expand-file-name invocation-name invocation-directory)
+  "Emacs executable used by `init-smoke-test-profile'."
+  :type 'file
+  :group 'init)
+
+(defcustom init-smoke-test-timeout 120
+  "Seconds before a profile smoke test is cancelled."
+  :type 'natnum
+  :group 'init)
+
+(defcustom init-smoke-test-start-codex-on-failure t
+  "Whether failed profile smoke tests should open a Codex repair session."
+  :type 'boolean
+  :group 'init)
+
+(defcustom init-smoke-test-codex-project-directory nil
+  "Project directory used for Codex profile smoke-test repair sessions.
+When nil, use `paths-dir-dotemacs' if it is bound, otherwise
+`default-directory'."
+  :type '(choice (const :tag "Infer" nil) directory)
+  :group 'init)
+
+(defvar init-smoke-test-process nil
+  "Most recent profile smoke-test process.")
+
+(defconst init-smoke-test-buffer-name "*init-profile-smoke-test*"
+  "Name of the public profile smoke-test result buffer.")
+
+(defconst init-smoke-test-output-buffer-name "*init-profile-smoke-test-output*"
+  "Name of the raw profile smoke-test output buffer.")
 
 (defcustom init-profiles-directory (expand-file-name "~/.config/emacs-profiles/")
   "Directory containing the Emacs profiles."
@@ -397,8 +439,16 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
       (with-current-buffer (or (find-file-noselect paths-file-config)
 			       (find-buffer-visiting paths-file-config))
 	(init-build-profile (init-profile-dir profile-name))))
-    (run-hooks 'init-post-deploy-hook)
-    (message "Deployed profile '%s'." profile-name)))
+    (if init-smoke-test-after-deploy
+	(progn
+	  (init-smoke-test-profile
+	   (init-profile-dir profile-name)
+	   (lambda ()
+	     (run-hooks 'init-post-deploy-hook)
+	     (message "Deployed profile '%s'." profile-name)))
+	  (message "Deploying profile '%s'; smoke test is running." profile-name))
+      (run-hooks 'init-post-deploy-hook)
+      (message "Deployed profile '%s'." profile-name))))
 
 (autoload 'magit-process-git "magit-process")
 (autoload 'magit-git-exit-code "magit-git")
@@ -433,6 +483,208 @@ If the source lockfile is missing, do nothing."
     (when (file-exists-p src)
       (copy-file src dest t)
       (message "init: Copied `%s' to `%s'." init-lockfile-name dest))))
+
+(defun init-smoke-test-profile (init-dir &optional on-success)
+  "Load INIT-DIR in a fresh batch Emacs process.
+Run ON-SUCCESS after a successful smoke test."
+  (interactive
+   (list (init-profile-dir
+	  (completing-read
+	   "Profile to smoke test: "
+	   (init-available-init-dirs)
+	   nil t))))
+  (let ((init-file (file-name-concat init-dir "init.el")))
+    (unless (file-regular-p init-file)
+      (user-error "No init.el found in %s" init-dir))
+    (when (and (processp init-smoke-test-process)
+	       (process-live-p init-smoke-test-process))
+      (user-error "A profile smoke test is already running"))
+    (let ((buffer (get-buffer-create init-smoke-test-buffer-name))
+	  (output-buffer (generate-new-buffer " *init-profile-smoke-test-output*")))
+      (with-current-buffer buffer
+	(erase-buffer)
+	(insert (format "Smoke test running for %s\n" init-dir)))
+      (message "init: Smoke testing profile `%s' in the background..."
+	       (file-name-nondirectory (directory-file-name init-dir)))
+      (setq init-smoke-test-process
+	    (make-process
+	     :name "init-profile-smoke-test"
+	     :buffer output-buffer
+	     :noquery t
+	     :command (list init-smoke-test-emacs-command
+			    "--batch"
+			    (format "--init-directory=%s" init-dir)
+			    "--eval" (init-smoke-test-disable-debugger-form)
+			    "-l" init-file
+			    "--eval" (init-smoke-test-success-form))
+	     :sentinel (lambda (process _event)
+			 (unless (process-live-p process)
+			   (init-handle-smoke-test-exit
+			    process init-dir buffer output-buffer on-success)))))
+      (process-put init-smoke-test-process 'init-smoke-test-timeout
+		   init-smoke-test-timeout)
+      (process-put init-smoke-test-process 'init-smoke-test-timer
+		   (run-at-time init-smoke-test-timeout nil
+				#'init-timeout-smoke-test
+				init-smoke-test-process))
+      init-smoke-test-process)))
+
+(defun init-smoke-test-disable-debugger-form ()
+  "Return Lisp that disables interactive debugging in smoke-test Emacs."
+  (prin1-to-string
+   '(progn
+      (setq debug-on-error nil)
+      (fset 'toggle-debug-on-error
+	    (lambda (&optional _arg)
+	      (setq debug-on-error nil))))))
+
+(defun init-smoke-test-success-form ()
+  "Return Lisp that completes a successful smoke-test Emacs run."
+  (prin1-to-string
+   '(progn
+      (setq elpaca-after-init-hook nil)
+      (when (fboundp 'elpaca-process-queues)
+	(elpaca-process-queues)
+	(elpaca-wait))
+      (message "init-smoke-test-ok")
+      (kill-emacs 0))))
+
+(defun init-handle-smoke-test-exit (process init-dir buffer output-buffer on-success)
+  "Handle PROCESS exit for smoke-tested INIT-DIR.
+BUFFER is the public result buffer.  OUTPUT-BUFFER contains raw
+smoke-test output.  ON-SUCCESS is called when PROCESS exits successfully."
+  (let ((timer (process-get process 'init-smoke-test-timer)))
+    (when (timerp timer)
+      (cancel-timer timer)))
+  (cond
+   ((process-get process 'init-smoke-test-timed-out)
+    (with-current-buffer buffer
+      (erase-buffer)
+      (insert (format "Smoke test timed out after %s seconds for %s\n"
+		      (process-get process 'init-smoke-test-timeout)
+		      init-dir)))
+    (kill-buffer output-buffer)
+    (message "init: Smoke test timed out for `%s'; see %s"
+	     init-dir (buffer-name buffer))
+    (init-maybe-start-smoke-test-codex
+     init-dir buffer nil "Smoke test timed out"))
+   ((zerop (process-exit-status process))
+    (with-current-buffer buffer
+      (erase-buffer)
+      (insert (format "Smoke test passed for %s\n" init-dir)))
+    (kill-buffer output-buffer)
+    (message "init: Smoke test passed for `%s'." init-dir)
+    (when on-success
+      (funcall on-success)))
+   (t
+    (with-current-buffer buffer
+      (erase-buffer)
+      (insert (format "Smoke test failed for %s\n\n" init-dir))
+      (insert (format "Summary:\n%s\n\n" (init-smoke-test-summary output-buffer)))
+      (insert (format "Full output: %s\n" init-smoke-test-output-buffer-name)))
+    (with-current-buffer output-buffer
+      (rename-buffer init-smoke-test-output-buffer-name t))
+    (display-buffer buffer)
+    (message "init: Smoke test failed for `%s'; see %s"
+	     init-dir (buffer-name buffer))
+    (init-maybe-start-smoke-test-codex
+     init-dir buffer output-buffer "Smoke test failed"))))
+
+(defun init-smoke-test-summary (output-buffer)
+  "Return the relevant failure lines from smoke-test OUTPUT-BUFFER."
+  (let ((patterns '("Error:"
+		    "fatal:"
+		    "Failed dependencies:"
+		    "Subprocess error"
+		    "unable to read tree"
+		    "elpaca-build-error"))
+	lines)
+    (with-current-buffer output-buffer
+      (save-excursion
+	(goto-char (point-min))
+	(while (not (eobp))
+	  (let ((line (buffer-substring-no-properties
+		       (line-beginning-position)
+		       (line-end-position))))
+	    (when (seq-some (lambda (pattern)
+			      (string-match-p pattern line))
+			    patterns)
+	      (push line lines)))
+	  (forward-line 1))))
+    (if lines
+	(string-join (nreverse (seq-take lines 20)) "\n")
+      (with-current-buffer output-buffer
+	(buffer-substring-no-properties (max (point-min) (- (point-max) 4000))
+					(point-max))))))
+
+(defun init-maybe-start-smoke-test-codex (init-dir buffer output-buffer reason)
+  "Maybe start Codex to repair a smoke-test failure.
+INIT-DIR is the failed profile directory.  BUFFER contains the concise
+failure report.  OUTPUT-BUFFER, when non-nil, contains raw output.  REASON is a
+short failure description."
+  (when init-smoke-test-start-codex-on-failure
+    (condition-case err
+	(init-start-smoke-test-codex init-dir buffer output-buffer reason)
+      (error
+       (message "init: Could not start Codex smoke-test repair session: %s"
+		(error-message-string err))))))
+
+(declare-function codex--start "codex")
+(declare-function codex--directory "codex")
+(defun init-start-smoke-test-codex (init-dir buffer output-buffer reason)
+  "Start a Codex repair session for smoke-tested INIT-DIR.
+BUFFER contains the concise failure report.  OUTPUT-BUFFER, when non-nil,
+contains raw smoke-test output.  REASON describes the failure class."
+  (unless (require 'codex nil t)
+    (user-error "Package `codex' is required to start a repair session"))
+  (let* ((artifact (init-write-smoke-test-failure-artifact
+		    init-dir buffer output-buffer reason))
+	 (dir (init-smoke-test-codex-project-dir))
+	 (prompt (init-smoke-test-codex-prompt init-dir artifact reason)))
+    (message "init: Starting Codex smoke-test repair session in %s..." dir)
+    (cl-letf (((symbol-function 'codex--directory) (lambda () dir)))
+      (codex--start nil (list prompt) nil t))))
+
+(defun init-smoke-test-codex-project-dir ()
+  "Return the project directory for smoke-test repair sessions."
+  (file-name-as-directory
+   (expand-file-name
+    (or init-smoke-test-codex-project-directory
+	(and (boundp 'paths-dir-dotemacs) paths-dir-dotemacs)
+	default-directory))))
+
+(defun init-write-smoke-test-failure-artifact (init-dir buffer output-buffer reason)
+  "Write a smoke-test failure artifact and return its path.
+INIT-DIR is the failed profile directory.  BUFFER contains the public report.
+OUTPUT-BUFFER, when non-nil, contains raw output.  REASON describes the failure."
+  (let ((file (make-temp-file "init-smoke-test-failure-" nil ".txt")))
+    (with-temp-file file
+      (insert (format "Reason: %s\nProfile: %s\n\n" reason init-dir))
+      (insert "Summary buffer:\n")
+      (insert (with-current-buffer buffer
+		(buffer-substring-no-properties (point-min) (point-max))))
+      (when output-buffer
+	(insert "\n\nRaw output:\n")
+	(insert (with-current-buffer output-buffer
+		  (buffer-substring-no-properties (point-min) (point-max))))))
+    file))
+
+(defun init-smoke-test-codex-prompt (init-dir artifact reason)
+  "Return the Codex repair prompt for INIT-DIR using ARTIFACT and REASON."
+  (format "A deployed Emacs profile smoke test failed.
+
+Profile: %s
+Failure artifact: %s
+Reason: %s
+
+Diagnose the root cause and implement the systemic fix. Start by reading the artifact, then inspect the dotfiles/profile code that generates this profile. Fix the source of truth, not just the deployed profile cache. Verify by rerunning the profile smoke test when possible, and commit the logical fix."
+	  init-dir artifact reason))
+
+(defun init-timeout-smoke-test (process)
+  "Cancel smoke-test PROCESS if it is still running."
+  (when (process-live-p process)
+    (process-put process 'init-smoke-test-timed-out t)
+    (delete-process process)))
 
 (declare-function elpaca-extras-write-lock-file-excluding "elpaca-extras")
 (defun init-maybe-write-lockfile ()

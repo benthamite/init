@@ -19,7 +19,8 @@ The main entry point is the `init-menu` transient command, which provides access
 - ~init-create-profile~: Create a new profile.
 - ~init-delete-profile~: Delete an existing profile.
 - ~init-list-profiles~: List available profiles.
-- ~init-deploy-profile~: Deploy a profile, optionally building it first.
+- ~init-deploy-profile~: Deploy a profile, optionally building it first, then
+  smoke-test the generated profile in a fresh background batch Emacs process.
 - ~init-build-profile~: Build (tangle) the Elisp files for a profile.
 
 *** Configuration Update
@@ -34,6 +35,23 @@ The main entry point is the `init-menu` transient command, which provides access
 
 - =init-profiles-directory=: Directory where profiles are stored (default: =~/.config/emacs-profiles/=).
 - =init-user-config-file=: Path to the user-specific Org configuration file (set via environment variable =USER_CONFIG_FILE=).
+- =init-smoke-test-after-deploy=: whether deployment should start a background
+  smoke test that verifies the generated profile loads successfully in batch
+  Emacs.
+- =init-smoke-test-emacs-command=: Emacs executable used for deployment smoke
+  tests.
+- =init-smoke-test-timeout=: seconds before a background smoke test is
+  cancelled.
+- =init-smoke-test-start-codex-on-failure=: whether failed profile smoke tests
+  should open a Codex repair session.
+- =init-smoke-test-codex-project-directory=: project directory used for Codex
+  profile smoke-test repair sessions, defaulting to the dotfiles Emacs
+  directory when available.
+- =*init-profile-smoke-test*=: public smoke-test result buffer.  Successful
+  runs leave only a concise status line; failed runs show only a summary and
+  point to the raw output buffer.
+- =*init-profile-smoke-test-output*=: raw smoke-test output, kept only after a
+  failed run.
 - Hooks: =init-post-init-hook=, =init-post-build-hook=, =init-post-deploy-hook=.
 
 * tlon.el
