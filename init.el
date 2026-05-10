@@ -77,10 +77,18 @@ Elpaca build errors before the profile is opened interactively."
   :type 'file
   :group 'init)
 
-(defcustom init-smoke-test-timeout 120
-  "Seconds before a profile smoke test is cancelled."
+(defcustom init-smoke-test-timeout 900
+  "Seconds before a profile smoke test is cancelled.
+Fresh profile builds may need several minutes because Elpaca has to clone and
+compile packages before startup can finish."
   :type 'natnum
   :group 'init)
+
+(when (and (boundp 'init-smoke-test-timeout)
+	   (= init-smoke-test-timeout 120)
+	   (not (get 'init-smoke-test-timeout 'saved-value))
+	   (not (get 'init-smoke-test-timeout 'customized-value)))
+  (setq init-smoke-test-timeout 900))
 
 (defcustom init-smoke-test-start-codex-on-failure t
   "Whether failed profile smoke tests should open a Codex repair session."
@@ -530,13 +538,16 @@ Run ON-SUCCESS after a successful smoke test."
       init-smoke-test-process)))
 
 (defun init-smoke-test-disable-debugger-form ()
-  "Return Lisp that disables interactive debugging in smoke-test Emacs."
+  "Return Lisp that prepares the smoke-test Emacs process.
+The smoke-test process must not start or delete the live Emacs server socket."
   (prin1-to-string
    '(progn
       (setq debug-on-error nil)
       (fset 'toggle-debug-on-error
 	    (lambda (&optional _arg)
-	      (setq debug-on-error nil))))))
+	      (setq debug-on-error nil)))
+      (with-eval-after-load 'server
+	(advice-add 'server-start :override #'ignore)))))
 
 (defun init-smoke-test-success-form ()
   "Return Lisp that completes a successful smoke-test Emacs run."
@@ -562,12 +573,16 @@ smoke-test output.  ON-SUCCESS is called when PROCESS exits successfully."
       (erase-buffer)
       (insert (format "Smoke test timed out after %s seconds for %s\n"
 		      (process-get process 'init-smoke-test-timeout)
-		      init-dir)))
-    (kill-buffer output-buffer)
+		      init-dir))
+      (insert (format "\nLast output:\n%s\n"
+		      (init-smoke-test-summary output-buffer)))
+      (insert (format "\nFull output: %s\n" init-smoke-test-output-buffer-name)))
+    (with-current-buffer output-buffer
+      (rename-buffer init-smoke-test-output-buffer-name t))
     (message "init: Smoke test timed out for `%s'; see %s"
 	     init-dir (buffer-name buffer))
     (init-maybe-start-smoke-test-codex
-     init-dir buffer nil "Smoke test timed out"))
+     init-dir buffer output-buffer "Smoke test timed out"))
    ((zerop (process-exit-status process))
     (with-current-buffer buffer
       (erase-buffer)

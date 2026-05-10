@@ -37,11 +37,14 @@ The main entry point is the `init-menu` transient command, which provides access
 - =init-user-config-file=: Path to the user-specific Org configuration file (set via environment variable =USER_CONFIG_FILE=).
 - =init-smoke-test-after-deploy=: whether deployment should start a background
   smoke test that verifies the generated profile loads successfully in batch
-  Emacs.
+  Emacs. The smoke-test process suppresses =server-start= so it cannot take over
+  or delete the live Emacs server socket.
 - =init-smoke-test-emacs-command=: Emacs executable used for deployment smoke
   tests.
 - =init-smoke-test-timeout=: seconds before a background smoke test is
-  cancelled.
+  cancelled. The default is long enough for fresh Elpaca profile builds, which
+  may need several minutes to clone and compile packages. Reloading the package
+  updates an uncustomized live session from the old 120-second default.
 - =init-smoke-test-start-codex-on-failure=: whether failed profile smoke tests
   should open a Codex repair session.
 - =init-smoke-test-codex-project-directory=: project directory used for Codex
@@ -50,8 +53,8 @@ The main entry point is the `init-menu` transient command, which provides access
 - =*init-profile-smoke-test*=: public smoke-test result buffer.  Successful
   runs leave only a concise status line; failed runs show only a summary and
   point to the raw output buffer.
-- =*init-profile-smoke-test-output*=: raw smoke-test output, kept only after a
-  failed run.
+- =*init-profile-smoke-test-output*=: raw smoke-test output, kept after a
+  failed or timed-out run.
 - Hooks: =init-post-init-hook=, =init-post-build-hook=, =init-post-deploy-hook=.
 
 * tlon.el
