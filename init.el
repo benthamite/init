@@ -309,11 +309,13 @@ default will be overridden by that code."
 
 (defun init-tangle-user-config-file ()
   "Tangle the user config file.
-See `init-user-config-file' for details."
-  (if (and init-user-config-file (file-exists-p init-user-config-file))
-      (with-current-buffer (find-file-noselect init-user-config-file)
-	(init-tangle))
-    (user-error "Extra config file for user %s not found" user-full-name)))
+Do nothing when `init-user-config-file' is nil.  Signal a user error when it
+names a missing file."
+  (when init-user-config-file
+    (if (file-exists-p init-user-config-file)
+	(with-current-buffer (find-file-noselect init-user-config-file)
+	  (init-tangle))
+      (user-error "Extra config file for user %s not found" user-full-name))))
 
 ;;;;; Startup
 
