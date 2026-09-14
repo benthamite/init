@@ -39,8 +39,11 @@ The main entry point is the `init-menu` transient command, which provides access
 - =init-profiles-directory=: Directory where profiles are stored (default: =~/.config/emacs-profiles/=).
 - =init-user-config-file=: Optional path to the user-specific Org configuration
   file (set via environment variable =USER_CONFIG_FILE=). When unset, profile
-  builds skip the user-specific tangle passes and, since =excluded-packages.el=
-  is tangled from this file, exclude no packages.
+  builds skip the user-specific tangle passes, and the files it tangles
+  (=excluded-packages.el=, =paths-override.el=, =code-override.el=,
+  =late-init.el=) are treated as optional at build and startup.
+- =init-post-init-hook=: run by =init-load-late-init= after =late-init.el= is
+  loaded, whether or not that file exists. =late-init.el= must not run it.
 - =init-smoke-test-after-deploy=: whether deployment should start a background
   smoke test that verifies the generated profile loads successfully in batch
   Emacs. The smoke-test process suppresses =server-start= so it cannot take over

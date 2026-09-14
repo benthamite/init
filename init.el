@@ -43,13 +43,12 @@
   :group 'emacs)
 
 (defcustom init-post-init-hook nil
-  "Hook run at the end of the user’s config file.
-If the user is Pablo, it is run at the end of `config.org'. Otherwise, it is run
-at the end the user’s personal config file, e.g. `config-leonardo.org' if the
-user is Leo.
+  "Hook run by `init-load-late-init' after `late-init.el' is loaded.
+It runs whether or not the profile has a `late-init.el', so that file must not
+run it again.
 
-The advantage of this hook over `elpaca-after-init-hook' is that the latter will
-always load at the end of `config.org', even when the user is not Pablo."
+The advantage of this hook over `elpaca-after-init-hook' is that it runs after
+the user-specific `late-init.el', not merely after `config.org'."
   :type 'hook
   :group 'init)
 
@@ -242,9 +241,26 @@ default will be overridden by that code."
 
 ;;;;;
 
+(defun init-user-config-output-present-p (file)
+  "Return non-nil when FILE, an output of the user config file, exists.
+The files `excluded-packages.el', `paths-override.el', `code-override.el' and
+`late-init.el' are tangled from `init-user-config-file'.  When no user config
+file is configured they are legitimately absent: message and return nil.  When
+one is configured but FILE is absent, signal a user error."
+  (cond ((file-regular-p file) t)
+	(init-user-config-file
+	 (user-error "`%s' not present in init directory `%s'"
+		     (file-name-nondirectory file) (file-name-directory file)))
+	(t
+	 (message "init: No user config file; skipping absent `%s' for Emacs profile `%s'."
+		  (file-name-nondirectory file) init-current-profile)
+	 nil)))
+
 (defun init-read-file (fname)
-  "Read FNAME and return its contents."
-  (when fname
+  "Read FNAME, an output of the user config file, and return its contents.
+Return nil when FNAME is nil or is legitimately absent; see
+`init-user-config-output-present-p'."
+  (when (and fname (init-user-config-output-present-p fname))
     (with-temp-buffer
       (insert-file-contents fname)
       (goto-char (point-min))
@@ -261,21 +277,15 @@ default will be overridden by that code."
 
 (defun init-load-excluded-packages-file (init-dir)
   "Load the excluded packages list for INIT-DIR.
-`excluded-packages.el' is tangled from `init-user-config-file'.  When no user
-config file is configured, the file is legitimately absent and no packages are
-excluded.  When a user config file is configured but the file is still absent,
-signal a user error."
+When `excluded-packages.el' is legitimately absent (see
+`init-user-config-output-present-p'), exclude no packages."
   (let ((file (file-name-concat init-dir "excluded-packages.el")))
-    (cond ((file-regular-p file)
-	   (load-file file)
-	   (message "init: Loaded excluded packages for Emacs profile `%s'."
-		    init-current-profile))
-	  (init-user-config-file
-	   (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
-	  (t
-	   (setq init-excluded-packages nil)
-	   (message "init: No user config file; excluding no packages for Emacs profile `%s'."
-		    init-current-profile)))))
+    (if (init-user-config-output-present-p file)
+	(progn
+	  (load-file file)
+	  (message "init: Loaded excluded packages for Emacs profile `%s'."
+		   init-current-profile))
+      (setq init-excluded-packages nil))))
 
 (defun init-build-profile (init-dir)
   "Build or rebuild a profile in INIT-DIR."
@@ -349,9 +359,11 @@ names a missing file."
   (message "init: Added `init-load-late-init' to `elpaca-after-init-hook'."))
 
 (defun init-load-late-init ()
-  "Load `late-init.el'."
-  (load init-file-late-init)
-  (message "init: Loaded `late-init.el' for Emacs profile `%s'." init-current-profile))
+  "Load `late-init.el' if present, then run `init-post-init-hook'."
+  (when (init-user-config-output-present-p init-file-late-init)
+    (load init-file-late-init)
+    (message "init: Loaded `late-init.el' for Emacs profile `%s'." init-current-profile))
+  (run-hooks 'init-post-init-hook))
 
 (defun init-load-paths ()
   "Set paths from the currently booted init profile."
