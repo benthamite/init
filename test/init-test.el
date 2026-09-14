@@ -19,6 +19,35 @@
       (should (equal (nreverse build-steps)
 		     '(paths excluded-packages main-config post-build-hook))))))
 
+(ert-deftest init-load-excluded-packages-file-excludes-nothing-without-user-config ()
+  (let ((init-user-config-file nil)
+	(init-excluded-packages '(stale-package))
+	(init-dir (make-temp-file "init-profile-" t)))
+    (unwind-protect
+	(progn
+	  (init-load-excluded-packages-file init-dir)
+	  (should (null init-excluded-packages)))
+      (delete-directory init-dir t))))
+
+(ert-deftest init-load-excluded-packages-file-errors-when-user-config-set ()
+  (let ((init-user-config-file "/nonexistent/user-config.org")
+	(init-dir (make-temp-file "init-profile-" t)))
+    (unwind-protect
+	(should-error (init-load-excluded-packages-file init-dir) :type 'user-error)
+      (delete-directory init-dir t))))
+
+(ert-deftest init-load-excluded-packages-file-loads-present-file ()
+  (let ((init-user-config-file nil)
+	(init-excluded-packages nil)
+	(init-dir (make-temp-file "init-profile-" t)))
+    (unwind-protect
+	(progn
+	  (with-temp-file (file-name-concat init-dir "excluded-packages.el")
+	    (insert "(setq init-excluded-packages '(foo))\n"))
+	  (init-load-excluded-packages-file init-dir)
+	  (should (equal init-excluded-packages '(foo))))
+      (delete-directory init-dir t))))
+
 (ert-deftest init-tangle-user-config-file-errors-for-missing-file ()
   (let ((init-user-config-file
 	 (make-temp-name

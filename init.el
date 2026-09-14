@@ -260,12 +260,22 @@ default will be overridden by that code."
           (init-list-profiles)))
 
 (defun init-load-excluded-packages-file (init-dir)
-  "Load the excluded packages list for INIT-DIR."
+  "Load the excluded packages list for INIT-DIR.
+`excluded-packages.el' is tangled from `init-user-config-file'.  When no user
+config file is configured, the file is legitimately absent and no packages are
+excluded.  When a user config file is configured but the file is still absent,
+signal a user error."
   (let ((file (file-name-concat init-dir "excluded-packages.el")))
-    (if (file-regular-p file)
-	(load-file file)
-      (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
-    (message "init: Loaded excluded packages for Emacs profile `%s'." init-current-profile)))
+    (cond ((file-regular-p file)
+	   (load-file file)
+	   (message "init: Loaded excluded packages for Emacs profile `%s'."
+		    init-current-profile))
+	  (init-user-config-file
+	   (user-error "`excluded-packages.el' not present in init directory `%s'" init-dir))
+	  (t
+	   (setq init-excluded-packages nil)
+	   (message "init: No user config file; excluding no packages for Emacs profile `%s'."
+		    init-current-profile)))))
 
 (defun init-build-profile (init-dir)
   "Build or rebuild a profile in INIT-DIR."
