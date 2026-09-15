@@ -93,6 +93,16 @@
 	  (should (equal init-excluded-packages '(foo))))
       (delete-directory init-dir t))))
 
+(ert-deftest init-pablo-system-p-accepts-bonjour-suffix ()
+  (dolist (case '(("Pablos-MacBook-Pro.local" . t)
+		  ("Pablos-MacBook-Pro-2.local" . t)
+		  ("Pablos-MacBook-Pro-13.local" . t)
+		  ("Pablos-MacBook-Pro" . nil)
+		  ("Leos-MacBook-Pro.local" . nil)
+		  ("XPablos-MacBook-Pro.local" . nil)))
+    (cl-letf (((symbol-function 'system-name) (lambda () (car case))))
+      (should (eq (init-pablo-system-p) (cdr case))))))
+
 (ert-deftest init-tangle-user-config-file-errors-for-missing-file ()
   (let ((init-user-config-file
 	 (make-temp-name

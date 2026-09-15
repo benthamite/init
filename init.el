@@ -172,8 +172,11 @@ It should be set in `init.el'.")
   "Name of the current profile being used.")
 
 (defconst init-system-name-pablo
-  "Pablos-MacBook-Pro-2.local"
-  "System name of Pablo's computer.")
+  "\\`Pablos-MacBook-Pro\\(-[0-9]+\\)?\\.local\\'"
+  "Regexp matching the system name of Pablo's computer.
+macOS appends a numeric suffix to the Bonjour host name whenever another
+device on the network claims the same name, so the reported name alternates
+between `Pablos-MacBook-Pro.local' and `Pablos-MacBook-Pro-2.local'.")
 
 ;;;;; Lockfile
 
@@ -492,8 +495,9 @@ a profile lockfile. On other systems, always use a profile lockfile."
       (y-or-n-p (format "Use lockfile for profile '%s'? " profile-name))))
 
 (defun init-pablo-system-p ()
-  "Return non-nil when running on Pablo's computer."
-  (string= (system-name) init-system-name-pablo))
+  "Return non-nil when running on Pablo's computer.
+The system name is matched against `init-system-name-pablo'."
+  (and (string-match-p init-system-name-pablo (system-name)) t))
 
 (autoload 'magit-process-git "magit-process")
 (autoload 'magit-git-exit-code "magit-git")
@@ -742,7 +746,7 @@ Diagnose the root cause and implement the systemic fix. Start by reading the art
 
 (declare-function elpaca-extras-write-lock-file-excluding "elpaca-extras")
 (defun init-maybe-write-lockfile ()
-  "Prompt to write the lockfile if system name equals `init-system-name-pablo'.
+  "Prompt to write the lockfile if system name matches `init-system-name-pablo'.
 Commit and push the lockfile after writing it."
   (when (and (init-pablo-system-p)
 	     (y-or-n-p "Write lockfile? "))
