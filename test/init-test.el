@@ -103,6 +103,26 @@
     (cl-letf (((symbol-function 'system-name) (lambda () (car case))))
       (should (eq (init-pablo-system-p) (cdr case))))))
 
+(ert-deftest init-commit-and-push-lockfile-tolerates-refused-push ()
+  (let ((paths-dir-dotemacs temporary-file-directory)
+	(init-master-lockfile-path "/tmp/lockfile.el")
+	(git-calls nil))
+    (cl-letf (((symbol-function 'shell-command-to-string) (lambda (&rest _) " M lockfile.el\n"))
+	      ((symbol-function 'magit-git-exit-code)
+	       (lambda (&rest args)
+		 (push (car args) git-calls)
+		 (if (equal (car args) "push") 1 0))))
+      (init-commit-and-push-lockfile)
+      (should (equal (nreverse git-calls) '("add" "commit" "push"))))))
+
+(ert-deftest init-commit-and-push-lockfile-errors-when-commit-fails ()
+  (let ((paths-dir-dotemacs temporary-file-directory)
+	(init-master-lockfile-path "/tmp/lockfile.el"))
+    (cl-letf (((symbol-function 'shell-command-to-string) (lambda (&rest _) " M lockfile.el\n"))
+	      ((symbol-function 'magit-git-exit-code)
+	       (lambda (&rest args) (if (equal (car args) "commit") 1 0))))
+      (should-error (init-commit-and-push-lockfile) :type 'user-error))))
+
 (ert-deftest init-tangle-user-config-file-errors-for-missing-file ()
   (let ((init-user-config-file
 	 (make-temp-name

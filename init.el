@@ -754,7 +754,10 @@ Commit and push the lockfile after writing it."
     (init-commit-and-push-lockfile)))
 
 (defun init-commit-and-push-lockfile ()
-  "Commit and push modifications, if any, to the master lockfile."
+  "Commit and push modifications, if any, to the master lockfile.
+A failed push is reported but does not signal an error: the deploy only needs
+the committed local lockfile, and the dotfiles repository may refuse ordinary
+pushes in favour of a separate publication step."
   (interactive)
   (let ((default-directory paths-dir-dotemacs))
     (if (string-empty-p (shell-command-to-string (format "git status --porcelain %s"
@@ -764,13 +767,12 @@ Commit and push the lockfile after writing it."
       (unless (zerop (magit-git-exit-code "add" init-master-lockfile-path))
         (user-error "Staging lockfile failed"))
       (message "init: Committing lockfile...")
-      (if (zerop (magit-git-exit-code "commit" "-m" "Update lockfile"))
-          (progn
-            (message "init: Pushing lockfile...")
-            (if (zerop (magit-git-exit-code "push"))
-                (message "init: Lockfile committed and pushed successfully.")
-              (user-error "Pushing lockfile failed")))
-        (user-error "Committing lockfile failed")))))
+      (unless (zerop (magit-git-exit-code "commit" "-m" "Update lockfile"))
+        (user-error "Committing lockfile failed"))
+      (message "init: Pushing lockfile...")
+      (if (zerop (magit-git-exit-code "push"))
+          (message "init: Lockfile committed and pushed successfully.")
+        (message "init: Lockfile committed; push refused or failed. Publish the dotfiles repository separately.")))))
 
 ;;;;; Update package
 
