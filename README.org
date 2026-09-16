@@ -19,9 +19,9 @@ The main entry point is the `init-menu` transient command, which provides access
 - ~init-create-profile~: Create a new profile.
 - ~init-delete-profile~: Delete an existing profile.
 - ~init-list-profiles~: List available profiles.
-- ~init-deploy-profile~: Deploy a profile, optionally building it first, then
-  smoke-test the generated profile in a fresh background batch Emacs process.
-  On Pablo's machine, deployment asks whether the profile should use a
+- ~init-deploy-profile~: Deploy a profile, optionally building it first. It
+  does not test the built profile; the =release-dotfiles= agent skill owns
+  building, testing and repairing new profiles. On Pablo's machine, deployment asks whether the profile should use a
   lockfile, so development profiles can intentionally run unpinned. On other
   systems, deployed profiles always receive the canonical lockfile.
 - ~init-build-profile~: Build (tangle) the Elisp files for a profile.
@@ -44,26 +44,6 @@ The main entry point is the `init-menu` transient command, which provides access
   =late-init.el=) are treated as optional at build and startup.
 - =init-post-init-hook=: run by =init-load-late-init= after =late-init.el= is
   loaded, whether or not that file exists. =late-init.el= must not run it.
-- =init-smoke-test-after-deploy=: whether deployment should start a background
-  smoke test that verifies the generated profile loads successfully in batch
-  Emacs. The smoke-test process suppresses =server-start= so it cannot take over
-  or delete the live Emacs server socket.
-- =init-smoke-test-emacs-command=: Emacs executable used for deployment smoke
-  tests.
-- =init-smoke-test-timeout=: seconds before a background smoke test is
-  cancelled. The default is long enough for fresh Elpaca profile builds, which
-  may need several minutes to clone and compile packages. Reloading the package
-  updates an uncustomized live session from the old 120-second default.
-- =init-smoke-test-start-codex-on-failure=: whether failed profile smoke tests
-  should open a Codex repair session.
-- =init-smoke-test-codex-project-directory=: project directory used for Codex
-  profile smoke-test repair sessions, defaulting to the dotfiles Emacs
-  directory when available.
-- =*init-profile-smoke-test*=: public smoke-test result buffer.  Successful
-  runs leave only a concise status line; failed runs show only a summary and
-  point to the raw output buffer.
-- =*init-profile-smoke-test-output*=: raw smoke-test output, kept after a
-  failed or timed-out run.
 - Hooks: =init-post-init-hook=, =init-post-build-hook=, =init-post-deploy-hook=.
 
 * tlon.el
