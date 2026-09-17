@@ -407,8 +407,30 @@ If SKIP-CONFIRMATION is non-nil, skip confirmation prompt."
 
 (defun init-get-tag ()
   "Get the tag of local `dotfiles' repository."
-  (let ((default-directory paths-dir-dotemacs))
-    (string-trim (shell-command-to-string "git describe --tags --abbrev=0"))))
+  (init-git-output "describe" "--tags" "--abbrev=0"))
+
+(defun init-git-output (&rest args)
+  "Run git with ARGS in the `dotfiles' repository and return its trimmed output.
+Run git directly rather than through a shell, so that shell startup output
+cannot leak into the result.  Signal a `user-error' with git's exit status and
+error output when the command fails."
+  (let ((default-directory paths-dir-dotemacs)
+	(stderr-file (make-temp-file "init-git-stderr")))
+    (unwind-protect
+	(with-temp-buffer
+	  (let ((exit-code (apply #'call-process "git" nil (list (current-buffer) stderr-file) nil args)))
+	    (unless (eql exit-code 0)
+	      (user-error "Running git %s failed with status %s: %s"
+			  (string-join args " ") exit-code
+			  (string-trim (init-file-string stderr-file))))
+	    (string-trim (buffer-string))))
+      (delete-file stderr-file))))
+
+(defun init-file-string (file)
+  "Return the contents of FILE as a string."
+  (with-temp-buffer
+    (insert-file-contents file)
+    (buffer-string)))
 
 (defvar elpaca-lock-file)
 (declare-function elpaca-write-lock-file "elpaca")
@@ -493,8 +515,7 @@ the committed local lockfile, and the dotfiles repository may refuse ordinary
 pushes in favour of a separate publication step."
   (interactive)
   (let ((default-directory paths-dir-dotemacs))
-    (if (string-empty-p (shell-command-to-string (format "git status --porcelain %s"
-							 (shell-quote-argument init-master-lockfile-path))))
+    (if (string-empty-p (init-git-output "status" "--porcelain" init-master-lockfile-path))
         (message "init: No changes to lockfile to commit.")
       (message "init: Staging lockfile...")
       (unless (zerop (magit-git-exit-code "add" init-master-lockfile-path))

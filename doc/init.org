@@ -12,3 +12,13 @@ check has completed.
 On other systems, deployment always copies the canonical lockfile into the
 profile. If the canonical lockfile is missing when a profile should use it,
 deployment fails instead of silently creating an unpinned profile.
+
+* Git invocations
+
+The default profile name offered by ~init-deploy-profile~ is the latest tag of
+the dotfiles repository, and ~init-commit-and-push-lockfile~ checks whether the
+canonical lockfile has uncommitted changes before committing it. Both read git's
+output through ~init-git-output~, which runs git directly rather than through
+the user's interactive shell, so messages printed by shell startup files cannot
+leak into the tag or the status check. If git exits with a non-zero status, the
+command fails with an error that reports the status and git's error output.
